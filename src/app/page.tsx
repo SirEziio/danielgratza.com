@@ -6,6 +6,7 @@ import GridBackground from "@/components/GridBackground";
 import BouncingBall from "@/components/BouncingBall";
 import MouseScrollIcon from "@/components/MouseScrollIcon";
 import { caseStudies, portfolioItems } from "@/lib/data";
+import DotGrid from "@/components/DotGrid";
 
 const tagsMap = Object.fromEntries(portfolioItems.map(p => [p.slug, p.tags]));
 
@@ -15,6 +16,14 @@ export default function HomePage() {
   const [seenSections, setSeenSections] = useState<Set<number>>(new Set());
   // Hero lazy-load stages: 0=hidden, 1=grid, 2=name, 3=subtitle, 4=ball+scroll
   const [heroStage, setHeroStage] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 820);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     const t1 = setTimeout(() => setHeroStage(1), 80);   // grid
@@ -65,19 +74,20 @@ export default function HomePage() {
     sections[idx]?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Text: fades + rises from below (starts after photo is mid-way)
-  const TEXT_DELAY = 280; // ms offset so text starts mid-photo slide
+  // Text: fades + rises from below — starts immediately
+  const TEXT_DELAY = 0;
   const walkin = (isSeen: boolean, delay = 0) => ({
     opacity: isSeen ? 1 : 0,
     transform: isSeen ? "none" : "translateY(26px)",
     transition: `opacity 0.6s ease ${TEXT_DELAY + delay}ms, transform 0.6s ease ${TEXT_DELAY + delay}ms`,
   });
 
-  // Photo: slides in from the correct side, starts immediately
+  // Photo: slides in from the correct side, after text
+  const PHOTO_DELAY = 380; // ms — fires after the last text element (320ms)
   const photoSlide = (isSeen: boolean, fromRight: boolean) => ({
     opacity: isSeen ? 1 : 0,
     transform: isSeen ? "none" : `translateX(${fromRight ? "60px" : "-60px"})`,
-    transition: `opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)`,
+    transition: `opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) ${PHOTO_DELAY}ms, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) ${PHOTO_DELAY}ms`,
   });
 
   return (
@@ -224,9 +234,25 @@ export default function HomePage() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                position: "relative",
               }}
             >
-              <div className="cs-section-inner" style={{
+              {/* Dot grid — covers image half of section, behind all content */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  bottom: 0,
+                  [i % 2 === 0 ? "right" : "left"]: 0,
+                  width: "50%",
+                  zIndex: 0,
+                  pointerEvents: "none",
+                }}
+              >
+                <DotGrid />
+              </div>
+
+              <div className="cs-section-inner" style={{ position: "relative", zIndex: 1,
                 flexDirection: i % 2 === 1 ? "row-reverse" : "row",
                 gap: "8vw",
                 paddingLeft:  i % 2 === 0 ? "7vw" : "6vw",
@@ -268,10 +294,10 @@ export default function HomePage() {
                   <p
                     className="font-futura"
                     style={{
-                      fontSize: "1.05rem",
-                      fontWeight: 300,
+                      fontSize: "clamp(16px, 1.35vw, 19px)",
+                      fontWeight: 400,
                       color: "var(--ink-muted)",
-                      lineHeight: 1.65,
+                      lineHeight: 1.8,
                       marginBottom: "2rem",
                       ...walkin(isSeen, 170),
                     }}
@@ -297,10 +323,11 @@ export default function HomePage() {
                         <p
                           className="font-futura"
                           style={{
-                            fontSize: "0.6rem",
-                            letterSpacing: "0.14em",
+                            fontSize: 11,
+                            fontWeight: 700,
+                            letterSpacing: "0.16em",
                             textTransform: "uppercase",
-                            color: "rgba(36,36,36,0.35)",
+                            color: "var(--ink-faint)",
                             marginBottom: "0.2rem",
                           }}
                         >
@@ -335,12 +362,12 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Cover photo — slides in from side */}
+                {/* Cover photo — slides in after text */}
                 <div
                   className="cs-card-col"
                   style={{
                     flex: 1,
-                    ...photoSlide(isSeen, i % 2 === 0),
+                    ...(isMobile ? walkin(isSeen, PHOTO_DELAY) : photoSlide(isSeen, i % 2 === 0)),
                   }}
                 >
                   <img
@@ -351,7 +378,7 @@ export default function HomePage() {
                       width: "100%",
                       height: "auto",
                       aspectRatio: "16/10",
-                      borderRadius: 8,
+                      borderRadius: 0,
                       display: "block",
                       objectFit: "cover",
                       objectPosition: "center",

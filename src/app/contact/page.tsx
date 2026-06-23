@@ -173,9 +173,12 @@ export default function ContactPage() {
           <span
             className="font-futura"
             style={{
-              fontSize: "clamp(16px, 1.53vw, 22px)",
-              fontStyle: "italic",
-              color: "var(--ink)",
+              fontSize: 11,
+              fontStyle: "normal",
+              fontWeight: 700,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase" as const,
+              color: "var(--ink-faint)",
             }}
           >
             phone:
@@ -184,7 +187,7 @@ export default function ContactPage() {
             href="tel:+420601338213"
             className="font-futura"
             style={{
-              fontSize: "clamp(16px, 1.53vw, 22px)",
+              fontSize: "clamp(16px, 1.35vw, 19px)",
               fontWeight: 500,
               color: "var(--ink)",
               textDecoration: "none",
@@ -206,9 +209,12 @@ export default function ContactPage() {
           <span
             className="font-futura"
             style={{
-              fontSize: "clamp(16px, 1.53vw, 22px)",
-              fontStyle: "italic",
-              color: "var(--ink)",
+              fontSize: 11,
+              fontStyle: "normal",
+              fontWeight: 700,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase" as const,
+              color: "var(--ink-faint)",
             }}
           >
             email:
@@ -217,7 +223,7 @@ export default function ContactPage() {
             href="mailto:dxgratza@gmail.com"
             className="font-futura"
             style={{
-              fontSize: "clamp(16px, 1.53vw, 22px)",
+              fontSize: "clamp(16px, 1.35vw, 19px)",
               fontWeight: 500,
               color: "var(--ink)",
               textDecoration: "none",
@@ -243,8 +249,9 @@ export default function ContactPage() {
           <span
             className="font-futura"
             style={{
-              fontSize: 15,
+              fontSize: "0.85rem",
               fontStyle: "italic",
+              fontWeight: 400,
               color: "var(--ink-muted)",
             }}
           >
@@ -262,7 +269,7 @@ export default function ContactPage() {
             height: 184,
             cursor: "default",
             flexShrink: 0,
-            borderRadius: 4,
+            borderRadius: 0,
             overflow: "hidden",
           }}
         >
@@ -351,9 +358,12 @@ export default function ContactPage() {
           <span
             className="font-futura"
             style={{
-              fontSize: "clamp(16px, 1.53vw, 22px)",
-              fontStyle: "italic",
-              color: "var(--ink)",
+              fontSize: 11,
+              fontStyle: "normal",
+              fontWeight: 700,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase" as const,
+              color: "var(--ink-faint)",
             }}
           >
             location:
@@ -361,7 +371,7 @@ export default function ContactPage() {
           <span
             className="font-futura"
             style={{
-              fontSize: "clamp(16px, 1.53vw, 22px)",
+              fontSize: "clamp(16px, 1.35vw, 19px)",
               fontWeight: 500,
               color: "var(--ink)",
             }}

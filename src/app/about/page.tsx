@@ -232,6 +232,14 @@ function TimelineRow({ entry, index, visible }: { entry: Entry; index: number; v
 export default function AboutPage() {
   const [timelineVisible, setTimelineVisible] = useState(false);
   const timelineRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 1280);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     const el = timelineRef.current;
@@ -277,8 +285,7 @@ export default function AboutPage() {
             className="font-futura"
             style={{
               fontSize: "clamp(18px, 1.67vw, 24px)",
-              fontWeight: 500,
-              fontStyle: "italic",
+              fontWeight: 600,
               color: "var(--ink)",
               lineHeight: 1.45,
               textAlign: "justify",
@@ -290,8 +297,8 @@ export default function AboutPage() {
           <p
             className="font-futura"
             style={{
-              fontSize: "clamp(15px, 1.25vw, 18px)",
-              fontWeight: 300,
+              fontSize: "clamp(16px, 1.35vw, 19px)",
+              fontWeight: 400,
               color: "var(--ink)",
               lineHeight: 1.75,
               textAlign: "justify",
@@ -303,8 +310,8 @@ export default function AboutPage() {
           <p
             className="font-futura"
             style={{
-              fontSize: "clamp(15px, 1.25vw, 18px)",
-              fontWeight: 300,
+              fontSize: "clamp(16px, 1.35vw, 19px)",
+              fontWeight: 400,
               color: "var(--ink)",
               lineHeight: 1.75,
               textAlign: "justify",
@@ -316,8 +323,8 @@ export default function AboutPage() {
           <p
             className="font-futura"
             style={{
-              fontSize: "clamp(15px, 1.25vw, 18px)",
-              fontWeight: 300,
+              fontSize: "clamp(16px, 1.35vw, 19px)",
+              fontWeight: 400,
               color: "var(--ink)",
               lineHeight: 1.75,
               textAlign: "justify",
@@ -333,52 +340,99 @@ export default function AboutPage() {
         </div>
 
         {/* ── RIGHT: Timeline ── */}
-        <div ref={timelineRef} style={{ position: "relative" }}>
-          {/* Vertical center line — grows downward with the stagger */}
-          <div
-            style={{
-              position: "absolute",
-              left: "50%",
-              top: 6 + 6,
-              height: (ENTRIES.length - 1) * ROW_H + 12,
-              width: 1,
-              background: "var(--ink)",
-              opacity: 0.35,
-              transform: `translateX(-50%) scaleY(${timelineVisible ? 1 : 0})`,
-              transformOrigin: "top center",
-              transition: `transform ${(ENTRIES.length - 1) * 200}ms linear 50ms`,
-              pointerEvents: "none",
-            }}
-          />
+        <div ref={timelineRef}>
+          {isMobile ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+              {ENTRIES.map((entry, i) => (
+                <div
+                  key={`${entry.year}-${entry.org}`}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 12,
+                    paddingBottom: 20,
+                    opacity: timelineVisible ? 1 : 0,
+                    transform: timelineVisible ? "none" : "translateY(12px)",
+                    transition: `opacity 600ms ease ${i * 100}ms, transform 600ms ease ${i * 100}ms`,
+                  }}
+                >
+                  {/* Org circle */}
+                  <div style={{ flexShrink: 0, paddingTop: 1 }}>
+                    <OrgCircle color={entry.color} initials={entry.initials} scaled={false} iconSrc={entry.iconSrc} />
+                  </div>
+                  {/* Text */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
+                      <span className="font-futura" style={{ fontSize: 15, fontWeight: 500, color: "var(--ink)" }}>
+                        {entry.org}
+                      </span>
+                      <span className="font-futura" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-faint)" }}>
+                        {entry.year}
+                      </span>
+                      {entry.current && (
+                        <span className="font-futura" style={{ fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-faint)", fontWeight: 700 }}>
+                          current
+                        </span>
+                      )}
+                    </div>
+                    {entry.role && (
+                      <p className="font-futura" style={{ fontSize: 13, fontStyle: "italic", color: "var(--ink-muted)", marginTop: 2 }}>
+                        {entry.role}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ position: "relative" }}>
+              {/* Vertical center line — grows downward with the stagger */}
+              <div
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: 6 + 6,
+                  height: (ENTRIES.length - 1) * ROW_H + 12,
+                  width: 1,
+                  background: "var(--ink)",
+                  opacity: 0.35,
+                  transform: `translateX(-50%) scaleY(${timelineVisible ? 1 : 0})`,
+                  transformOrigin: "top center",
+                  transition: `transform ${(ENTRIES.length - 1) * 200}ms linear 50ms`,
+                  pointerEvents: "none",
+                }}
+              />
 
-          {/* Dots — absolutely positioned so they fade in place, not sliding */}
-          {ENTRIES.map((entry, i) => (
-            <div
-              key={`dot-${i}`}
-              style={{
-                position: "absolute",
-                left: "50%",
-                top: i * ROW_H + 7, // line starts at top:12; dot center at 12, so top = 12-5=7
-                transform: "translateX(-50%)",
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                border: `1.5px solid ${entry.current ? "var(--ink)" : "var(--ink-faint)"}`,
-                background: entry.current ? "var(--ink)" : "var(--bg)",
-                zIndex: 2,
-                opacity: timelineVisible ? 1 : 0,
-                transition: `opacity 600ms ease ${i * 200 + 200}ms`,
-                pointerEvents: "none",
-              }}
-            />
-          ))}
+              {/* Dots — absolutely positioned so they fade in place, not sliding */}
+              {ENTRIES.map((entry, i) => (
+                <div
+                  key={`dot-${i}`}
+                  style={{
+                    position: "absolute",
+                    left: "50%",
+                    top: i * ROW_H + 7,
+                    transform: "translateX(-50%)",
+                    width: 10,
+                    height: 10,
+                    borderRadius: "50%",
+                    border: `1.5px solid ${entry.current ? "var(--ink)" : "var(--ink-faint)"}`,
+                    background: entry.current ? "var(--ink)" : "var(--bg)",
+                    zIndex: 2,
+                    opacity: timelineVisible ? 1 : 0,
+                    transition: `opacity 600ms ease ${i * 200 + 200}ms`,
+                    pointerEvents: "none",
+                  }}
+                />
+              ))}
 
-          {/* Entries */}
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            {ENTRIES.map((entry, i) => (
-              <TimelineRow key={`${entry.year}-${entry.org}`} entry={entry} index={i} visible={timelineVisible} />
-            ))}
-          </div>
+              {/* Entries */}
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                {ENTRIES.map((entry, i) => (
+                  <TimelineRow key={`${entry.year}-${entry.org}`} entry={entry} index={i} visible={timelineVisible} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
       </div>

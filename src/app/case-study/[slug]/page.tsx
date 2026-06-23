@@ -101,7 +101,7 @@ function MetaBlock({ block }: { block: ChapterBlock & { type: "meta" } }) {
             </p>
           </div>
           {i < arr.length - 1 && (
-            <div style={{ width: 1, background: "var(--grid-line)", margin: "12px 0" }} />
+            <div className="cs-meta-divider" style={{ width: 1, background: "var(--grid-line)", margin: "12px 0" }} />
           )}
         </React.Fragment>
       ))}
@@ -518,12 +518,14 @@ function ChapterContent({
   isLast,
   prevStudy,
   nextStudy,
+  isMobile,
 }: {
   chapter: CaseStudyChapter;
   onImageClick: (localImageIdx: number) => void;
   isLast?: boolean;
   prevStudy?: { slug: string; title: string } | null;
   nextStudy?: { slug: string; title: string } | null;
+  isMobile?: boolean;
 }) {
   // Pre-compute image offsets within this chapter
   let imageOffset = 0;
@@ -532,21 +534,23 @@ function ChapterContent({
     <div
       className="cs-chapter-content"
       style={{
-        minHeight: "100dvh",
+        minHeight: isMobile ? "auto" : "100dvh",
         background: "var(--bg)",
       }}
     >
       {/* Connector line — top 1/3 sits behind navbar (fades out), bottom 2/3 visible below it */}
-      <div style={{ display: "flex", justifyContent: "center", paddingTop: 44 }}>
-        <div style={{
-          width: 1,
-          height: 100,
-          background: "linear-gradient(to bottom, transparent 0%, rgba(36,36,36,0.2) 100%)",
-        }} />
-      </div>
+      {!isMobile && (
+        <div style={{ display: "flex", justifyContent: "center", paddingTop: 44 }}>
+          <div style={{
+            width: 1,
+            height: 100,
+            background: "linear-gradient(to bottom, transparent 0%, rgba(36,36,36,0.2) 100%)",
+          }} />
+        </div>
+      )}
 
       {/* Chapter content — natural gap below the line */}
-      <div style={{ padding: "48px clamp(40px, 19.2vw, 276px) 100px" }}>
+      <div style={{ padding: isMobile ? "32px 20px 80px" : "48px clamp(40px, 19.2vw, 276px) 100px" }}>
 
       {/* Chapter header — centered */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 48 }}>
@@ -634,8 +638,10 @@ function ChapterContent({
             paddingTop: 40,
             borderTop: "1px solid var(--grid-line)",
             display: "flex",
-            alignItems: "center",
+            flexDirection: isMobile ? "column" : "row",
+            alignItems: isMobile ? "stretch" : "center",
             justifyContent: "space-between",
+            gap: isMobile ? 16 : 0,
           }}
         >
           {/* Prev study */}
@@ -659,7 +665,7 @@ function ChapterContent({
                 <path d="M9 4L3 10L9 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               <span className="font-futura" style={{ fontSize: 14, letterSpacing: "0.04em" }}>
-                {prevStudy.title}
+                <span style={{ wordBreak: "break-word" }}>{prevStudy.title}</span>
               </span>
             </a>
           ) : (
@@ -683,7 +689,7 @@ function ChapterContent({
               onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "0.6"; }}
             >
               <span className="font-futura" style={{ fontSize: 14, letterSpacing: "0.04em" }}>
-                {nextStudy.title}
+                <span style={{ wordBreak: "break-word" }}>{nextStudy.title}</span>
               </span>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path d="M7 4L13 10L7 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -698,7 +704,7 @@ function ChapterContent({
       </div>{/* end inner padding div */}
 
       {/* Hint line at the bottom — sticky so it's always visible at viewport bottom */}
-      {!isLast && (
+      {!isLast && !isMobile && (
         <div style={{
           position: "sticky",
           bottom: 0,
@@ -918,6 +924,15 @@ export default function CaseStudyPage({ params }: Props) {
   const [galleryChapterIdx, setGalleryChapterIdx] = useState(0);
   const [galleryImageIdx, setGalleryImageIdx] = useState(0);
 
+  /* ── Mobile detection ── */
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 820);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   /* ── Connector line overlay animation ── */
   type LinePhase = 'hidden' | 'stretch' | 'snap';
   const [linePhase, setLinePhase] = useState<LinePhase>('hidden');
@@ -962,6 +977,7 @@ export default function CaseStudyPage({ params }: Props) {
   /* ── Wheel handler ── */
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
+      if (window.innerWidth <= 820) return;
       // Always take over scroll — prevents window elastic bounce / back-navigation on macOS
       e.preventDefault();
 
@@ -1024,6 +1040,7 @@ export default function CaseStudyPage({ params }: Props) {
       touchStartY = e.touches[0].clientY;
     };
     const onTouchEnd = (e: TouchEvent) => {
+      if (window.innerWidth <= 820) return;
       const dy = touchStartY - e.changedTouches[0].clientY;
       const activeEl = panelRefs.current[targetPanelRef.current];
       if (!activeEl) return;
@@ -1044,11 +1061,12 @@ export default function CaseStudyPage({ params }: Props) {
 
   /* ── Lock body scroll ── */
   useEffect(() => {
+    if (isMobile) return;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "";
     };
-  }, []);
+  }, [isMobile]);
 
   /* ── Gallery helpers ── */
   const openGallery = (chapterIdx: number, imageIdx: number) => {
@@ -1108,7 +1126,7 @@ export default function CaseStudyPage({ params }: Props) {
           right: "1.5rem",
           top: "50%",
           transform: "translateY(-50%)",
-          display: "flex",
+          display: isMobile ? "none" : "flex",
           flexDirection: "column",
           gap: "0.4rem",
           zIndex: 50,
@@ -1138,7 +1156,7 @@ export default function CaseStudyPage({ params }: Props) {
       <div className="page-grid-bg" style={{ position: "fixed", zIndex: 0 }} />
 
       {/* ── Connector line overlay — stretches from bottom then snaps to final position ── */}
-      {(() => {
+      {!isMobile && (() => {
         const vh = lineVhRef.current;
         const STRETCH_H = Math.round(vh * 0.94);
         const STRETCH_TOP = vh - STRETCH_H;
@@ -1176,12 +1194,18 @@ export default function CaseStudyPage({ params }: Props) {
       })()}
 
       {/* ── Panel container ── */}
-      <div style={{ position: "fixed", inset: 0, overflow: "hidden", zIndex: 1 }}>
+      <div style={isMobile ? { position: "relative", overflow: "visible", zIndex: 1 } : { position: "fixed", inset: 0, overflow: "hidden", zIndex: 1 }}>
         {/* Hero panel */}
         <div
           ref={(el) => { panelRefs.current[0] = el; }}
           className="cs-panel"
-          style={{
+          style={isMobile ? {
+            position: "relative",
+            height: "auto",
+            overflowY: "visible",
+            transform: "none",
+            transition: "none",
+          } : {
             position: "absolute",
             top: 0, left: 0, right: 0,
             height: "100dvh",
@@ -1209,7 +1233,13 @@ export default function CaseStudyPage({ params }: Props) {
             key={chapter.id}
             ref={(el) => { panelRefs.current[i + 1] = el; }}
             className="cs-panel"
-            style={{
+            style={isMobile ? {
+              position: "relative",
+              height: "auto",
+              overflowY: "visible",
+              transform: "none",
+              transition: "none",
+            } : {
               position: "absolute",
               top: 0, left: 0, right: 0,
               height: "100dvh",
@@ -1226,6 +1256,7 @@ export default function CaseStudyPage({ params }: Props) {
               isLast={i === chapters.length - 1}
               prevStudy={prevStudy}
               nextStudy={nextStudy}
+              isMobile={isMobile}
             />
           </div>
         ))}

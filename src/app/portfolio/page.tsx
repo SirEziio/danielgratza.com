@@ -120,11 +120,11 @@ function GlassCard({ project }: { project: PortfolioItem }) {
           </div>
         </div>
 
-        {/* Title — shifts down toward center on hover */}
+        {/* Title — shifts down slightly on hover */}
         <p
           className="font-caslon portfolio-card-title"
           style={{
-            marginTop: hovered ? 40 : 10,
+            marginTop: hovered ? 20 : 10,
             flexShrink: 0,
             transition: "margin-top 420ms cubic-bezier(0.22, 1, 0.36, 1)",
           }}
@@ -136,7 +136,8 @@ function GlassCard({ project }: { project: PortfolioItem }) {
         <p
           className="font-futura"
           style={{
-            fontSize: 13,
+            fontSize: "0.85rem",
+            fontWeight: 400,
             color: "var(--ink)",
             lineHeight: 1.65,
             marginTop: 12,
@@ -150,14 +151,19 @@ function GlassCard({ project }: { project: PortfolioItem }) {
           {project.description}
         </p>
 
-        {/* Date — right under description, fades in on hover */}
+        {/* Date — right below description */}
         <p
-          className="font-futura portfolio-card-muted"
+          className="font-futura"
           style={{
-            fontSize: 12,
-            marginTop: 8,
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+            color: "var(--ink-faint)",
+            textAlign: "right",
+            marginTop: 10,
             opacity: hovered ? 1 : 0,
-            transition: hovered ? "opacity 320ms ease 120ms" : "opacity 180ms ease",
+            transition: hovered ? "opacity 320ms ease 140ms" : "opacity 180ms ease",
           }}
         >
           {project.date}
@@ -166,37 +172,25 @@ function GlassCard({ project }: { project: PortfolioItem }) {
         {/* Spacer */}
         <div style={{ flex: 1 }} />
 
-        {/* CTA — right-aligned, fades in on hover */}
+        {/* CTA — pinned to bottom right */}
         <div
           style={{
             display: "flex",
             justifyContent: "flex-end",
             opacity: hovered ? 1 : 0,
-            transition: hovered
-              ? "opacity 320ms ease 180ms"
-              : "opacity 180ms ease",
+            transition: hovered ? "opacity 320ms ease 180ms" : "opacity 180ms ease",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <span
-              className="font-futura"
-              style={{
-                fontSize: 12,
-                color: "var(--ink)",
-                textDecoration: "underline",
-                textTransform: "uppercase",
-                letterSpacing: "0.06em",
-              }}
-            >
-              View Study
-            </span>
-            <span
-              className="font-futura"
-              style={{ fontSize: 14, color: "var(--ink)", lineHeight: 1 }}
-            >
-              &raquo;
-            </span>
-          </div>
+          <span
+            className="nav-link"
+            style={{
+              fontSize: "1rem",
+              fontWeight: 500,
+              letterSpacing: "0.04em",
+            }}
+          >
+            View case study →
+          </span>
         </div>
       </div>
     </Link>
@@ -209,7 +203,7 @@ export default function PortfolioPage() {
       <Navigation />
 
       {/* Breathing grid background */}
-      <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+      <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", filter: "blur(0.6px)" }}>
         <GridBackground />
       </div>
 
@@ -230,10 +224,11 @@ export default function PortfolioPage() {
         <p
           className="font-futura"
           style={{
-            fontSize: "0.7rem",
-            letterSpacing: "0.18em",
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: "0.16em",
             textTransform: "uppercase",
-            color: "var(--ink-muted)",
+            color: "var(--ink-faint)",
             marginBottom: "2.5rem",
           }}
         >
