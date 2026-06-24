@@ -36,11 +36,12 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
       {/* Scroll fade gradient */}
       <div
         aria-hidden
+        className="nav-fade-bg"
         style={{
           position: "fixed",
           top: 0, left: 0, right: 0,
-          height: 88,
-          background: "linear-gradient(to bottom, var(--bg) 0%, transparent 100%)",
+          height: 64,
+          background: "linear-gradient(to bottom, var(--bg) 50%, transparent 100%)",
           zIndex: 99,
           pointerEvents: "none",
           opacity: scrolledPastHero && !lightNav ? 1 : 0,
@@ -49,6 +50,7 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
       />
 
       <header
+        className="site-header"
         style={{
           position: "fixed",
           top: 0, left: 0, right: 0,
@@ -62,7 +64,7 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
       >
         {/* Logo */}
         {!hideLogo && (
-          <div style={{ position: "absolute", left: 30, pointerEvents: "auto" }}>
+          <div className="site-nav-logo" style={{ position: "absolute", left: 30, pointerEvents: "auto" }}>
             <Link href="/" style={{ display: "block", lineHeight: 0 }}>
               <img
                 src="/images/home-Logo.png"
@@ -100,13 +102,14 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
 
         {/* Mobile hamburger button */}
         <button
-          className="nav-mobile"
+          className="nav-mobile site-nav-hamburger"
           onClick={() => setMenuOpen(o => !o)}
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           style={{
             position: "absolute",
             right: 24,
             background: "none",
+            // CSS override via .site-nav-hamburger in globals.css
             border: "none",
             cursor: "pointer",
             padding: 6,

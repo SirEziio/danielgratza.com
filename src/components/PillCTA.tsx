@@ -4,111 +4,71 @@ import { useState } from "react";
 import Link from "next/link";
 
 interface PillCTAProps {
-  href: string;
+  href?: string;
+  onClick?: () => void;
   label: string;
+  direction?: "left" | "right"; // left = ← text (default), right = text →
   style?: React.CSSProperties;
 }
 
-const DURATION = "0.45s";
-const EASE = "cubic-bezier(0.4, 0, 0.2, 1)";
-const TRANSITION = `${DURATION} ${EASE}`;
-
-/* Arrow SVG using currentColor */
-function Arrow() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ flexShrink: 0 }}
-    >
-      <path
-        d="M2 8h12M8 2l6 6-6 6"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-export default function PillCTA({ href, label, style }: PillCTAProps) {
+export default function PillCTA({ href, onClick, label, direction = "left", style }: PillCTAProps) {
   const [hovered, setHovered] = useState(false);
 
-  const contentStyle: React.CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: 16,
-    whiteSpace: "nowrap",
-  };
+  const chevron =
+    direction === "right" ? (
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+        <path d="M5 2l5 5-5 5" stroke="var(--ink)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ) : (
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+        <path d="M9 2L4 7l5 5" stroke="var(--ink)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    );
 
-  const textStyle: React.CSSProperties = {
-    fontFamily: '"Futura PT", var(--font-futura), sans-serif',
-    fontSize: 20,
-    fontStyle: "italic",
-    textTransform: "uppercase",
-    letterSpacing: "0.04em",
-    lineHeight: 1,
-  };
-
-  return (
-    <Link
-      href={href}
+  const inner = (
+    <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        position: "relative",
-        overflow: "hidden",
         display: "inline-flex",
         alignItems: "center",
-        border: "2px solid var(--ink)",
-        borderRadius: 28,
-        padding: "6px 18px",
-        textDecoration: "none",
+        flexDirection: direction === "right" ? "row-reverse" : "row",
+        gap: 12,
+        border: `1px solid ${hovered ? "rgba(36,36,36,0.25)" : "var(--grid-line)"}`,
+        borderRadius: 999,
+        padding: "12px 28px",
+        background: hovered ? "var(--bg-card)" : "var(--bg)",
+        transition: "border-color 0.2s ease, background 0.2s ease",
         cursor: "pointer",
-        ...style,
       }}
     >
-      {/* Sliding ink fill — grows left → right */}
-      <div
+      {chevron}
+      <span
+        className="font-futura"
         style={{
-          position: "absolute",
-          inset: 0,
-          background: "var(--ink)",
-          transform: hovered ? "scaleX(1)" : "scaleX(0)",
-          transformOrigin: "left center",
-          transition: `transform ${TRANSITION}`,
-          zIndex: 0,
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* Base layer — ink colored (shows where fill hasn't reached yet) */}
-      <div style={{ ...contentStyle, position: "relative", zIndex: 1, color: "var(--ink)" }}>
-        <span style={textStyle}>{label}</span>
-        <Arrow />
-      </div>
-
-      {/* Top layer — bg colored, clipped to the filled region only */}
-      <div
-        style={{
-          ...contentStyle,
-          position: "absolute",
-          inset: 0,
-          padding: "6px 18px",
-          color: "var(--bg)",
-          clipPath: hovered ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)",
-          transition: `clip-path ${TRANSITION}`,
-          zIndex: 2,
-          pointerEvents: "none",
+          fontSize: 13,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          color: "var(--ink)",
+          fontWeight: 500,
         }}
       >
-        <span style={textStyle}>{label}</span>
-        <Arrow />
-      </div>
+        {label}
+      </span>
+    </div>
+  );
+
+  if (onClick) {
+    return (
+      <button onClick={onClick} style={{ background: "none", border: "none", padding: 0, display: "inline-block", ...style }}>
+        {inner}
+      </button>
+    );
+  }
+
+  return (
+    <Link href={href!} style={{ textDecoration: "none", display: "inline-block", ...style }}>
+      {inner}
     </Link>
   );
 }

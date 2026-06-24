@@ -245,7 +245,17 @@ export default function ContactPage() {
             paddingBottom: 110,
           }}
         >
-          <PillCTA href="/cv" label="CV" />
+          <a
+            href="/cv"
+            className="nav-link"
+            style={{
+              fontSize: "1rem",
+              fontWeight: 500,
+              letterSpacing: "0.04em",
+            }}
+          >
+            View CV →
+          </a>
           <span
             className="font-futura"
             style={{

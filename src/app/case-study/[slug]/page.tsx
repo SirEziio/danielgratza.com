@@ -902,10 +902,8 @@ export default function CaseStudyPage({ params }: Props) {
   const prevStudy = currentIdx > 0 ? caseStudies[currentIdx - 1] : null;
   const nextStudy = currentIdx < caseStudies.length - 1 ? caseStudies[currentIdx + 1] : null;
 
-  // v2 case studies use the new template
-  if (study.version === 2) {
-    return <CaseStudyV2 study={study} chapters={chapters} portfolio={portfolio} />;
-  }
+  // All case studies use the V2 template
+  return <CaseStudyV2 study={study} chapters={chapters} portfolio={portfolio} />;
 
   const totalPanels = chapters.length + 1; // hero + chapters
 
@@ -927,7 +925,7 @@ export default function CaseStudyPage({ params }: Props) {
   /* ── Mobile detection ── */
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 820);
+    const check = () => setIsMobile(window.innerWidth <= 840);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
@@ -977,7 +975,7 @@ export default function CaseStudyPage({ params }: Props) {
   /* ── Wheel handler ── */
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      if (window.innerWidth <= 820) return;
+      if (window.innerWidth <= 840) return;
       // Always take over scroll — prevents window elastic bounce / back-navigation on macOS
       e.preventDefault();
 
@@ -1040,7 +1038,7 @@ export default function CaseStudyPage({ params }: Props) {
       touchStartY = e.touches[0].clientY;
     };
     const onTouchEnd = (e: TouchEvent) => {
-      if (window.innerWidth <= 820) return;
+      if (window.innerWidth <= 840) return;
       const dy = touchStartY - e.changedTouches[0].clientY;
       const activeEl = panelRefs.current[targetPanelRef.current];
       if (!activeEl) return;

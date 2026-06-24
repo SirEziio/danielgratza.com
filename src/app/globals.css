@@ -359,7 +359,7 @@ html.dark .cs-glass-card {
 /* Desktop-only / mobile-only nav elements */
 .nav-mobile { display: none !important; }
 
-@media (max-width: 640px) {
+@media (max-width: 840px) {
   .nav-desktop { display: none !important; }
   .nav-mobile  { display: flex !important; }
 }
@@ -371,8 +371,19 @@ html.dark .cs-glass-card {
   gap: 1.5rem;
 }
 
-/* ── Tablet portrait (≤ 820px) ─────────────────────────── */
-@media (max-width: 820px) {
+/* ── Medium (≤ 1100px) — meta strip 4-col → 3+tools row ── */
+@media (max-width: 1100px) {
+  .cs-meta-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 20px 32px !important;
+  }
+  .cs-meta-tools {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+/* ── Tablet portrait (≤ 840px) ─────────────────────────── */
+@media (max-width: 840px) {
   /* Homepage: image on top, text below */
   .cs-section-inner {
     flex-direction: column-reverse !important;
@@ -384,13 +395,21 @@ html.dark .cs-glass-card {
     flex: none !important;
     max-width: 100% !important;
     width: 100%;
-    padding: 2.5rem 12vw 3rem !important;
+    padding: 2.5rem 8vw 3rem !important;
   }
   .cs-section-inner .cs-card-col {
     flex: none !important;
     width: 100%;
-    padding: 0 12vw;
+    padding: 6rem 8vw 0;
   }
+
+  /* Nav: align logo + hamburger to same 8vw gutter as case study content */
+  .site-header { padding-left: 8vw !important; padding-right: 8vw !important; }
+  .site-nav-logo { left: 8vw !important; top: 16px !important; }
+  .site-nav-hamburger { right: calc(8vw - 6px) !important; top: 16px !important; }
+
+  /* Stronger fade on mobile so logo doesn't collide with content */
+  .nav-fade-bg { height: 64px !important; background: linear-gradient(to bottom, var(--bg) 50%, transparent 100%) !important; }
   .cs-cover-img {
     border-radius: 8px;
     aspect-ratio: 3/2 !important;
@@ -403,10 +422,26 @@ html.dark .cs-glass-card {
     grid-template-columns: 1fr !important;
     gap: 32px !important;
   }
+
+  /* Meta strip: 2x2 at 640–840px */
+  .cs-meta-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px 32px !important;
+  }
+  .cs-meta-tools {
+    grid-column: auto !important;
+  }
+}
+
+/* ── Small mobile (≤ 640px) — meta strip fully stacked ── */
+@media (max-width: 640px) {
+  .cs-meta-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 /* ── Mobile (≤ 540px) ──────────────────────────────────────────────────── */
-@media (max-width: 820px) {
+@media (max-width: 840px) {
   /* Meta bar wraps to column on small screens */
   .cs-meta-bar {
     flex-direction: column !important;

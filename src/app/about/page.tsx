@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import Navigation from "@/components/Navigation";
 import GridBackground from "@/components/GridBackground";
-import PillCTA from "@/components/PillCTA";
 
 /* ─────────────────────────────────────────────────────────────
    Timeline data (matches Figma exactly)
@@ -30,7 +29,7 @@ const ENTRIES: Entry[] = [
   { year: "2025", org: "Ackee",               role: "UX / UI Designer",                    side: "right", color: "#2200FF", initials: "A",  iconSrc: "/images/contact/ackee.png", current: true },
 ];
 
-const ROW_H = 72; // px per timeline row — matches Figma's 72 px spacing
+const ROW_H = 88; // px per timeline row — tall enough for 2-line role text
 
 /* ─────────────────────────────────────────────────────────────
    Small colored circle with initials
@@ -232,14 +231,21 @@ function TimelineRow({ entry, index, visible }: { entry: Entry; index: number; v
 export default function AboutPage() {
   const [timelineVisible, setTimelineVisible] = useState(false);
   const timelineRef = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [vw, setVw] = useState(1400);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 1280);
+    const check = () => setVw(window.innerWidth);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
+
+  // ≤640px  → stacked (single column)
+  // <1280px → two columns, simple list timeline
+  // ≥1280px → two columns, fancy centre-line timeline
+  const isStacked = vw <= 640;
+  const isSimple  = vw < 1280;
+  const isMobile  = isStacked;
 
   useEffect(() => {
     const el = timelineRef.current;
@@ -266,20 +272,40 @@ export default function AboutPage() {
         <GridBackground />
       </div>
 
-      <div style={{ position: "relative", zIndex: 1, minHeight: "100dvh", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "clamp(80px, 8vw, 120px) clamp(40px, 5vw, 80px) 80px" }}>
       <div
-        className="about-layout"
         style={{
-          width: "100%",
-          maxWidth: 1600,
-          display: "grid",
-          gridTemplateColumns: "420px 1fr",
-          gap: "clamp(60px, 6.5vw, 100px)",
+          position: "relative",
+          zIndex: 1,
+          minHeight: "100dvh",
+          paddingTop: "clamp(96px, 8vw, 128px)",
+          paddingBottom: "80px",
+          // ≤840px  → 8vw (matches nav gutter)
+          // 841–1280px → 15vw (narrower content band)
+          // >1280px → 10vw capped at 120px (wider content)
+          paddingLeft:  vw <= 840 ? "8vw" : vw <= 1280 ? "clamp(60px, 15vw, 160px)" : "clamp(40px, 10vw, 120px)",
+          paddingRight: vw <= 840 ? "8vw" : vw <= 1280 ? "clamp(60px, 15vw, 160px)" : "clamp(40px, 10vw, 120px)",
+        }}
+      >
+      <div
+        style={{
+          maxWidth: 1400,
+          margin: "0 auto",
+          display: "flex",
+          flexDirection: isStacked ? "column" : "row",
+          gap: isStacked ? "48px" : "clamp(40px, 4vw, 60px)",
           alignItems: "start",
         }}
       >
         {/* ── LEFT: Bio ── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 19 }}>
+        <div style={{
+          // always fills remaining space after the timeline column
+          flex: "1 1 auto",
+          minWidth: 0,
+          maxWidth: isStacked ? "none" : 700,
+          display: "flex",
+          flexDirection: "column",
+          gap: 19,
+        }}>
           {/* Intro headline */}
           <p
             className="font-futura"
@@ -334,14 +360,25 @@ export default function AboutPage() {
           </p>
 
           {/* Contact Me button */}
-          <div style={{ paddingTop: 40 }}>
-            <PillCTA href="/contact" label="Contact me" />
+          <div style={{ paddingTop: 40, display: "flex", justifyContent: "flex-end" }}>
+            <a
+              href="/contact"
+              className="nav-link"
+              style={{ fontSize: "1rem", fontWeight: 500, letterSpacing: "0.04em" }}
+            >
+              Contact me →
+            </a>
           </div>
         </div>
 
         {/* ── RIGHT: Timeline ── */}
-        <div ref={timelineRef}>
-          {isMobile ? (
+        <div ref={timelineRef} style={{
+          // simple: auto-size to list content (no gap on right)
+          // fancy: fixed basis growing from 520px min → 640px max with viewport
+          flex: isStacked ? "1 1 auto" : isSimple ? "0 0 auto" : "0 0 clamp(520px, 40vw, 640px)",
+          minWidth: 0,
+        }}>
+          {isSimple ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               {ENTRIES.map((entry, i) => (
                 <div

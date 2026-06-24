@@ -19,7 +19,7 @@ export default function HomePage() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 820);
+    const check = () => setIsMobile(window.innerWidth <= 840);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
@@ -237,27 +237,32 @@ export default function HomePage() {
                 position: "relative",
               }}
             >
-              {/* Dot grid — covers image half of section, behind all content */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  bottom: 0,
-                  [i % 2 === 0 ? "right" : "left"]: 0,
-                  width: "50%",
-                  zIndex: 0,
-                  pointerEvents: "none",
-                }}
-              >
-                <DotGrid />
-              </div>
+              {/* Dot grid — desktop: covers image half; mobile: left 20% strip, odd sections only */}
+              {(!isMobile || i % 2 === 1) && (() => {
+                const side = isMobile ? "left" : (i % 2 === 0 ? "right" : "left");
+                return (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      bottom: 0,
+                      [side]: 0,
+                      width: isMobile ? "20%" : "50%",
+                      zIndex: 0,
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <DotGrid />
+                  </div>
+                );
+              })()}
 
               <div className="cs-section-inner" style={{ position: "relative", zIndex: 1,
                 flexDirection: i % 2 === 1 ? "row-reverse" : "row",
                 gap: "8vw",
                 paddingLeft:  i % 2 === 0 ? "7vw" : "6vw",
                 paddingRight: i % 2 === 0 ? "6vw" : "7vw",
-                paddingTop: "4rem",
+                paddingTop: isMobile ? "8rem" : "4rem",
                 paddingBottom: "4rem",
               }}>
                 {/* Left — text, staggered walk-in */}
@@ -278,18 +283,23 @@ export default function HomePage() {
                     ))}
                   </div>
 
-                  <h2
-                    className="font-caslon"
-                    style={{
-                      fontSize: "clamp(2rem, 3.5vw, 3.2rem)",
-                      color: "var(--ink)",
-                      lineHeight: 1.05,
-                      marginBottom: "1rem",
-                      ...walkin(isSeen, 90),
-                    }}
+                  <a
+                    href={`/case-study/${study.slug}`}
+                    style={{ textDecoration: "none", display: "block", ...walkin(isSeen, 90) }}
                   >
-                    {study.title}
-                  </h2>
+                    <h2
+                      className="font-caslon"
+                      style={{
+                        fontSize: "clamp(2rem, 3.5vw, 3.2rem)",
+                        color: "var(--ink)",
+                        lineHeight: 1.05,
+                        marginBottom: "1rem",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {study.title}
+                    </h2>
+                  </a>
 
                   <p
                     className="font-futura"
@@ -370,20 +380,23 @@ export default function HomePage() {
                     ...(isMobile ? walkin(isSeen, PHOTO_DELAY) : photoSlide(isSeen, i % 2 === 0)),
                   }}
                 >
-                  <img
-                    src={study.coverImage}
-                    alt={study.title}
-                    className="cs-cover-img"
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                      aspectRatio: "16/10",
-                      borderRadius: 0,
-                      display: "block",
-                      objectFit: "cover",
-                      objectPosition: "center",
-                    }}
-                  />
+                  <a href={`/case-study/${study.slug}`} style={{ display: "block" }}>
+                    <img
+                      src={study.coverImage}
+                      alt={study.title}
+                      className="cs-cover-img"
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        aspectRatio: "16/10",
+                        borderRadius: 0,
+                        display: "block",
+                        objectFit: "cover",
+                        objectPosition: "center",
+                        cursor: "pointer",
+                      }}
+                    />
+                  </a>
                 </div>
               </div>
             </div>

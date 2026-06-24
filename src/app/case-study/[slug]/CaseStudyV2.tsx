@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import GridBackground from "@/components/GridBackground";
 import { CaseStudy, CaseStudyChapter } from "@/lib/types";
-import { PortfolioItem } from "@/lib/data";
+import { PortfolioItem, caseStudies } from "@/lib/data";
+import PillCTA from "@/components/PillCTA";
 
 /* ─────────────────────────────────────────────────────────────────
    useInView — fires once when element enters the viewport
@@ -58,6 +60,159 @@ function FadeUp({
       }}
     >
       {children}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   SectionGallery — slides through images, dot indicator, hover chevrons
+───────────────────────────────────────────────────────────────── */
+function SectionGallery({ images }: { images: string[] }) {
+  const [current, setCurrent] = useState(0);
+  const [hovered, setHovered] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+  const count = images.length;
+
+  const go = (dir: number) => {
+    setCurrent((prev) => (prev + dir + count) % count);
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const dx = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 40) go(dx > 0 ? 1 : -1);
+    touchStartX.current = null;
+  };
+
+  if (!count) return null;
+
+  const chevronBtn: React.CSSProperties = {
+    position: "absolute",
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "rgba(255,255,255,0.72)",
+    backdropFilter: "blur(8px)",
+    WebkitBackdropFilter: "blur(8px)",
+    border: "1px solid rgba(36,36,36,0.1)",
+    borderRadius: "50%",
+    width: 40,
+    height: 40,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    zIndex: 2,
+    color: "rgba(36,36,36,0.8)",
+    transition: "opacity 250ms ease, background 200ms ease",
+  };
+
+  return (
+    <div
+      style={{ userSelect: "none", position: "relative" }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Image viewport */}
+      <div
+        style={{ position: "relative", overflow: "hidden", aspectRatio: "3/2" }}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
+        {/* Sliding strip */}
+        <div
+          style={{
+            display: "flex",
+            height: "100%",
+            width: `${count * 100}%`,
+            transform: `translateX(-${(current / count) * 100}%)`,
+            transition: "transform 480ms cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        >
+          {images.map((src, i) => (
+            <div
+              key={i}
+              style={{ position: "relative", width: `${100 / count}%`, flexShrink: 0 }}
+            >
+              <Image
+                src={src}
+                alt=""
+                fill
+                style={{ objectFit: "cover" }}
+                sizes="(max-width: 840px) 100vw, 60vw"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Left chevron — half outside the image */}
+      {count > 1 && (
+        <button
+          onClick={() => go(-1)}
+          aria-label="Previous"
+          style={{
+            ...chevronBtn,
+            left: -20,
+            opacity: hovered ? 1 : 0,
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      )}
+
+      {/* Right chevron — half outside the image */}
+      {count > 1 && (
+        <button
+          onClick={() => go(1)}
+          aria-label="Next"
+          style={{
+            ...chevronBtn,
+            right: -20,
+            opacity: hovered ? 1 : 0,
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      )}
+
+      {/* Dot indicators */}
+      {count > 1 && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 7,
+            paddingTop: 14,
+          }}
+        >
+          {images.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              aria-label={`Photo ${i + 1}`}
+              style={{
+                width: i === current ? 8 : 6,
+                height: i === current ? 8 : 6,
+                borderRadius: "50%",
+                background: "var(--ink)",
+                opacity: i === current ? 0.7 : 0.2,
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+                transition: "all 280ms ease",
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -142,7 +297,9 @@ function HeroSection({
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(105deg, rgba(26,30,21,0.97) 0%, rgba(26,30,21,0.88) 28%, rgba(26,30,21,0.45) 55%, rgba(26,30,21,0.05) 75%, transparent 88%)",
+              `linear-gradient(to top,    rgba(16,18,14,0.96) 0%,  rgba(16,18,14,0.55) 40%, transparent 65%),
+               linear-gradient(to right,  rgba(16,18,14,0.88) 0%,  rgba(16,18,14,0.60) 38%, rgba(16,18,14,0.10) 62%, transparent 75%),
+               linear-gradient(135deg,    rgba(16,18,14,0.45) 0%,  transparent 55%)`,
           }}
         />
       </div>
@@ -220,65 +377,21 @@ function HeroSection({
           {study.subtitle}
         </p>
 
-        {/* Role / Year tags */}
+        {/* Role / Year tags — always on dark hero, force light variant */}
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
           {[study.role, String(study.year)].filter(Boolean).map((tag) => (
             <span
               key={tag}
-              className="font-futura"
+              className="portfolio-tag"
               style={{
-                fontSize: 12,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
                 color: "rgba(225,223,216,0.6)",
-                border: "1px solid rgba(225,223,216,0.15)",
-                borderRadius: 0,
-                padding: "6px 14px",
+                borderColor: "rgba(225,223,216,0.3)",
               }}
             >
               {tag}
             </span>
           ))}
         </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 36,
-          left: "50%",
-          transform: "translateX(-50%)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 8,
-          zIndex: 3,
-        }}
-      >
-        <div
-          style={{
-            width: 1,
-            height: 48,
-            background:
-              "linear-gradient(to bottom, transparent, rgba(225,223,216,0.3))",
-          }}
-        />
-        <svg
-          width="16"
-          height="8"
-          viewBox="0 0 16 8"
-          fill="none"
-          aria-hidden
-        >
-          <path
-            d="M1 1l7 6 7-6"
-            stroke="rgba(225,223,216,0.3)"
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
       </div>
     </section>
   );
@@ -287,12 +400,36 @@ function HeroSection({
 /* ─────────────────────────────────────────────────────────────────
    2. META STRIP
 ───────────────────────────────────────────────────────────────── */
+const TOOL_ICON: Record<string, string> = {
+  "figma":           "/icons/tools/figma.svg",
+  "framer":          "/icons/tools/framer.svg",
+  "optimizely":      "/icons/tools/optimizely.svg",
+  "ga4":             "/icons/tools/ga4.svg",
+  "adobe cc":        "/icons/tools/adobe-cc.svg",
+  "photoshop":       "/icons/tools/photoshop.svg",
+  "illustrator":     "/icons/tools/illustrator.svg",
+  "indesign":        "/icons/tools/indesign.svg",
+  "maze":            "/icons/tools/maze.svg",
+  "jira":            "/icons/tools/jira.svg",
+  "python":          "/icons/tools/python.svg",
+  "firebase":        "/icons/tools/firebase.svg",
+  "blender":         "/icons/tools/blender.svg",
+  "miro":            "/icons/tools/miro.svg",
+  "unity":           "/icons/tools/unity.svg",
+  "claude":          "/icons/tools/Claude.svg",
+};
+
+function getToolIcon(name: string): string | null {
+  return TOOL_ICON[name.toLowerCase().trim()] ?? null;
+}
+
 function MetaStrip({ study }: { study: CaseStudy }) {
-  const items = [
-    { label: "Role", value: study.role || "UX Designer" },
+  const toolList = (study.tools || "Figma").split("·").map((t) => t.trim()).filter(Boolean);
+
+  const metaItems = [
+    { label: "Role",     value: study.role || "UX Designer" },
     { label: "Timeline", value: study.timeline || "—" },
     { label: "Platform", value: "Desktop / Mobile" },
-    { label: "Tools", value: study.tools || "Figma" },
   ];
 
   return (
@@ -310,21 +447,23 @@ function MetaStrip({ study }: { study: CaseStudy }) {
         }}
       >
         <div
+          className="cs-meta-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gridTemplateColumns: "repeat(4, 1fr)",
             gap: "clamp(24px, 4vw, 48px)",
           }}
         >
-          {items.map((item) => (
+          {metaItems.map((item) => (
             <FadeUp key={item.label}>
               <p
                 className="font-futura"
                 style={{
-                  fontSize: 10,
-                  letterSpacing: "0.14em",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.16em",
                   textTransform: "uppercase",
-                  color: "var(--ink-muted)",
+                  color: "var(--ink-faint)",
                   marginBottom: 8,
                 }}
               >
@@ -343,6 +482,52 @@ function MetaStrip({ study }: { study: CaseStudy }) {
               </p>
             </FadeUp>
           ))}
+
+          {/* Tools — icons + names */}
+          <div className="cs-meta-tools"><FadeUp>
+            <p
+              className="font-futura"
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "var(--ink-faint)",
+                marginBottom: 8,
+              }}
+            >
+              Tools
+            </p>
+            <div style={{ display: "flex", flexWrap: "nowrap", gap: "8px 16px", overflow: "hidden" }}>
+              {toolList.map((tool) => {
+                const icon = getToolIcon(tool);
+                return (
+                  <div key={tool} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {icon && (
+                      <img
+                        src={icon}
+                        alt={tool}
+                        width={16}
+                        height={16}
+                        style={{ flexShrink: 0, objectFit: "contain" }}
+                      />
+                    )}
+                    <span
+                      className="font-futura"
+                      style={{
+                        fontSize: "clamp(14px, 1.2vw, 17px)",
+                        color: "var(--ink)",
+                        fontWeight: 400,
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {tool}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </FadeUp></div>
         </div>
       </div>
     </section>
@@ -409,7 +594,7 @@ function OverviewSection({ chapters }: { chapters: CaseStudyChapter[] }) {
               style={{
                 borderRadius: 0,
                 overflow: "hidden",
-                aspectRatio: "4 / 3",
+                aspectRatio: "3 / 2",
                 position: "relative",
               }}
             >
@@ -430,7 +615,7 @@ function OverviewSection({ chapters }: { chapters: CaseStudyChapter[] }) {
 /* ─────────────────────────────────────────────────────────────────
    4. RESEARCH
 ───────────────────────────────────────────────────────────────── */
-function ResearchSection({ chapters }: { chapters: CaseStudyChapter[] }) {
+function ResearchSection({ chapters, study }: { chapters: CaseStudyChapter[]; study: CaseStudy }) {
   // Pull findings from any two-col-findings block
   const findingsBlock = chapters
     .flatMap((ch) => ch.blocks)
@@ -444,6 +629,15 @@ function ResearchSection({ chapters }: { chapters: CaseStudyChapter[] }) {
           { num: "02", text: "Inventory management is a critical bottleneck under stress" },
           { num: "03", text: "Military conventions shape mental models; deviate at your peril" },
         ];
+
+  // Gallery: first image-row block across all chapters
+  const firstImageRow = chapters
+    .flatMap((ch) => ch.blocks)
+    .find((b) => b.type === "image-row");
+  const galleryImages =
+    firstImageRow?.type === "image-row"
+      ? firstImageRow.images
+      : ["/images/cs-arma4-1.jpg", "/images/cs-arma4-2.jpg", "/images/cs-arma4-3.jpg"];
 
   return (
     <section
@@ -497,8 +691,8 @@ function ResearchSection({ chapters }: { chapters: CaseStudyChapter[] }) {
                     fontSize: "clamp(17px, 1.5vw, 21px)",
                     fontWeight: 700,
                     letterSpacing: "0.08em",
-                    color: "var(--ink)",
-                    opacity: 0.28,
+                    color: study.accentColor,
+                    opacity: 0.85,
                     flexShrink: 0,
                     width: 36,
                     textAlign: "right",
@@ -523,24 +717,9 @@ function ResearchSection({ chapters }: { chapters: CaseStudyChapter[] }) {
           ))}
         </div>
 
-        {/* Research — full-width image */}
+        {/* Research — gallery */}
         <FadeUp delay={200}>
-          <div
-            style={{
-              borderRadius: 0,
-              overflow: "hidden",
-              aspectRatio: "16/7",
-              position: "relative",
-              border: "1px solid var(--grid-line)",
-            }}
-          >
-            <Image
-              src="/images/cs-arma4-1.jpg"
-              alt="Research process"
-              fill
-              style={{ objectFit: "cover" }}
-            />
-          </div>
+          <SectionGallery images={galleryImages} />
         </FadeUp>
       </div>
     </section>
@@ -567,6 +746,16 @@ function ProcessSection({ chapters }: { chapters: CaseStudyChapter[] }) {
     textBlock?.type === "two-col-text"
       ? textBlock.rightText
       : "Multiple rounds of wireframing followed, testing different organizational hierarchies, drag-and-drop interactions, and contextual quick-actions before arriving at the final system.";
+
+  // Gallery: second image-row block across all chapters (process images)
+  const allImageRows = chapters
+    .flatMap((ch) => ch.blocks)
+    .filter((b) => b.type === "image-row");
+  const processImageRow = allImageRows[1] ?? allImageRows[0];
+  const galleryImages =
+    processImageRow?.type === "image-row"
+      ? processImageRow.images
+      : ["/images/cs-arma4-4.jpg", "/images/cs-arma4-5.jpg", "/images/cs-arma4-6.jpg"];
 
   return (
     <section
@@ -713,23 +902,9 @@ function ProcessSection({ chapters }: { chapters: CaseStudyChapter[] }) {
           </div>
         </FadeUp>
 
-        {/* Full-width process image */}
+        {/* Process — gallery */}
         <FadeUp delay={240}>
-          <div
-            style={{
-              borderRadius: 0,
-              overflow: "hidden",
-              aspectRatio: "16/7",
-              position: "relative",
-            }}
-          >
-            <Image
-              src="/images/cs-arma4-4.jpg"
-              alt="Design process detail"
-              fill
-              style={{ objectFit: "cover" }}
-            />
-          </div>
+          <SectionGallery images={galleryImages} />
         </FadeUp>
       </div>
     </section>
@@ -744,8 +919,8 @@ function SolutionSection({ study }: { study: CaseStudy }) {
     {
       icon: (
         <svg
-          width="20"
-          height="20"
+          width="28"
+          height="28"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -764,8 +939,8 @@ function SolutionSection({ study }: { study: CaseStudy }) {
     {
       icon: (
         <svg
-          width="20"
-          height="20"
+          width="28"
+          height="28"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -783,8 +958,8 @@ function SolutionSection({ study }: { study: CaseStudy }) {
     {
       icon: (
         <svg
-          width="20"
-          height="20"
+          width="28"
+          height="28"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -829,7 +1004,7 @@ function SolutionSection({ study }: { study: CaseStudy }) {
             style={{
               borderRadius: 0,
               overflow: "hidden",
-              aspectRatio: "16/8",
+              aspectRatio: "3/2",
               position: "relative",
               marginBottom: 48,
             }}
@@ -859,9 +1034,9 @@ function SolutionSection({ study }: { study: CaseStudy }) {
                   backdropFilter: "blur(12px)",
                   WebkitBackdropFilter: "blur(12px)",
                   border: "1px solid rgba(36,36,36,0.08)",
-                  borderLeft: "3px solid rgba(36,36,36,0.75)",
+                  borderLeft: `3px solid ${study.accentColor}`,
                   borderRadius: 0,
-                  padding: "32px 28px 28px",
+                  padding: "40px 36px 36px",
                   height: "100%",
                   transition: "box-shadow 0.25s ease",
                   cursor: "default",
@@ -873,24 +1048,11 @@ function SolutionSection({ study }: { study: CaseStudy }) {
                   (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
                 }}
               >
-                {/* Large step number */}
-                <p
-                  className="font-caslon"
-                  style={{
-                    fontSize: "clamp(48px, 5vw, 72px)",
-                    color: "rgba(36,36,36,0.1)",
-                    lineHeight: 1,
-                    marginBottom: 20,
-                    letterSpacing: "-0.02em",
-                  }}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </p>
                 {/* Icon */}
                 <div
                   style={{
-                    color: "var(--ink-muted)",
-                    marginBottom: 14,
+                    color: "var(--ink-faint)",
+                    marginBottom: 22,
                   }}
                 >
                   {card.icon}
@@ -898,10 +1060,10 @@ function SolutionSection({ study }: { study: CaseStudy }) {
                 <p
                   className="font-futura"
                   style={{
-                    fontSize: 16,
+                    fontSize: "clamp(18px, 1.67vw, 24px)",
                     color: "var(--ink)",
                     fontWeight: 600,
-                    marginBottom: 10,
+                    marginBottom: 14,
                     letterSpacing: "0.01em",
                   }}
                 >
@@ -910,9 +1072,9 @@ function SolutionSection({ study }: { study: CaseStudy }) {
                 <p
                   className="font-futura"
                   style={{
-                    fontSize: 14,
+                    fontSize: "clamp(16px, 1.35vw, 19px)",
                     color: "var(--ink-muted)",
-                    lineHeight: 1.7,
+                    lineHeight: 1.8,
                     fontWeight: 400,
                   }}
                 >
@@ -930,7 +1092,7 @@ function SolutionSection({ study }: { study: CaseStudy }) {
 /* ─────────────────────────────────────────────────────────────────
    7. REFLECTION — dark bg
 ───────────────────────────────────────────────────────────────── */
-function ReflectionSection({ chapters }: { chapters: CaseStudyChapter[] }) {
+function ReflectionSection({ chapters, study }: { chapters: CaseStudyChapter[]; study: CaseStudy }) {
   // Pull reflection text from blocks
   const reflectionBlock = chapters
     .flatMap((ch) => ch.blocks)
@@ -950,11 +1112,22 @@ function ReflectionSection({ chapters }: { chapters: CaseStudyChapter[] }) {
   return (
     <section
       style={{
-        background: "#1a1e15",
+        background: "#111214",
         position: "relative",
         overflow: "hidden",
       }}
     >
+      {/* Accent colour tint — subtle, keeps section always legible */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: study.accentColor,
+          opacity: 0.12,
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
       <GridBackground forceDark />
       <div
         style={{
@@ -1012,7 +1185,7 @@ function ReflectionSection({ chapters }: { chapters: CaseStudyChapter[] }) {
               marginTop: 56,
               borderRadius: 0,
               overflow: "hidden",
-              aspectRatio: "16/6",
+              aspectRatio: "3/2",
               position: "relative",
               border: "1px solid rgba(255,255,255,0.06)",
             }}
@@ -1033,14 +1206,23 @@ function ReflectionSection({ chapters }: { chapters: CaseStudyChapter[] }) {
 /* ─────────────────────────────────────────────────────────────────
    8. NEXT PROJECT — pagination
 ───────────────────────────────────────────────────────────────── */
-function NextProjectSection() {
+function NextProjectSection({ study }: { study: CaseStudy }) {
+  const router = useRouter();
+  const idx = caseStudies.findIndex((c) => c.slug === study.slug);
+  const prev = idx > 0 ? caseStudies[idx - 1] : null;
+  const next = idx < caseStudies.length - 1 ? caseStudies[idx + 1] : null;
+
+  const [backLabel, setBackLabel] = useState("Back to Portfolio");
+  useEffect(() => {
+    const ref = document.referrer;
+    if (ref) {
+      const path = new URL(ref).pathname;
+      if (path === "/" || path === "") setBackLabel("Back to Homepage");
+    }
+  }, []);
+
   return (
-    <section
-      style={{
-        background: "var(--bg)",
-        borderTop: "1px solid var(--grid-line)",
-      }}
-    >
+    <section style={{ background: "var(--bg)", borderTop: "1px solid var(--grid-line)" }}>
       <div
         style={{
           ...sectionPad,
@@ -1048,80 +1230,159 @@ function NextProjectSection() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          textAlign: "center",
+          gap: 56,
         }}
       >
-        <FadeUp>
-          <Eyebrow text="Navigation" />
-          <p
-            className="font-futura"
-            style={{
-              fontSize: "clamp(13px, 1vw, 15px)",
-              color: "var(--ink-muted)",
-              marginBottom: 16,
-              letterSpacing: "0.04em",
-            }}
-          >
-            You&apos;ve reached the end
-          </p>
-          <Link
-            href="/portfolio"
-            style={{ textDecoration: "none" }}
-          >
+        {/* Prev / Next pagination */}
+        {(prev || next) && (
+          <FadeUp style={{ width: "100%" }}>
             <div
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 16,
+                display: "grid",
+                gridTemplateColumns: prev && next ? "1fr 1fr" : "1fr",
+                gap: 1,
+                background: "var(--grid-line)",
                 border: "1px solid var(--grid-line)",
-                borderRadius: 0,
-                padding: "14px 32px",
-                transition:
-                  "border-color 0.25s ease, background 0.25s ease",
-                cursor: "pointer",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.background =
-                  "rgba(36,36,36,0.05)";
-                (e.currentTarget as HTMLDivElement).style.borderColor =
-                  "rgba(36,36,36,0.2)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.background =
-                  "transparent";
-                (e.currentTarget as HTMLDivElement).style.borderColor =
-                  "var(--grid-line)";
               }}
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                aria-hidden
-              >
-                <path
-                  d="M10 3L5 8l5 5"
-                  stroke="var(--ink)"
-                  strokeWidth="1.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span
+              {prev && (
+                <Link
+                  href={`/case-study/${prev.slug}`}
+                  style={{ textDecoration: "none" }}
+                >
+                  <div
+                    style={{
+                      padding: "32px 36px",
+                      background: "var(--bg)",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 10,
+                      transition: "background 0.2s ease",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLDivElement).style.background = "var(--bg-card)";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLDivElement).style.background = "var(--bg)";
+                    }}
+                  >
+                    <span
+                      className="font-futura"
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        letterSpacing: "0.16em",
+                        textTransform: "uppercase",
+                        color: "var(--ink-faint)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M8 2L4 6l4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      Previous
+                    </span>
+                    <span
+                      className="font-caslon"
+                      style={{
+                        fontSize: "clamp(18px, 1.8vw, 26px)",
+                        color: "var(--ink)",
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {prev.title}
+                    </span>
+                  </div>
+                </Link>
+              )}
+
+              {next && (
+                <Link
+                  href={`/case-study/${next.slug}`}
+                  style={{ textDecoration: "none" }}
+                >
+                  <div
+                    style={{
+                      padding: "32px 36px",
+                      background: "var(--bg)",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-end",
+                      textAlign: "right",
+                      gap: 10,
+                      transition: "background 0.2s ease",
+                      cursor: "pointer",
+                      height: "100%",
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLDivElement).style.background = "var(--bg-card)";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLDivElement).style.background = "var(--bg)";
+                    }}
+                  >
+                    <span
+                      className="font-futura"
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        letterSpacing: "0.16em",
+                        textTransform: "uppercase",
+                        color: "var(--ink-faint)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                      }}
+                    >
+                      Next
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M4 2l4 4-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </span>
+                    <span
+                      className="font-caslon"
+                      style={{
+                        fontSize: "clamp(18px, 1.8vw, 26px)",
+                        color: "var(--ink)",
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {next.title}
+                    </span>
+                  </div>
+                </Link>
+              )}
+            </div>
+          </FadeUp>
+        )}
+
+        {/* Back button + optional "View all projects" grouped together */}
+        <FadeUp delay={100}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+            {backLabel === "Back to Homepage" && (
+              <Link
+                href="/portfolio"
                 className="font-futura"
                 style={{
                   fontSize: 13,
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
-                  color: "var(--ink)",
+                  color: "var(--ink-muted)",
+                  textDecoration: "none",
                   fontWeight: 500,
+                  transition: "color 0.2s ease",
                 }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-muted)")}
               >
-                Back to Portfolio
-              </span>
-            </div>
-          </Link>
+                View all projects
+              </Link>
+            )}
+            <PillCTA onClick={() => router.back()} label={backLabel} />
+          </div>
         </FadeUp>
       </div>
     </section>
@@ -1171,7 +1432,7 @@ export default function CaseStudyV2({
         <OverviewSection chapters={chapters} />
 
         {/* 4 — Research */}
-        <ResearchSection chapters={chapters} />
+        <ResearchSection chapters={chapters} study={study} />
 
         {/* 5 — Process */}
         <ProcessSection chapters={chapters} />
@@ -1180,10 +1441,10 @@ export default function CaseStudyV2({
         <SolutionSection study={study} />
 
         {/* 7 — Reflection (dark) */}
-        <ReflectionSection chapters={chapters} />
+        <ReflectionSection chapters={chapters} study={study} />
 
         {/* 8 — Next project */}
-        <NextProjectSection />
+        <NextProjectSection study={study} />
       </main>
     </>
   );
