@@ -891,8 +891,9 @@ interface Props {
 
 export default function CaseStudyPage({ params }: Props) {
   const { slug } = use(params);
-  const study = caseStudies.find((c) => c.slug === slug);
-  if (!study) return notFound();
+  const maybeStudy = caseStudies.find((c) => c.slug === slug);
+  if (!maybeStudy) return notFound();
+  const study = maybeStudy;
 
   const portfolio = portfolioItems.find((p) => p.slug === slug);
   const chapters = study.chapters ?? [];
