@@ -295,7 +295,7 @@ export default function ContactPage() {
 
 
   /* Bracket colour */
-  const bracketColor = isDark ? "rgba(225,223,216,0.40)" : "rgba(36,36,36,0.28)";
+  const bracketColor = isDark ? "rgba(225,223,216,0.70)" : "rgba(36,36,36,0.55)";
 
   /* Status dot colour */
   const statusColor = isDark ? "#c5d100" : "#2e9e4a";

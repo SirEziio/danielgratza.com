@@ -12,7 +12,12 @@ export default function CVPage() {
       <style>{`
         .cv-content {
           width: 100%;
-          padding: 0 30px;
+          padding: 0;
+        }
+        @media (min-width: 540px) {
+          .cv-content {
+            padding: 0 30px;
+          }
         }
         @media (min-width: 768px) {
           .cv-content {
