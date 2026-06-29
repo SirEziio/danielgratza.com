@@ -43,9 +43,9 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
         style={{
           position: "fixed",
           top: 0, left: 0, right: 0,
-          height: "max(env(safe-area-inset-top, 44px), 44px)",
+          height: "env(safe-area-inset-top, 0px)",
           background: bgColor,
-          zIndex: 9999,
+          zIndex: 98,
           pointerEvents: "none",
           opacity: showFade ? 1 : 0,
           transition: "opacity 0.3s ease",
