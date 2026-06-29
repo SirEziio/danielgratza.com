@@ -12,6 +12,8 @@
   --ball:       #c5d100;
   --grid-line:  rgba(36,36,36,0.08);
   --nav-bg:     rgba(225,223,216,0.0);
+  /* Unified horizontal page padding — nav logo, hamburger, and all page content share this */
+  --page-pad:   clamp(24px, 3vw, 30px);
 }
 
 /* Logo invert in dark mode or on dark-bg sections */
@@ -83,8 +85,9 @@ main {
 .snap-container { scrollbar-width: none; }
 
 .snap-section {
-  height: 100dvh;
-  min-height: 100dvh;
+  /* height: 100% resolves against the fixed container (inset:0 = viewport height exactly)
+     — more reliable than dvh on Chrome/iOS 26 where dvh can differ slightly from the container */
+  height: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   position: relative;

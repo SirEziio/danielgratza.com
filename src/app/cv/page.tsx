@@ -16,7 +16,7 @@ export default function CVPage() {
         }
         @media (min-width: 540px) {
           .cv-content {
-            padding: 0 30px;
+            padding: 0 var(--page-pad);
           }
         }
         @media (min-width: 768px) {

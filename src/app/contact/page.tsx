@@ -319,8 +319,8 @@ export default function ContactPage() {
           alignItems: isMobile ? "stretch" : "center",
           justifyContent: "space-between",
           paddingTop: 80,
-          paddingLeft: isMobile ? 30 : 40,
-          paddingRight: isMobile ? 30 : 40,
+          paddingLeft: "var(--page-pad)",
+          paddingRight: "var(--page-pad)",
           paddingBottom: "max(48px, calc(env(safe-area-inset-bottom, 0px) + 24px))",
         }}
       >
@@ -544,7 +544,7 @@ export default function ContactPage() {
         </div>{/* end main content */}
 
         {/* ── Social icons ─────────────────────────────────────── */}
-        <div style={{ display: "flex", gap: 16, alignItems: "center", padding: 10, marginTop: isMobile ? 28 : 0 }}>
+        <div style={{ display: "flex", gap: 16, alignItems: "center", justifyContent: "center", padding: 10, marginTop: isMobile ? 40 : 0 }}>
           {[
             { href: "https://www.linkedin.com/in/daniel-gratza-82b893210/", label: "LinkedIn",  icon: <IconLinkedIn />  },
             { href: "https://www.instagram.com/dxgratza/",                  label: "Instagram", icon: <IconInstagram /> },

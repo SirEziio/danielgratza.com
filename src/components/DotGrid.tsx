@@ -71,9 +71,11 @@ export default function DotGrid({ style }: { style?: React.CSSProperties }) {
     };
 
     const resize = () => {
-      const r = canvas.getBoundingClientRect();
-      cw = r.width;
-      ch = r.height;
+      // Use offsetWidth/offsetHeight — reliable even when canvas is off-screen
+      // (getBoundingClientRect returns wrong values for elements in scrolled snap containers on Chrome)
+      cw = canvas.offsetWidth;
+      ch = canvas.offsetHeight;
+      if (!cw || !ch) return; // not yet laid out
       canvas.width  = Math.round(cw * devicePixelRatio);
       canvas.height = Math.round(ch * devicePixelRatio);
       buildColumns(elapsed);
@@ -148,12 +150,16 @@ export default function DotGrid({ style }: { style?: React.CSSProperties }) {
     };
 
     resize();
+    // ResizeObserver catches layout changes (e.g. section becoming visible in snap container)
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
     window.addEventListener("resize", resize);
     window.addEventListener("mousemove", onMove);
     raf = requestAnimationFrame(draw);
 
     return () => {
       cancelAnimationFrame(raf);
+      ro.disconnect();
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", onMove);
     };

@@ -4,20 +4,16 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";
-import { useTheme } from "./ThemeProvider";
 
 interface Props {
   hideLogo?: boolean;
   lightNav?: boolean;
   scrolledPastHero?: boolean;
-  showFade?: boolean;
 }
 
-export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true, showFade = false }: Props) {
+export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true }: Props) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const { theme } = useTheme();
-  const bgColor = theme === "dark" ? "#242424" : "#e1dfd8";
 
   // Close on route change
   useEffect(() => { setMenuOpen(false); }, [pathname]);
@@ -37,39 +33,6 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
 
   return (
     <>
-      {/* Status bar solid cover — GPU-composited to render correctly in iOS safe area during scroll */}
-      <div
-        aria-hidden
-        style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0,
-          height: "env(safe-area-inset-top, 0px)",
-          background: bgColor,
-          zIndex: 98,
-          pointerEvents: "none",
-          opacity: showFade ? 1 : 0,
-          transition: "opacity 0.3s ease",
-          transform: "translateZ(0)",
-          willChange: "transform",
-        }}
-      />
-
-      {/* Scroll fade gradient */}
-      <div
-        aria-hidden
-        className="nav-fade-bg"
-        style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0,
-          height: 90,
-          background: "linear-gradient(to bottom, var(--bg) 60%, transparent 100%)",
-          zIndex: 99,
-          pointerEvents: "none",
-          opacity: showFade ? 1 : 0,
-          transition: "opacity 0.3s ease",
-        }}
-      />
-
       <header
         className="site-header"
         style={{
@@ -79,13 +42,13 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "max(20px, calc(14px + env(safe-area-inset-top, 0px))) 30px 20px",
+          padding: "max(20px, calc(14px + env(safe-area-inset-top, 0px))) var(--page-pad) 20px",
           pointerEvents: "none",
         }}
       >
         {/* Logo */}
         {!hideLogo && (
-          <div className="site-nav-logo" style={{ position: "absolute", left: 30, pointerEvents: "auto" }}>
+          <div className="site-nav-logo" style={{ position: "absolute", left: "var(--page-pad)", pointerEvents: "auto" }}>
             <Link href="/" style={{ display: "block", lineHeight: 0 }}>
               <img
                 src="/images/home-Logo.png"
@@ -117,7 +80,7 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
         </nav>
 
         {/* Desktop theme toggle */}
-        <div className="nav-desktop" style={{ position: "absolute", right: 30, pointerEvents: "auto" }}>
+        <div className="nav-desktop" style={{ position: "absolute", right: "var(--page-pad)", pointerEvents: "auto" }}>
           <ThemeToggle />
         </div>
 
@@ -128,7 +91,7 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           style={{
             position: "absolute",
-            right: 24,
+            right: "var(--page-pad)",
             background: "none",
             // CSS override via .site-nav-hamburger in globals.css
             border: "none",
