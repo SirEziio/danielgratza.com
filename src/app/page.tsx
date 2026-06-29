@@ -261,7 +261,7 @@ export default function HomePage() {
           transform: "translateY(-50%)",
           display: "flex",
           flexDirection: "column",
-          gap: "0.45rem",
+          gap: "0.4rem",
           zIndex: 50,
           pointerEvents: "auto",
         }}
@@ -269,23 +269,32 @@ export default function HomePage() {
         {[0, ...caseStudies.map((_, i) => i + 1), caseStudies.length + 1].map((i) => {
           const onDark = activeSection === caseStudies.length + 1;
           const dotColor = onDark ? "#e1dfd8" : "var(--ink)";
+          const isActive = activeSection === i;
           return (
             <button
               key={i}
               onClick={() => scrollTo(i)}
-              style={{
-                width: activeSection === i ? 7 : 5,
-                height: activeSection === i ? 7 : 5,
-                borderRadius: "50%",
-                background: dotColor,
-                opacity: activeSection === i ? 0.8 : 0.2,
-                border: "none",
-                cursor: "pointer",
-                padding: 0,
-                transition: "all 0.25s ease",
-              }}
               aria-label={`Section ${i + 1}`}
-            />
+              style={{
+                width: 12, height: 12,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: "none", border: "none",
+                padding: 0, cursor: "pointer", flexShrink: 0,
+              }}
+            >
+              <span style={{
+                display: "block",
+                width:  isActive ? 8 : 5,
+                height: isActive ? 8 : 5,
+                borderRadius: 0,
+                transform: "rotate(45deg)",
+                background: isActive ? dotColor : "transparent",
+                border:     isActive ? "none" : `1.5px solid ${dotColor}`,
+                opacity:    isActive ? 0.90 : 0.28,
+                transition: "all 0.25s ease",
+                flexShrink: 0,
+              }} />
+            </button>
           );
         })}
       </div>
@@ -438,6 +447,7 @@ export default function HomePage() {
 
                   <a
                     href={`/case-study/${study.slug}`}
+                    onClick={() => sessionStorage.setItem("caseStudySource", "home")}
                     style={{ textDecoration: "none", display: "block", ...walkin(isSeen, 90) }}
                   >
                     <h2
@@ -513,6 +523,7 @@ export default function HomePage() {
                   <div style={{ display: "flex", justifyContent: "flex-end", ...walkin(isSeen, 320) }}>
                     <a
                       href={`/case-study/${study.slug}`}
+                      onClick={() => sessionStorage.setItem("caseStudySource", "home")}
                       className="nav-link"
                       style={{
                         fontSize: "1rem",
@@ -533,7 +544,7 @@ export default function HomePage() {
                     ...(isMobile ? walkin(isSeen, PHOTO_DELAY) : photoSlide(isSeen, i % 2 === 0)),
                   }}
                 >
-                  <a href={`/case-study/${study.slug}`} style={{ display: "block" }}>
+                  <a href={`/case-study/${study.slug}`} onClick={() => sessionStorage.setItem("caseStudySource", "home")} style={{ display: "block" }}>
                     <img
                       src={study.coverImage}
                       alt={study.title}
@@ -579,7 +590,7 @@ export default function HomePage() {
           <div style={{
             position: "absolute",
             left: "50%", top: "50%",
-            width: "150vw", height: "150vw",
+            width: "max(150vw, 150vh)", height: "max(150vw, 150vh)",
             transform: "translate(-50%, -50%)",
             background: "conic-gradient(from 0deg, transparent 0deg, transparent 290deg, rgba(225,223,216,0.02) 315deg, rgba(225,223,216,0.07) 348deg, rgba(225,223,216,0.14) 360deg)",
             animation: "radarSweep 8s linear infinite",
@@ -621,21 +632,6 @@ export default function HomePage() {
             }}>+</div>
           ))}
 
-          {/* Vertical fill bar — right edge, grows when section enters */}
-          <div style={{
-            position: "absolute", right: "6%", top: "15%",
-            width: 1, height: "70%",
-            background: "rgba(225,223,216,0.08)",
-            zIndex: 1, pointerEvents: "none",
-            overflow: "hidden",
-          }}>
-            <div style={{
-              position: "absolute", top: 0, left: 0, right: 0,
-              height: isFooterSeen ? "100%" : "0%",
-              background: "linear-gradient(to bottom, transparent, rgba(225,223,216,0.35) 50%, transparent)",
-              transition: "height 2.4s cubic-bezier(0.22,1,0.36,1) 0.6s",
-            }} />
-          </div>
 
           {/* Mouse coordinate HUD — bottom right */}
           <div className="font-futura" style={{

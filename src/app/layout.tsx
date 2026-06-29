@@ -20,6 +20,10 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
+export const viewport = {
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "Daniel Gratza — UX Designer",
   description:

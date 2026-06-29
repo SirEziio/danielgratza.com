@@ -58,6 +58,18 @@ body {
   overflow-x: hidden;
 }
 
+/* ── iOS safe-area ──────────────────────────────────────────── */
+/* Backgrounds bleed edge-to-edge (viewport-fit=cover in layout.tsx).
+   Nav header shifts down to clear the status bar.
+   Page-level bottom padding keeps content above home indicator / browser chrome. */
+.site-header {
+  padding-top: max(20px, calc(14px + env(safe-area-inset-top, 0px))) !important;
+}
+
+main {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* ─── Scroll-snap container ───────────────────────────────── */
 .snap-container {
   height: 100dvh;

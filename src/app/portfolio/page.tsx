@@ -1,19 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import GridBackground from "@/components/GridBackground";
 import { portfolioItems, PortfolioItem } from "@/lib/data";
 
-function GlassCard({ project }: { project: PortfolioItem }) {
+function GlassCard({ project, index }: { project: PortfolioItem; index: number }) {
   const [hovered, setHovered] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLAnchorElement>(null);
+  const mountedAt = useRef(Date.now());
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          // Stagger only for cards visible on initial load (within ~1s of mount)
+          const elapsed = Date.now() - mountedAt.current;
+          const delay = elapsed < 1000 ? index * 130 : 0;
+          setTimeout(() => setVisible(true), delay);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [index]);
 
   return (
     <Link
+      ref={ref}
       href={`/case-study/${project.slug}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => sessionStorage.setItem("caseStudySource", "portfolio")}
       className="portfolio-glass-card"
       style={{
         position: "relative",
@@ -26,6 +50,9 @@ function GlassCard({ project }: { project: PortfolioItem }) {
         flexShrink: 0,
         boxShadow: "2px 4px 20px 0px rgba(0,0,0,0.08)",
         display: "block",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(24px)",
+        transition: "opacity 0.6s ease, transform 0.6s cubic-bezier(0.22,1,0.36,1)",
       }}
     >
       {/* ── Cover image — anchored to bottom, height shrinks to 0 on hover (disappears top-down) ── */}
@@ -198,9 +225,10 @@ function GlassCard({ project }: { project: PortfolioItem }) {
 }
 
 export default function PortfolioPage() {
+
   return (
     <>
-      <Navigation />
+      <Navigation showFade />
 
       {/* Breathing grid background */}
       <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", filter: "blur(0.6px)" }}>
@@ -247,8 +275,8 @@ export default function PortfolioPage() {
             padding: "0 20px",
           }}
         >
-          {portfolioItems.map((project) => (
-            <GlassCard key={project.slug} project={project} />
+          {portfolioItems.map((project, i) => (
+            <GlassCard key={project.slug} project={project} index={i} />
           ))}
         </div>
       </div>

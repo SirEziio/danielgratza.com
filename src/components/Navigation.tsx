@@ -9,9 +9,10 @@ interface Props {
   hideLogo?: boolean;
   lightNav?: boolean;
   scrolledPastHero?: boolean;
+  showFade?: boolean;
 }
 
-export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true }: Props) {
+export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true, showFade = false }: Props) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -44,7 +45,7 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
           background: "linear-gradient(to bottom, var(--bg) 50%, transparent 100%)",
           zIndex: 99,
           pointerEvents: "none",
-          opacity: 0,
+          opacity: showFade ? 1 : 0,
           transition: "opacity 0.3s ease",
         }}
       />
@@ -58,7 +59,7 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "20px 30px",
+          padding: "max(20px, calc(14px + env(safe-area-inset-top, 0px))) 30px 20px",
           pointerEvents: "none",
         }}
       >

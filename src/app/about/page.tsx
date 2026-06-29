@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Navigation from "@/components/Navigation";
 import GridBackground from "@/components/GridBackground";
+import { useTheme } from "@/components/ThemeProvider";
 
 /* ─────────────────────────────────────────────────────────────
    Timeline data (matches Figma exactly)
@@ -81,28 +82,48 @@ function OrgCircle({ color, initials, scaled, iconSrc }: { color: string; initia
 ───────────────────────────────────────────────────────────── */
 function TimelineRow({ entry, index, visible }: { entry: Entry; index: number; visible: boolean }) {
   const [hovered, setHovered] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const isLeft = entry.side === "left";
-  const delay = index * 200; // ms stagger per row
+  const delay = index * 200;
+
+  const cardBg = isDark
+    ? "linear-gradient(-59.58deg, rgba(255,255,255,0.08) 7.637%, rgba(255,255,255,0.04) 92.363%)"
+    : "linear-gradient(-59.58deg, rgba(255,255,255,0.55) 7.637%, rgba(255,255,255,0.25) 92.363%)";
 
   return (
+    // Outer — handles entrance animation only
+    <div
+      style={{
+        height: ROW_H,
+        opacity: visible ? 1 : 0,
+        transform: visible ? "none" : isLeft ? "translateX(-16px)" : "translateX(16px)",
+        transition: `opacity 850ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms, transform 850ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms`,
+        position: "relative",
+        zIndex: hovered ? 10 : 1,
+      }}
+    >
+    {/* Inner — hover card; scale only, no layout changes */}
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        height: ROW_H,
+        height: "100%",
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-start",
-        paddingTop: 6,
+        paddingTop: hovered ? 14 : 6,
+        paddingBottom: hovered ? 14 : 6,
+        paddingInline: hovered ? 20 : 4,
         gap: 4,
         cursor: "default",
-        opacity: visible ? 1 : 0,
-        transform: visible
-          ? "none"
-          : isLeft
-            ? "translateX(-16px)"
-            : "translateX(16px)",
-        transition: `opacity 850ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms, transform 850ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms`,
+        borderRadius: 10,
+        background: hovered ? cardBg : "transparent",
+        backdropFilter: hovered ? "blur(14px)" : "none",
+        WebkitBackdropFilter: hovered ? "blur(14px)" : "none",
+        boxShadow: hovered ? "0 8px 40px rgba(0,0,0,0.12)" : "none",
+        transform: hovered ? "scale(1.08)" : "scale(1)",
+        transition: "background 0.28s ease, box-shadow 0.28s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1)",
       }}
     >
       {/* Main row: [left half] [dot] [right half] */}
@@ -222,6 +243,83 @@ function TimelineRow({ entry, index, visible }: { entry: Entry; index: number; v
         </div>
       )}
     </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Simple list row (used at <1280px) — same card hover effect
+───────────────────────────────────────────────────────────── */
+function SimpleRow({ entry, index, visible }: { entry: Entry; index: number; visible: boolean }) {
+  const [hovered, setHovered] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  const cardBg = isDark
+    ? "linear-gradient(-59.58deg, rgba(255,255,255,0.08) 7.637%, rgba(255,255,255,0.04) 92.363%)"
+    : "linear-gradient(-59.58deg, rgba(255,255,255,0.55) 7.637%, rgba(255,255,255,0.25) 92.363%)";
+
+  return (
+    // Outer — entrance animation + layout anchor (never changes size)
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        position: "relative",
+        zIndex: hovered ? 10 : 1,
+        opacity: visible ? 1 : 0,
+        transform: visible ? "none" : "translateY(12px)",
+        transition: `opacity 600ms ease ${index * 100}ms, transform 600ms ease ${index * 100}ms`,
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 12,
+        paddingBottom: 20,
+        cursor: "default",
+      }}
+    >
+      {/* Absolutely positioned card — expands on hover without shifting layout */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: hovered ? "-12px -16px 8px" : "0",
+          borderRadius: 10,
+          background: hovered ? cardBg : "transparent",
+          backdropFilter: hovered ? "blur(14px)" : "none",
+          WebkitBackdropFilter: hovered ? "blur(14px)" : "none",
+          boxShadow: hovered ? "0 8px 40px rgba(0,0,0,0.12)" : "none",
+          transform: hovered ? "scale(1.06)" : "scale(1)",
+          transformOrigin: "left center",
+          transition: "background 0.28s ease, box-shadow 0.28s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1), inset 0.3s cubic-bezier(0.22,1,0.36,1)",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+      {/* Content — scales with the card */}
+      <div style={{ flexShrink: 0, paddingTop: 1, position: "relative", zIndex: 1, transform: hovered ? "scale(1.06)" : "scale(1)", transformOrigin: "left center", transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)" }}>
+        <OrgCircle color={entry.color} initials={entry.initials} scaled={hovered} iconSrc={entry.iconSrc} />
+      </div>
+      <div style={{ flex: 1, minWidth: 0, position: "relative", zIndex: 1, transform: hovered ? "scale(1.06)" : "scale(1)", transformOrigin: "left center", transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
+          <span className="font-futura" style={{ fontSize: 15, fontWeight: 500, color: "var(--ink)" }}>
+            {entry.org}
+          </span>
+          <span className="font-futura" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--ink-faint)" }}>
+            {entry.year}
+          </span>
+          {entry.current && (
+            <span className="font-futura" style={{ fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--ink-faint)", fontWeight: 700 }}>
+              current
+            </span>
+          )}
+        </div>
+        {entry.role && (
+          <p className="font-futura" style={{ fontSize: 13, fontStyle: "italic", color: "var(--ink-muted)", marginTop: 2 }}>
+            {entry.role}
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -229,6 +327,7 @@ function TimelineRow({ entry, index, visible }: { entry: Entry; index: number; v
    Main page
 ───────────────────────────────────────────────────────────── */
 export default function AboutPage() {
+  const [bioVisible, setBioVisible]           = useState(false);
   const [timelineVisible, setTimelineVisible] = useState(false);
   const timelineRef = useRef<HTMLDivElement>(null);
   const [vw, setVw] = useState(1400);
@@ -247,20 +346,11 @@ export default function AboutPage() {
   const isSimple  = vw < 1280;
   const isMobile  = isStacked;
 
+  // Bio fades in on mount; timeline starts only after bio is visible
   useEffect(() => {
-    const el = timelineRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setTimelineVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
+    const t1 = setTimeout(() => setBioVisible(true), 80);
+    const t2 = setTimeout(() => setTimelineVisible(true), 880);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
   return (
@@ -315,6 +405,9 @@ export default function AboutPage() {
               color: "var(--ink)",
               lineHeight: 1.45,
               textAlign: "justify",
+              opacity: bioVisible ? 1 : 0,
+              transform: bioVisible ? "none" : "translateY(16px)",
+              transition: "opacity 0.65s ease 80ms, transform 0.65s cubic-bezier(0.22,1,0.36,1) 80ms",
             }}
           >
             Hi, I&rsquo;m Daniel — a designer who thinks like a psychologist and works like a builder.
@@ -328,6 +421,9 @@ export default function AboutPage() {
               color: "var(--ink)",
               lineHeight: 1.75,
               textAlign: "justify",
+              opacity: bioVisible ? 1 : 0,
+              transform: bioVisible ? "none" : "translateY(16px)",
+              transition: "opacity 0.65s ease 220ms, transform 0.65s cubic-bezier(0.22,1,0.36,1) 220ms",
             }}
           >
             I started out fascinated by how people think, which led me to study psychology and sociology. Somewhere along the way, I picked up a love for digital design — and realized I could combine both to create things that are not only beautiful, but make sense to people.
@@ -341,6 +437,9 @@ export default function AboutPage() {
               color: "var(--ink)",
               lineHeight: 1.75,
               textAlign: "justify",
+              opacity: bioVisible ? 1 : 0,
+              transform: bioVisible ? "none" : "translateY(16px)",
+              transition: "opacity 0.65s ease 360ms, transform 0.65s cubic-bezier(0.22,1,0.36,1) 360ms",
             }}
           >
             These days, I focus on mobile-first UX/UI, backed by research, experimentation, and collaboration with developers and product teams. I&rsquo;m equally comfortable sketching flows, tweaking UI details, or diving into test results.
@@ -354,13 +453,21 @@ export default function AboutPage() {
               color: "var(--ink)",
               lineHeight: 1.75,
               textAlign: "justify",
+              opacity: bioVisible ? 1 : 0,
+              transform: bioVisible ? "none" : "translateY(16px)",
+              transition: "opacity 0.65s ease 500ms, transform 0.65s cubic-bezier(0.22,1,0.36,1) 500ms",
             }}
           >
             Outside the screen, I unwind through climbing, hiking, or getting lost with my camera. Movement is how I reset. Design is how I think.
           </p>
 
           {/* Contact Me button */}
-          <div style={{ paddingTop: 40, display: "flex", justifyContent: "flex-end" }}>
+          <div style={{
+            paddingTop: 40, display: "flex", justifyContent: "flex-end",
+            opacity: bioVisible ? 1 : 0,
+            transform: bioVisible ? "none" : "translateY(16px)",
+            transition: "opacity 0.65s ease 640ms, transform 0.65s cubic-bezier(0.22,1,0.36,1) 640ms",
+          }}>
             <a
               href="/contact"
               className="nav-link"
@@ -381,44 +488,7 @@ export default function AboutPage() {
           {isSimple ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               {ENTRIES.map((entry, i) => (
-                <div
-                  key={`${entry.year}-${entry.org}`}
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: 12,
-                    paddingBottom: 20,
-                    opacity: timelineVisible ? 1 : 0,
-                    transform: timelineVisible ? "none" : "translateY(12px)",
-                    transition: `opacity 600ms ease ${i * 100}ms, transform 600ms ease ${i * 100}ms`,
-                  }}
-                >
-                  {/* Org circle */}
-                  <div style={{ flexShrink: 0, paddingTop: 1 }}>
-                    <OrgCircle color={entry.color} initials={entry.initials} scaled={false} iconSrc={entry.iconSrc} />
-                  </div>
-                  {/* Text */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
-                      <span className="font-futura" style={{ fontSize: 15, fontWeight: 500, color: "var(--ink)" }}>
-                        {entry.org}
-                      </span>
-                      <span className="font-futura" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-faint)" }}>
-                        {entry.year}
-                      </span>
-                      {entry.current && (
-                        <span className="font-futura" style={{ fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-faint)", fontWeight: 700 }}>
-                          current
-                        </span>
-                      )}
-                    </div>
-                    {entry.role && (
-                      <p className="font-futura" style={{ fontSize: 13, fontStyle: "italic", color: "var(--ink-muted)", marginTop: 2 }}>
-                        {entry.role}
-                      </p>
-                    )}
-                  </div>
-                </div>
+                <SimpleRow key={`${entry.year}-${entry.org}`} entry={entry} index={i} visible={timelineVisible} />
               ))}
             </div>
           ) : (

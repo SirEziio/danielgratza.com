@@ -314,7 +314,7 @@ function HeroSection({
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "flex-start",
-          padding: "120px clamp(24px, 6vw, 80px) 80px",
+          padding: "max(120px, calc(80px + env(safe-area-inset-top, 0px))) clamp(24px, 6vw, 80px) 80px",
           maxWidth: 1100,
           margin: "0 auto",
           width: "100%",
@@ -1215,11 +1215,7 @@ function NextProjectSection({ study }: { study: CaseStudy }) {
 
   const [backLabel, setBackLabel] = useState("Back to Portfolio");
   useEffect(() => {
-    const ref = document.referrer;
-    if (ref) {
-      const path = new URL(ref).pathname;
-      if (path === "/" || path === "") setBackLabel("Back to Homepage");
-    }
+    if (sessionStorage.getItem("caseStudySource") === "home") setBackLabel("Back to Homepage");
   }, []);
 
   return (
@@ -1420,7 +1416,7 @@ export default function CaseStudyV2({
   return (
     <>
       {/* Navigation — lightNav while in the dark hero, normal after */}
-      <Navigation lightNav={!scrolledPastHero} scrolledPastHero={scrolledPastHero} />
+      <Navigation lightNav={!scrolledPastHero} scrolledPastHero={scrolledPastHero} showFade={scrolledPastHero} />
 
       <main>
         {/* 1 — Hero */}
