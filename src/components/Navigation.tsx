@@ -34,6 +34,21 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
 
   return (
     <>
+      {/* Status bar solid cover — blocks content bleeding into iOS safe area */}
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          top: 0, left: 0, right: 0,
+          height: "env(safe-area-inset-top, 0px)",
+          background: "var(--bg)",
+          zIndex: 101,
+          pointerEvents: "none",
+          opacity: showFade ? 1 : 0,
+          transition: "opacity 0.3s ease",
+        }}
+      />
+
       {/* Scroll fade gradient */}
       <div
         aria-hidden
