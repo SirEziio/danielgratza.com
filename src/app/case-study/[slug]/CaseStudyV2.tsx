@@ -1430,7 +1430,7 @@ export default function CaseStudyV2({
   return (
     <>
       {/* Navigation — lightNav while in the dark hero, normal after */}
-      <Navigation lightNav={!scrolledPastHero} scrolledPastHero={scrolledPastHero} showFade={scrolledPastHero} />
+      <Navigation lightNav={!scrolledPastHero} scrolledPastHero={scrolledPastHero} />
 
       <main>
         {/* 1 — Hero */}

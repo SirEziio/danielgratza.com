@@ -7,7 +7,7 @@ export default function CVPage() {
 
   return (
     <>
-      <Navigation showFade />
+      <Navigation />
 
       <style>{`
         .cv-content {

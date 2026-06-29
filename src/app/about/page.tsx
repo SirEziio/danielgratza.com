@@ -372,8 +372,8 @@ export default function AboutPage() {
           // ≤840px  → 8vw (matches nav gutter)
           // 841–1280px → 15vw (narrower content band)
           // >1280px → 10vw capped at 120px (wider content)
-          paddingLeft:  vw <= 840 ? "8vw" : vw <= 1280 ? "clamp(60px, 15vw, 160px)" : "clamp(40px, 10vw, 120px)",
-          paddingRight: vw <= 840 ? "8vw" : vw <= 1280 ? "clamp(60px, 15vw, 160px)" : "clamp(40px, 10vw, 120px)",
+          paddingLeft:  vw <= 840 ? 30 : vw <= 1280 ? "clamp(60px, 15vw, 160px)" : "clamp(40px, 10vw, 120px)",
+          paddingRight: vw <= 840 ? 30 : vw <= 1280 ? "clamp(60px, 15vw, 160px)" : "clamp(40px, 10vw, 120px)",
         }}
       >
       <div

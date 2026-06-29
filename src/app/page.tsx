@@ -181,6 +181,14 @@ export default function HomePage() {
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
   }, []);
 
+  // Sync theme-color meta with current section for iOS status bar
+  useEffect(() => {
+    let tag = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (!tag) { tag = document.createElement("meta"); tag.name = "theme-color"; document.head.appendChild(tag); }
+    const isFooter = activeSection === footerIdx;
+    tag.content = isFooter ? "#1a1a1a" : (isDark ? "#242424" : "#e1dfd8");
+  }, [activeSection, isDark, footerIdx]);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;

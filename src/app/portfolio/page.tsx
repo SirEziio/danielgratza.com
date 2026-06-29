@@ -228,7 +228,7 @@ export default function PortfolioPage() {
 
   return (
     <>
-      <Navigation showFade />
+      <Navigation />
 
       {/* Breathing grid background */}
       <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", filter: "blur(0.6px)" }}>
