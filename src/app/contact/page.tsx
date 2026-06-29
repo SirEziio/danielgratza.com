@@ -168,8 +168,8 @@ function CopyButton({ text }: { text: string }) {
 /* ──────────────────────────────────────────────────────────────
    Social link
 ────────────────────────────────────────────────────────────── */
-function SocialLink({ href, label, children, delay = 0, isVisible }: {
-  href: string; label: string; children: React.ReactNode; delay?: number; isVisible: boolean;
+function SocialLink({ href, label, children, delay = 0, isVisible, brandColor }: {
+  href: string; label: string; children: React.ReactNode; delay?: number; isVisible: boolean; brandColor?: string;
 }) {
   const [hovered, setHovered] = useState(false);
   // Once the entrance animation completes, switch to instant hover transitions
@@ -191,11 +191,11 @@ function SocialLink({ href, label, children, delay = 0, isVisible }: {
       style={{
         display: "flex", alignItems: "center", justifyContent: "center",
         width: 36, height: 36,
-        color: "var(--ink)",
-        opacity: isVisible ? (hovered ? 1 : 0.55) : 0,
-        transform: isVisible ? (hovered ? "translateY(-2px)" : "none") : "translateY(12px)",
+        color: hovered && brandColor ? brandColor : "var(--ink)",
+        opacity: isVisible ? (hovered ? 1 : 0.5) : 0,
+        transform: isVisible ? (hovered ? "translateY(-3px) scale(1.1)" : "none") : "translateY(12px)",
         transition: entered
-          ? "opacity 0.18s ease, transform 0.18s cubic-bezier(0.22,1,0.36,1)"
+          ? "opacity 0.18s ease, transform 0.22s cubic-bezier(0.22,1,0.36,1), color 0.18s ease"
           : `opacity 0.6s ease ${delay}ms, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
         textDecoration: "none",
       }}
@@ -556,13 +556,13 @@ export default function ContactPage() {
         {/* ── Social icons ─────────────────────────────────────── */}
         <div style={{ display: "flex", gap: 16, alignItems: "center", justifyContent: "center", padding: 10, marginTop: isMobile ? 40 : 0 }}>
           {[
-            { href: "https://www.linkedin.com/in/daniel-gratza-82b893210/", label: "LinkedIn",  icon: <IconLinkedIn />  },
-            { href: "https://www.instagram.com/dxgratza/",                  label: "Instagram", icon: <IconInstagram /> },
-            { href: "https://wa.me/420601338213",                            label: "WhatsApp",  icon: <IconWhatsApp />  },
-            { href: "https://medium.com/@danielgratza",                      label: "Medium",    icon: <IconMedium />    },
-            { href: "https://dribbble.com/danielgratza",                     label: "Dribbble",  icon: <IconDribbble />  },
-          ].map(({ href, label, icon }, i) => (
-            <SocialLink key={label} href={href} label={label} delay={400 + i * 60} isVisible={isVisible}>
+            { href: "https://www.linkedin.com/in/daniel-gratza-82b893210/", label: "LinkedIn",  icon: <IconLinkedIn />,  brandColor: "#0A66C2" },
+            { href: "https://www.instagram.com/dxgratza/",                  label: "Instagram", icon: <IconInstagram />, brandColor: "#E1306C" },
+            { href: "https://wa.me/420601338213",                            label: "WhatsApp",  icon: <IconWhatsApp />,  brandColor: "#25D366" },
+            { href: "https://medium.com/@danielgratza",                      label: "Medium",    icon: <IconMedium />,    brandColor: "#000000" },
+            { href: "https://dribbble.com/danielgratza",                     label: "Dribbble",  icon: <IconDribbble />,  brandColor: "#EA4C89" },
+          ].map(({ href, label, icon, brandColor }, i) => (
+            <SocialLink key={label} href={href} label={label} delay={400 + i * 60} isVisible={isVisible} brandColor={brandColor}>
               {icon}
             </SocialLink>
           ))}

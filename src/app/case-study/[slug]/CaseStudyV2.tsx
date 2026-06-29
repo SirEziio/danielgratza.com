@@ -242,7 +242,7 @@ function Eyebrow({ text, light = false }: { text: string; light?: boolean }) {
    Helper — section wrapper with consistent horizontal padding
 ───────────────────────────────────────────────────────────────── */
 const sectionPad: React.CSSProperties = {
-  padding: "clamp(64px, 10vw, 120px) clamp(24px, 6vw, 80px)",
+  padding: "clamp(64px, 10vw, 120px) max(var(--page-pad), max(var(--page-pad), clamp(24px, 6vw, 80px)))",
   maxWidth: 1100,
   margin: "0 auto",
   width: "100%",
@@ -314,7 +314,7 @@ function HeroSection({
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "flex-start",
-          padding: "max(120px, calc(80px + env(safe-area-inset-top, 0px))) clamp(24px, 6vw, 80px) 80px",
+          padding: "max(120px, calc(80px + env(safe-area-inset-top, 0px))) max(var(--page-pad), clamp(24px, 6vw, 80px)) 80px",
           maxWidth: 1100,
           margin: "0 auto",
           width: "100%",
@@ -443,7 +443,7 @@ function MetaStrip({ study }: { study: CaseStudy }) {
       <div
         style={{
           ...sectionPad,
-          padding: "clamp(28px, 4vw, 48px) clamp(24px, 6vw, 80px)",
+          padding: "clamp(28px, 4vw, 48px) max(var(--page-pad), clamp(24px, 6vw, 80px))",
         }}
       >
         <div
@@ -1135,7 +1135,7 @@ function ReflectionSection({ chapters, study }: { chapters: CaseStudyChapter[]; 
           position: "relative",
           zIndex: 1,
           ...sectionPad,
-          padding: "clamp(80px, 12vw, 140px) clamp(24px, 6vw, 80px)",
+          padding: "clamp(80px, 12vw, 140px) max(var(--page-pad), clamp(24px, 6vw, 80px))",
         }}
       >
         <FadeUp>
@@ -1223,7 +1223,7 @@ function NextProjectSection({ study }: { study: CaseStudy }) {
       <div
         style={{
           ...sectionPad,
-          padding: "clamp(64px, 10vw, 120px) clamp(24px, 6vw, 80px)",
+          padding: "clamp(64px, 10vw, 120px) max(var(--page-pad), clamp(24px, 6vw, 80px))",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",

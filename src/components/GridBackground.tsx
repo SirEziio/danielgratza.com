@@ -112,9 +112,9 @@ export default function GridBackground({ forceDark, forceLight }: { forceDark?: 
           const dist = Math.min(1, Math.sqrt(dx * dx + dy * dy));
           const radialMask = 1 - dist * 0.75;
 
-          // Base grid line opacity: breathing (0 → 0.18) + radial fade
+          // Base grid line opacity: breathing (0 → 0.14) + radial fade
           const baseOpacity =
-            (0.005 + breathVal * 0.175) * radialMask;
+            (0.005 + breathVal * 0.135) * radialMask;
 
           const x = c * CELL;
           const y = r * CELL;
