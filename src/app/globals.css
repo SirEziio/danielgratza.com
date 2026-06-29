@@ -12,8 +12,10 @@
   --ball:       #c5d100;
   --grid-line:  rgba(36,36,36,0.08);
   --nav-bg:     rgba(225,223,216,0.0);
-  /* Unified horizontal page padding — nav logo, hamburger, and all page content share this */
-  --page-pad:   clamp(24px, 3vw, 30px);
+  /* Unified horizontal page padding — nav logo, hamburger, and all page content share this.
+     Mobile-first: 8vw matches the !important CSS overrides in the 840px breakpoint below.
+     Desktop overrides to clamp(24px, 3vw, 30px) via the min-width media query at the bottom. */
+  --page-pad:   8vw;
 }
 
 /* Logo invert in dark mode or on dark-bg sections */
@@ -411,21 +413,19 @@ html.dark .cs-glass-card {
     flex: none !important;
     max-width: 100% !important;
     width: 100%;
-    padding: 2.5rem 8vw 3rem !important;
+    padding: 2.5rem var(--page-pad) 3rem !important;
   }
   .cs-section-inner .cs-card-col {
     flex: none !important;
     width: 100%;
-    padding: 6rem 8vw 0;
+    /* top padding clears nav + safe-area so image enters the glass on scroll */
+    padding: max(6rem, calc(3.5rem + env(safe-area-inset-top, 0px))) var(--page-pad) 0;
   }
 
-  /* Nav: align logo + hamburger to same 8vw gutter as case study content */
-  .site-header { padding-left: 8vw !important; padding-right: 8vw !important; }
-  .site-nav-logo { left: 8vw !important; top: 16px !important; }
-  .site-nav-hamburger { right: calc(8vw - 6px) !important; top: 16px !important; }
-
-  /* Stronger fade on mobile so logo doesn't collide with content */
-  .nav-fade-bg { height: 64px !important; background: linear-gradient(to bottom, var(--bg) 50%, transparent 100%) !important; }
+  /* Nav: align logo + hamburger to same var(--page-pad) gutter as all page content */
+  .site-header { padding-left: var(--page-pad) !important; padding-right: var(--page-pad) !important; }
+  .site-nav-logo { left: var(--page-pad) !important; top: 16px !important; }
+  .site-nav-hamburger { right: calc(var(--page-pad) - 6px) !important; top: 16px !important; }
   .cs-cover-img {
     border-radius: 8px;
     aspect-ratio: 3/2 !important;
@@ -544,4 +544,11 @@ html.dark .cs-glass-card {
   92%           { opacity: 0.7; }
   94%           { opacity: 0.1; }
   96%           { opacity: 0.6; }
+}
+
+/* ── Desktop page padding — overrides the mobile-first 8vw default ── */
+@media (min-width: 841px) {
+  :root {
+    --page-pad: clamp(24px, 3vw, 30px);
+  }
 }

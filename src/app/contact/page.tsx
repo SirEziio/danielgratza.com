@@ -172,6 +172,14 @@ function SocialLink({ href, label, children, delay = 0, isVisible }: {
   href: string; label: string; children: React.ReactNode; delay?: number; isVisible: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
+  // Once the entrance animation completes, switch to instant hover transitions
+  const [entered, setEntered] = useState(false);
+  useEffect(() => {
+    if (!isVisible) return;
+    const t = setTimeout(() => setEntered(true), delay + 650);
+    return () => clearTimeout(t);
+  }, [isVisible, delay]);
+
   return (
     <a
       href={href}
@@ -186,7 +194,9 @@ function SocialLink({ href, label, children, delay = 0, isVisible }: {
         color: "var(--ink)",
         opacity: isVisible ? (hovered ? 1 : 0.55) : 0,
         transform: isVisible ? (hovered ? "translateY(-2px)" : "none") : "translateY(12px)",
-        transition: `opacity 0.6s ease ${delay}ms, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
+        transition: entered
+          ? "opacity 0.18s ease, transform 0.18s cubic-bezier(0.22,1,0.36,1)"
+          : `opacity 0.6s ease ${delay}ms, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
         textDecoration: "none",
       }}
     >
@@ -318,9 +328,9 @@ export default function ContactPage() {
           flexDirection: "column",
           alignItems: isMobile ? "stretch" : "center",
           justifyContent: "space-between",
-          paddingTop: 80,
-          paddingLeft: "var(--page-pad)",
-          paddingRight: "var(--page-pad)",
+          paddingTop: "max(80px, calc(60px + env(safe-area-inset-top, 0px)))",
+          paddingLeft: "calc(var(--page-pad) + 10px)",
+          paddingRight: "calc(var(--page-pad) + 10px)",
           paddingBottom: "max(48px, calc(env(safe-area-inset-bottom, 0px) + 24px))",
         }}
       >

@@ -30,7 +30,7 @@ const ENTRIES: Entry[] = [
   { year: "2025", org: "Ackee",               role: "UX / UI Designer",                    side: "right", color: "#2200FF", initials: "A",  iconSrc: "/images/contact/ackee.png", current: true },
 ];
 
-const ROW_H = 88; // px per timeline row — tall enough for 2-line role text
+const ROW_H = 108; // px per timeline row — tall enough for 2-line role text + symmetric top/bottom padding when hovered
 
 /* ─────────────────────────────────────────────────────────────
    Small colored circle with initials
@@ -108,7 +108,7 @@ function TimelineRow({ entry, index, visible }: { entry: Entry; index: number; v
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        height: "100%",
+        height: "auto",
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-start",

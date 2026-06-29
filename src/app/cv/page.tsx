@@ -10,20 +10,13 @@ export default function CVPage() {
       <Navigation />
 
       <style>{`
-        .cv-content {
+        .cv-pdf {
           width: 100%;
-          padding: 0;
-        }
-        @media (min-width: 540px) {
-          .cv-content {
-            padding: 0 var(--page-pad);
-          }
         }
         @media (min-width: 768px) {
-          .cv-content {
+          .cv-pdf {
             max-width: min(80vw, 1280px);
             margin: 0 auto;
-            padding: 0;
           }
         }
       `}</style>
@@ -34,22 +27,21 @@ export default function CVPage() {
           paddingBottom: 60,
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
           minHeight: "100dvh",
         }}
       >
-        <div className="cv-content">
-
-          {/* Toolbar */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingBlock: 10,
-              marginBottom: 20,
-            }}
-          >
+        {/* Toolbar — always aligned with nav logo/hamburger */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingBlock: 10,
+            marginBottom: 20,
+            paddingLeft: "var(--page-pad)",
+            paddingRight: "var(--page-pad)",
+          }}
+        >
             <a
               href="/contact"
               className="nav-link"
@@ -71,7 +63,8 @@ export default function CVPage() {
             </a>
           </div>
 
-          {/* PDF — A4 aspect ratio (297 / 210 ≈ 1.4143) */}
+        {/* PDF — A4 aspect ratio, max-width on desktop, full-width on mobile */}
+        <div className="cv-pdf">
           <div style={{ position: "relative", width: "100%", paddingTop: "141.43%" }}>
             <iframe
               src={pdfPath + "#toolbar=0&navpanes=0&scrollbar=1"}
@@ -85,8 +78,8 @@ export default function CVPage() {
               }}
             />
           </div>
-
         </div>
+
       </div>
     </>
   );
