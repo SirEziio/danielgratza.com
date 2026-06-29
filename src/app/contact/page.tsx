@@ -316,7 +316,7 @@ export default function ContactPage() {
           minHeight: "100dvh",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
+          alignItems: isMobile ? "stretch" : "center",
           justifyContent: "space-between",
           paddingTop: 80,
           paddingLeft: isMobile ? 30 : 40,
