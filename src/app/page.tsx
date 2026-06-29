@@ -252,7 +252,7 @@ export default function HomePage() {
         />
       </div>
 
-      {/* Scroll progress dots */}
+      {/* Scroll progress dots — hidden on hero */}
       <div
         style={{
           position: "fixed",
@@ -263,7 +263,9 @@ export default function HomePage() {
           flexDirection: "column",
           gap: "0.4rem",
           zIndex: 50,
-          pointerEvents: "auto",
+          pointerEvents: activeSection === 0 ? "none" : "auto",
+          opacity: activeSection === 0 ? 0 : 1,
+          transition: "opacity 0.4s ease",
         }}
       >
         {[0, ...caseStudies.map((_, i) => i + 1), caseStudies.length + 1].map((i) => {

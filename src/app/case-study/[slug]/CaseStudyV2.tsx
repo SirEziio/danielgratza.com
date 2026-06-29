@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -1401,17 +1401,32 @@ export default function CaseStudyV2({
   const heroRef = useRef<HTMLElement | null>(null);
   const [scrolledPastHero, setScrolledPastHero] = useState(false);
 
+  // Update theme-color meta to match status bar area
+  const setThemeColor = useCallback((color: string) => {
+    let tag = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (!tag) { tag = document.createElement("meta"); tag.name = "theme-color"; document.head.appendChild(tag); }
+    tag.content = color;
+  }, []);
+
   // Track scroll to know when nav should flip from dark→light mode
   useEffect(() => {
     const hero = heroRef.current;
     if (!hero) return;
     const obs = new IntersectionObserver(
-      ([entry]) => setScrolledPastHero(!entry.isIntersecting),
+      ([entry]) => {
+        const past = !entry.isIntersecting;
+        setScrolledPastHero(past);
+        // Match status bar to hero bg or page bg depending on position
+        const isDark = document.documentElement.classList.contains("dark");
+        setThemeColor(past ? (isDark ? "#242424" : "#e1dfd8") : "#1a1a1a");
+      },
       { threshold: 0.1 }
     );
     obs.observe(hero);
-    return () => obs.disconnect();
-  }, []);
+    // Set initial hero color
+    setThemeColor("#1a1a1a");
+    return () => { obs.disconnect(); setThemeColor(""); };
+  }, [setThemeColor]);
 
   return (
     <>
