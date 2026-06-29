@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";
+import { useTheme } from "./ThemeProvider";
 
 interface Props {
   hideLogo?: boolean;
@@ -15,6 +16,8 @@ interface Props {
 export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true, showFade = false }: Props) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { theme } = useTheme();
+  const bgColor = theme === "dark" ? "#242424" : "#e1dfd8";
 
   // Close on route change
   useEffect(() => { setMenuOpen(false); }, [pathname]);
@@ -40,9 +43,9 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
         style={{
           position: "fixed",
           top: 0, left: 0, right: 0,
-          height: "env(safe-area-inset-top, 0px)",
-          background: "var(--bg)",
-          zIndex: 101,
+          height: "max(env(safe-area-inset-top, 44px), 44px)",
+          background: bgColor,
+          zIndex: 9999,
           pointerEvents: "none",
           opacity: showFade ? 1 : 0,
           transition: "opacity 0.3s ease",

@@ -22,6 +22,10 @@ const cormorant = Cormorant_Garamond({
 
 export const viewport = {
   viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#e1dfd8" },
+    { media: "(prefers-color-scheme: dark)",  color: "#242424" },
+  ],
 };
 
 export const metadata: Metadata = {

@@ -1423,9 +1423,8 @@ export default function CaseStudyV2({
       { threshold: 0.1 }
     );
     obs.observe(hero);
-    // Set initial hero color
     setThemeColor("#1a1a1a");
-    return () => { obs.disconnect(); setThemeColor(""); };
+    return () => { obs.disconnect(); };
   }, [setThemeColor]);
 
   return (
