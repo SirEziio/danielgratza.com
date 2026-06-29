@@ -11,7 +11,7 @@ interface Cell {
   trail: number;  // 0–1 fading trail
 }
 
-export default function GridBackground({ forceDark }: { forceDark?: boolean } = {}) {
+export default function GridBackground({ forceDark, forceLight }: { forceDark?: boolean; forceLight?: boolean } = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cellsRef = useRef<Cell[][]>([]);
   const breathRef = useRef(0);
@@ -93,7 +93,7 @@ export default function GridBackground({ forceDark }: { forceDark?: boolean } = 
       const H = canvas.offsetHeight;
       ctx.clearRect(0, 0, W, H);
 
-      const isDark = forceDark || themeRef.current === "dark";
+      const isDark = forceLight ? false : (forceDark || themeRef.current === "dark");
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {

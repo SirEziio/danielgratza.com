@@ -8,6 +8,109 @@ import MouseScrollIcon from "@/components/MouseScrollIcon";
 import { caseStudies, portfolioItems } from "@/lib/data";
 import DotGrid from "@/components/DotGrid";
 
+/* ── Footer CTA ── */
+function FooterCTA({ isVisible }: { isVisible: boolean }) {
+  const [hovered, setHovered] = useState(false);
+  const fg         = "#e1dfd8";
+  const borderBase = "rgba(225,223,216,0.22)";
+  const borderHov  = "rgba(225,223,216,0.65)";
+  const bgHov      = "rgba(225,223,216,0.07)";
+  return (
+    <a
+      href="/contact"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: "inline-flex", alignItems: "center", gap: 12,
+        padding: "14px 36px",
+        border: `1px solid ${hovered ? borderHov : borderBase}`,
+        background: hovered ? bgHov : "transparent",
+        color: fg,
+        fontFamily: '"Futura PT", var(--font-futura), sans-serif',
+        fontSize: "0.8rem", fontWeight: 400,
+        letterSpacing: "0.14em", textTransform: "uppercase",
+        textDecoration: "none", cursor: "pointer", borderRadius: 0,
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? "none" : "translateY(18px)",
+        transition: `border-color 0.25s ease, background 0.25s ease, opacity 0.85s ease 520ms, transform 0.85s cubic-bezier(0.22,1,0.36,1) 520ms`,
+      }}
+    >
+      Get in touch
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+        style={{ opacity: 0.6, transition: "transform 0.25s ease", transform: hovered ? "translateX(3px)" : "none" }}>
+        <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    </a>
+  );
+}
+
+/* ── Footer photo — full-screen tilt + occasional glitch ── */
+function FooterPhoto({
+  isVisible, tilt, glitching,
+}: { isVisible: boolean; tilt: { x: number; y: number }; glitching: boolean }) {
+  const faceBg  = "linear-gradient(145deg,#2c2c2c 0%,#3a3a3a 55%,#272727 100%)";
+  const ring    = "rgba(255,255,255,0.12)";
+  const bracket = "rgba(225,223,216,0.35)";
+
+  const CORNERS: [string, string][] = [["top","left"],["top","right"],["bottom","left"],["bottom","right"]];
+
+  return (
+    <div style={{
+      flexShrink: 0,
+      position: "relative",
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? "none" : "translateY(24px) scale(0.88)",
+      transition: "opacity 1.2s cubic-bezier(0.22,1,0.36,1) 80ms, transform 1.2s cubic-bezier(0.22,1,0.36,1) 80ms",
+    }}>
+
+      {/* Float wrapper — brackets live inside so they bob with the photo */}
+      <div style={{ position: "relative", animation: isVisible ? "footerFloat 5s ease-in-out 1.5s infinite" : "none" }}>
+
+        {/* Corner reticle brackets */}
+        {CORNERS.map(([v, h]) => (
+          <div key={`${v}-${h}`} style={{
+            position: "absolute",
+            [v]: -12, [h]: -12,
+            width: 16, height: 16,
+            borderTop:    v === "top"    ? `1px solid ${bracket}` : "none",
+            borderBottom: v === "bottom" ? `1px solid ${bracket}` : "none",
+            borderLeft:   h === "left"   ? `1px solid ${bracket}` : "none",
+            borderRight:  h === "right"  ? `1px solid ${bracket}` : "none",
+            animation: isVisible ? `bracketPulse ${2.2 + CORNERS.indexOf([v,h]) * 0.4}s ease-in-out infinite` : "none",
+            pointerEvents: "none", zIndex: 3,
+          }} />
+        ))}
+
+        {/* Tilt wrapper — driven by parent's footerTilt prop */}
+        <div style={{
+          transform: `perspective(700px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+          transition: "transform 0.08s linear",
+        }}>
+
+          {/* Glitch + visual layer */}
+          <div style={{
+            width:  "clamp(140px, 18vw, 220px)",
+            height: "clamp(140px, 18vw, 220px)",
+            borderRadius: "50%",
+            background: faceBg,
+            overflow: "hidden",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: `0 24px 64px rgba(0,0,0,0.45), 0 0 0 1px ${ring}`,
+            animation: glitching ? "photoGlitch 0.45s steps(4, end) forwards" : "none",
+          }}>
+            <img
+              src="/images/daniel.png"
+              alt="Daniel Gratza"
+              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
+            />
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const tagsMap = Object.fromEntries(portfolioItems.map(p => [p.slug, p.tags]));
 
 export default function HomePage() {
@@ -17,6 +120,12 @@ export default function HomePage() {
   // Hero lazy-load stages: 0=hidden, 1=grid, 2=name, 3=subtitle, 4=ball+scroll
   const [heroStage, setHeroStage] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+  const [footerTilt, setFooterTilt]       = useState({ x: 0, y: 0 });
+  const [footerMousePx, setFooterMousePx] = useState({ x: 0, y: 0 });
+  const [footerGlitch, setFooterGlitch]   = useState(false);
+  const footerIdx = caseStudies.length + 1;
+  const isFooterSeen = seenSections.has(footerIdx);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= 840);
@@ -24,6 +133,45 @@ export default function HomePage() {
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
+
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.classList.contains("dark"));
+    check();
+    const obs = new MutationObserver(check);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => obs.disconnect();
+  }, []);
+
+  // Full-screen tilt — active only when footer is the current section
+  useEffect(() => {
+    if (activeSection !== footerIdx) {
+      setFooterTilt({ x: 0, y: 0 });
+      return;
+    }
+    const handler = (e: MouseEvent) => {
+      const dx = (e.clientX - window.innerWidth  / 2) / (window.innerWidth  / 2);
+      const dy = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+      setFooterTilt({ x: dy * -16, y: dx * 16 });
+      setFooterMousePx({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", handler);
+    return () => window.removeEventListener("mousemove", handler);
+  }, [activeSection, footerIdx]);
+
+  // Occasional glitch — starts after footer first appears
+  useEffect(() => {
+    if (!isFooterSeen) return;
+    let t: ReturnType<typeof setTimeout>;
+    const schedule = () => {
+      t = setTimeout(() => {
+        setFooterGlitch(true);
+        setTimeout(() => setFooterGlitch(false), 450);
+        schedule();
+      }, 8000 + Math.random() * 10000);
+    };
+    schedule();
+    return () => clearTimeout(t);
+  }, [isFooterSeen]);
 
   useEffect(() => {
     const t1 = setTimeout(() => setHeroStage(1), 80);   // grid
@@ -100,6 +248,7 @@ export default function HomePage() {
         <Navigation
           hideLogo={activeSection === 0}
           scrolledPastHero={activeSection > 0}
+          lightNav={activeSection === footerIdx}
         />
       </div>
 
@@ -117,24 +266,28 @@ export default function HomePage() {
           pointerEvents: "auto",
         }}
       >
-        {[0, ...caseStudies.map((_, i) => i + 1)].map((i) => (
-          <button
-            key={i}
-            onClick={() => scrollTo(i)}
-            style={{
-              width: activeSection === i ? 7 : 5,
-              height: activeSection === i ? 7 : 5,
-              borderRadius: "50%",
-              background: "var(--ink)",
-              opacity: activeSection === i ? 0.8 : 0.2,
-              border: "none",
-              cursor: "pointer",
-              padding: 0,
-              transition: "all 0.25s ease",
-            }}
-            aria-label={`Section ${i + 1}`}
-          />
-        ))}
+        {[0, ...caseStudies.map((_, i) => i + 1), caseStudies.length + 1].map((i) => {
+          const onDark = activeSection === caseStudies.length + 1;
+          const dotColor = onDark ? "#e1dfd8" : "var(--ink)";
+          return (
+            <button
+              key={i}
+              onClick={() => scrollTo(i)}
+              style={{
+                width: activeSection === i ? 7 : 5,
+                height: activeSection === i ? 7 : 5,
+                borderRadius: "50%",
+                background: dotColor,
+                opacity: activeSection === i ? 0.8 : 0.2,
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+                transition: "all 0.25s ease",
+              }}
+              aria-label={`Section ${i + 1}`}
+            />
+          );
+        })}
       </div>
 
       <div ref={containerRef} className="snap-container">
@@ -304,7 +457,7 @@ export default function HomePage() {
                   <p
                     className="font-futura"
                     style={{
-                      fontSize: "clamp(16px, 1.35vw, 19px)",
+                      fontSize: "clamp(15px, 1.1vw, 17px)",
                       fontWeight: 400,
                       color: "var(--ink-muted)",
                       lineHeight: 1.8,
@@ -402,6 +555,175 @@ export default function HomePage() {
             </div>
           );
         })}
+
+        {/* ── FOOTER: About + Contact ───────────────────────── */}
+        <div
+          className="snap-section"
+          data-idx={footerIdx}
+          style={{
+            background: "#1a1a1a",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+            overflow: "hidden",
+            transition: "background 0.35s ease",
+          }}
+        >
+          {/* Breathing interactive grid — same component as hero/about */}
+          <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+            <GridBackground forceDark={true} />
+          </div>
+
+          {/* Radar sweep — slow rotating conic gradient */}
+          <div style={{
+            position: "absolute",
+            left: "50%", top: "50%",
+            width: "150vw", height: "150vw",
+            transform: "translate(-50%, -50%)",
+            background: "conic-gradient(from 0deg, transparent 0deg, transparent 290deg, rgba(225,223,216,0.02) 315deg, rgba(225,223,216,0.07) 348deg, rgba(225,223,216,0.14) 360deg)",
+            animation: "radarSweep 8s linear infinite",
+            pointerEvents: "none", zIndex: 0,
+          }} />
+
+          {/* Ambient glow — breathes */}
+          <div style={{
+            position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <div style={{
+              width: "clamp(360px, 55vw, 700px)",
+              height: "clamp(360px, 55vw, 700px)",
+              borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(197,209,0,0.07) 0%, transparent 65%)",
+              filter: "blur(40px)",
+              opacity: isFooterSeen ? 1 : 0,
+              transition: "opacity 1.8s ease 100ms",
+              animation: isFooterSeen ? "footerGlowPulse 4s ease-in-out 1.8s infinite" : "none",
+            }} />
+          </div>
+
+          {/* Decorative + markers at fixed positions */}
+          {[
+            { left: "8%",  top: "18%" , delay: "0s"    },
+            { left: "88%", top: "72%" , delay: "1.1s"  },
+            { left: "12%", top: "78%" , delay: "2.3s"  },
+            { left: "82%", top: "22%" , delay: "0.7s"  },
+          ].map((pos, i) => (
+            <div key={i} style={{
+              position: "absolute", ...pos,
+              fontSize: 9,
+              color: "rgba(225,223,216,0.2)",
+              fontFamily: "monospace",
+              lineHeight: 1,
+              pointerEvents: "none", zIndex: 1, userSelect: "none",
+              animation: `markerFlicker ${5 + i * 1.3}s ease ${pos.delay} infinite`,
+            }}>+</div>
+          ))}
+
+          {/* Vertical fill bar — right edge, grows when section enters */}
+          <div style={{
+            position: "absolute", right: "6%", top: "15%",
+            width: 1, height: "70%",
+            background: "rgba(225,223,216,0.08)",
+            zIndex: 1, pointerEvents: "none",
+            overflow: "hidden",
+          }}>
+            <div style={{
+              position: "absolute", top: 0, left: 0, right: 0,
+              height: isFooterSeen ? "100%" : "0%",
+              background: "linear-gradient(to bottom, transparent, rgba(225,223,216,0.35) 50%, transparent)",
+              transition: "height 2.4s cubic-bezier(0.22,1,0.36,1) 0.6s",
+            }} />
+          </div>
+
+          {/* Mouse coordinate HUD — bottom right */}
+          <div className="font-futura" style={{
+            position: "absolute", bottom: "clamp(16px, 2.5vw, 28px)", right: "clamp(20px, 3vw, 36px)",
+            fontSize: 9, letterSpacing: "0.1em",
+            color: "rgba(225,223,216,0.28)",
+            fontVariantNumeric: "tabular-nums",
+            pointerEvents: "none", zIndex: 2, userSelect: "none",
+            opacity: isFooterSeen ? 1 : 0,
+            transition: "opacity 1s ease 1.2s",
+          }}>
+            {`${footerMousePx.x.toString(16).padStart(4,"0").toUpperCase()} · ${footerMousePx.y.toString(16).padStart(4,"0").toUpperCase()}`}
+          </div>
+
+          {/* Row layout: photo left, text right */}
+          <div style={{
+            position: "relative", zIndex: 1,
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            alignItems: "center",
+            gap: isMobile ? "clamp(28px, 5vw, 40px)" : "clamp(48px, 7vw, 100px)",
+            padding: "clamp(32px, 5vw, 56px) clamp(32px, 9vw, 100px)",
+            maxWidth: 900,
+            width: "100%",
+          }}>
+
+            {/* LEFT: Interactive photo */}
+            <FooterPhoto isVisible={isFooterSeen} tilt={footerTilt} glitching={footerGlitch} />
+
+            {/* RIGHT: Text block */}
+            <div style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: isMobile ? "center" : "flex-start",
+              textAlign: isMobile ? "center" : "left",
+            }}>
+              {/* Headline */}
+              <h2
+                className="font-caslon"
+                style={{
+                  fontSize: "clamp(1.8rem, 4vw, 3.4rem)",
+                  color: "#e1dfd8",
+                  lineHeight: 1.06,
+                  letterSpacing: "-0.01em",
+                  marginBottom: "clamp(8px, 1.2vw, 14px)",
+                  opacity: isFooterSeen ? 1 : 0,
+                  transform: isFooterSeen ? "none" : "translateY(36px)",
+                  transition: "opacity 0.95s ease 260ms, transform 0.95s cubic-bezier(0.22,1,0.36,1) 260ms",
+                }}
+              >
+                Let&rsquo;s make something great.
+              </h2>
+
+              {/* Tagline */}
+              <p
+                className="font-futura"
+                style={{
+                  fontSize: "clamp(11px, 0.9vw, 13px)",
+                  color: "rgba(225,223,216,0.45)",
+                  letterSpacing: "0.13em",
+                  textTransform: "uppercase",
+                  marginBottom: 0,
+                  opacity: isFooterSeen ? 1 : 0,
+                  transform: isFooterSeen ? "none" : "translateY(20px)",
+                  transition: "opacity 0.9s ease 380ms, transform 0.9s cubic-bezier(0.22,1,0.36,1) 380ms",
+                }}
+              >
+                Prague-based UX designer
+              </p>
+
+              {/* Divider — grows from left (or centre on mobile) */}
+              <div style={{
+                width: isFooterSeen ? 40 : 0,
+                height: 1,
+                background: "rgba(225,223,216,0.18)",
+                margin: isMobile
+                  ? "clamp(18px, 3vw, 28px) auto"
+                  : "clamp(18px, 3vw, 28px) 0",
+                transition: "width 1s cubic-bezier(0.22,1,0.36,1) 480ms",
+              }} />
+
+              {/* CTA */}
+              <FooterCTA isVisible={isFooterSeen} />
+            </div>
+          </div>
+        </div>
+
       </div>
     </>
   );

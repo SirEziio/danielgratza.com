@@ -187,7 +187,7 @@ export default function ContactPage() {
             href="tel:+420601338213"
             className="font-futura"
             style={{
-              fontSize: "clamp(16px, 1.35vw, 19px)",
+              fontSize: "clamp(15px, 1.1vw, 17px)",
               fontWeight: 500,
               color: "var(--ink)",
               textDecoration: "none",
@@ -223,7 +223,7 @@ export default function ContactPage() {
             href="mailto:dxgratza@gmail.com"
             className="font-futura"
             style={{
-              fontSize: "clamp(16px, 1.35vw, 19px)",
+              fontSize: "clamp(15px, 1.1vw, 17px)",
               fontWeight: 500,
               color: "var(--ink)",
               textDecoration: "none",
@@ -381,7 +381,7 @@ export default function ContactPage() {
           <span
             className="font-futura"
             style={{
-              fontSize: "clamp(16px, 1.35vw, 19px)",
+              fontSize: "clamp(15px, 1.1vw, 17px)",
               fontWeight: 500,
               color: "var(--ink)",
             }}

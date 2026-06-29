@@ -44,7 +44,7 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
           background: "linear-gradient(to bottom, var(--bg) 50%, transparent 100%)",
           zIndex: 99,
           pointerEvents: "none",
-          opacity: scrolledPastHero && !lightNav ? 1 : 0,
+          opacity: 0,
           transition: "opacity 0.3s ease",
         }}
       />

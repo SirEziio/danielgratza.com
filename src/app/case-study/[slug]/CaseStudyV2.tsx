@@ -366,7 +366,7 @@ function HeroSection({
         <p
           className="font-futura"
           style={{
-            fontSize: "clamp(15px, 1.4vw, 20px)",
+            fontSize: "clamp(14px, 1.1vw, 17px)",
             color: "rgba(225,223,216,0.82)",
             fontWeight: 400,
             marginBottom: 40,
@@ -450,7 +450,7 @@ function MetaStrip({ study }: { study: CaseStudy }) {
           className="cs-meta-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
+            gridTemplateColumns: "1fr 1fr 1fr 2fr",
             gap: "clamp(24px, 4vw, 48px)",
           }}
         >
@@ -498,11 +498,11 @@ function MetaStrip({ study }: { study: CaseStudy }) {
             >
               Tools
             </p>
-            <div style={{ display: "flex", flexWrap: "nowrap", gap: "8px 16px", overflow: "hidden" }}>
+            <div style={{ display: "flex", flexWrap: "nowrap", gap: "8px 16px" }}>
               {toolList.map((tool) => {
                 const icon = getToolIcon(tool);
                 return (
-                  <div key={tool} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div key={tool} style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
                     {icon && (
                       <img
                         src={icon}
@@ -519,6 +519,7 @@ function MetaStrip({ study }: { study: CaseStudy }) {
                         color: "var(--ink)",
                         fontWeight: 400,
                         lineHeight: 1.4,
+                        whiteSpace: "nowrap",
                       }}
                     >
                       {tool}
@@ -576,7 +577,7 @@ function OverviewSection({ chapters }: { chapters: CaseStudyChapter[] }) {
             <p
               className="font-futura"
               style={{
-                fontSize: "clamp(16px, 1.35vw, 19px)",
+                fontSize: "clamp(15px, 1.1vw, 17px)",
                 color: "var(--ink)",
                 lineHeight: 1.8,
                 fontWeight: 400,
@@ -875,7 +876,7 @@ function ProcessSection({ chapters }: { chapters: CaseStudyChapter[] }) {
               <p
                 className="font-futura"
                 style={{
-                  fontSize: "clamp(16px, 1.35vw, 19px)",
+                  fontSize: "clamp(15px, 1.1vw, 17px)",
                   color: "var(--ink)",
                   lineHeight: 1.8,
                   fontWeight: 400,
@@ -889,7 +890,7 @@ function ProcessSection({ chapters }: { chapters: CaseStudyChapter[] }) {
               <p
                 className="font-futura"
                 style={{
-                  fontSize: "clamp(16px, 1.35vw, 19px)",
+                  fontSize: "clamp(15px, 1.1vw, 17px)",
                   color: "var(--ink)",
                   lineHeight: 1.8,
                   fontWeight: 400,
@@ -1060,7 +1061,7 @@ function SolutionSection({ study }: { study: CaseStudy }) {
                 <p
                   className="font-futura"
                   style={{
-                    fontSize: "clamp(18px, 1.67vw, 24px)",
+                    fontSize: "clamp(17px, 1.35vw, 21px)",
                     color: "var(--ink)",
                     fontWeight: 600,
                     marginBottom: 14,
@@ -1072,7 +1073,7 @@ function SolutionSection({ study }: { study: CaseStudy }) {
                 <p
                   className="font-futura"
                   style={{
-                    fontSize: "clamp(16px, 1.35vw, 19px)",
+                    fontSize: "clamp(15px, 1.1vw, 17px)",
                     color: "var(--ink-muted)",
                     lineHeight: 1.8,
                     fontWeight: 400,

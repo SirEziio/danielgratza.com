@@ -310,7 +310,7 @@ export default function AboutPage() {
           <p
             className="font-futura"
             style={{
-              fontSize: "clamp(18px, 1.67vw, 24px)",
+              fontSize: "clamp(17px, 1.35vw, 21px)",
               fontWeight: 600,
               color: "var(--ink)",
               lineHeight: 1.45,
@@ -323,7 +323,7 @@ export default function AboutPage() {
           <p
             className="font-futura"
             style={{
-              fontSize: "clamp(16px, 1.35vw, 19px)",
+              fontSize: "clamp(15px, 1.1vw, 17px)",
               fontWeight: 400,
               color: "var(--ink)",
               lineHeight: 1.75,
@@ -336,7 +336,7 @@ export default function AboutPage() {
           <p
             className="font-futura"
             style={{
-              fontSize: "clamp(16px, 1.35vw, 19px)",
+              fontSize: "clamp(15px, 1.1vw, 17px)",
               fontWeight: 400,
               color: "var(--ink)",
               lineHeight: 1.75,
@@ -349,7 +349,7 @@ export default function AboutPage() {
           <p
             className="font-futura"
             style={{
-              fontSize: "clamp(16px, 1.35vw, 19px)",
+              fontSize: "clamp(15px, 1.1vw, 17px)",
               fontWeight: 400,
               color: "var(--ink)",
               lineHeight: 1.75,
