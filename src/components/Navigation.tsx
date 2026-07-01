@@ -33,6 +33,24 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
 
   return (
     <>
+      {/* iOS 26 Liquid Glass — status bar zone fix.
+          env(safe-area-inset-top, 0px) = 0 on desktop/Android → invisible.
+          On iPhone it equals the status bar height and gives the glass
+          a consistent dark backdrop instead of neutralising the page bg. */}
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "env(safe-area-inset-top, 0px)",
+          background: "rgba(0,0,0,0.28)",
+          zIndex: 200,
+          pointerEvents: "none",
+        }}
+      />
+
       <header
         className="site-header"
         style={{
@@ -153,45 +171,20 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
           zIndex: 130,
           display: "flex",
           flexDirection: "column",
-          // top pad clears status bar + space before links; bottom pad clears home indicator
-          padding: "max(80px, calc(env(safe-area-inset-top, 0px) + 60px)) 32px max(48px, calc(env(safe-area-inset-bottom, 0px) + 24px))",
+          padding: "80px 32px 48px",
           gap: 8,
           transform: menuOpen ? "translateX(0)" : "translateX(100%)",
           transition: "transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
           boxShadow: menuOpen ? "-8px 0 32px rgba(0,0,0,0.12)" : "none",
         }}
       >
-        {/* ── Logo in the status-bar glass zone ────────────────────────
-            Sits at y=0→safe-area-inset-top so dark content shows through
-            the iOS 26 Liquid Glass instead of beige neutralizing it.   */}
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: "max(env(safe-area-inset-top, 20px), 20px)",
-            display: "flex",
-            alignItems: "center",
-            paddingLeft: 28,
-          }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/home-Logo.png"
-            alt=""
-            style={{ width: 22, height: 22, opacity: 0.85 }}
-          />
-        </div>
-
-        {/* Close button — positioned just below safe-area-inset-top */}
+        {/* Close button */}
         <button
           onClick={() => setMenuOpen(false)}
           aria-label="Close menu"
           style={{
             position: "absolute",
-            top: "max(24px, calc(env(safe-area-inset-top, 0px) + 10px))",
+            top: 24,
             right: 24,
             background: "none",
             border: "none",
@@ -240,31 +233,6 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
           transition: `opacity 0.35s ease 340ms, transform 0.35s ease 340ms`,
         }}>
           <ThemeToggle />
-        </div>
-
-        {/* ── Home-indicator glass zone ─────────────────────────────────
-            A subtle pill visible through the bottom navigation glass.
-            Positioned below the padded area, inside safe-area-inset-bottom. */}
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: "max(env(safe-area-inset-bottom, 0px), 20px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div style={{
-            width: 36,
-            height: 3,
-            borderRadius: 2,
-            background: "var(--ink)",
-            opacity: 0.18,
-          }} />
         </div>
       </div>
     </>
