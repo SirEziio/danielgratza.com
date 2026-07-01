@@ -352,7 +352,7 @@ export default function ContactPage() {
           <div style={{ textAlign: "center" }}>
             <h1
               className="font-caslon"
-              style={{ fontSize: "clamp(28px, 2.5vw, 36px)", color: "var(--ink)", letterSpacing: "0.01em", marginBottom: 14, minHeight: "1.3em" }}
+              style={{ fontSize: "clamp(1.75rem, calc(0.75rem + 1.25vw), 2.25rem)", color: "var(--ink)", letterSpacing: "0.01em", marginBottom: 14, minHeight: "1.3em" }}
             >
               {typedHeadline}
               <span aria-hidden style={{ opacity: showCursor ? 1 : 0, transition: typedHeadline.length >= HEADLINE.length ? "opacity 0.8s ease" : "opacity 0.1s", fontStyle: "normal" }}>_</span>
@@ -432,7 +432,7 @@ export default function ContactPage() {
                       Phone
                     </span>
                     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                      <a href="tel:+420601338213" className="font-futura" style={{ fontSize: "clamp(16px, 1.4vw, 19px)", fontWeight: 500, color: "var(--ink)", letterSpacing: "0.02em", textDecoration: "none" }}>
+                      <a href="tel:+420601338213" className="font-futura" style={{ fontSize: "clamp(1rem, calc(0.5rem + 0.7vw), 1.1875rem)", fontWeight: 500, color: "var(--ink)", letterSpacing: "0.02em", textDecoration: "none" }}>
                         +420 601 338 213
                       </a>
                       <CopyButton text="+420601338213" />
@@ -448,7 +448,7 @@ export default function ContactPage() {
                       Email
                     </span>
                     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                      <a href="mailto:dxgratza@gmail.com" className="font-futura" style={{ fontSize: "clamp(16px, 1.4vw, 19px)", fontWeight: 500, color: "var(--ink)", letterSpacing: "0.02em", textDecoration: "none" }}>
+                      <a href="mailto:dxgratza@gmail.com" className="font-futura" style={{ fontSize: "clamp(1rem, calc(0.5rem + 0.7vw), 1.1875rem)", fontWeight: 500, color: "var(--ink)", letterSpacing: "0.02em", textDecoration: "none" }}>
                         dxgratza@gmail.com
                       </a>
                       <CopyButton text="dxgratza@gmail.com" />
@@ -543,7 +543,7 @@ export default function ContactPage() {
                   <span className="font-futura" style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase" as const, color: "var(--ink-faint)" }}>
                     Location:
                   </span>
-                  <span className="font-futura" style={{ fontSize: "clamp(12px, 0.9vw, 13px)", fontWeight: 500, color: "var(--ink)" }}>
+                  <span className="font-futura" style={{ fontSize: "0.75rem", fontWeight: 500, color: "var(--ink)" }}>
                     Prague, Czech Republic
                   </span>
                 </div>

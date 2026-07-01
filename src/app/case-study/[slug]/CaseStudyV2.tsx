@@ -242,7 +242,7 @@ function Eyebrow({ text, light = false }: { text: string; light?: boolean }) {
    Helper — section wrapper with consistent horizontal padding
 ───────────────────────────────────────────────────────────────── */
 const sectionPad: React.CSSProperties = {
-  padding: "clamp(64px, 10vw, 120px) max(var(--page-pad), max(var(--page-pad), clamp(24px, 6vw, 80px)))",
+  padding: "clamp(4rem, 10vw, 7.5000rem) max(var(--page-pad), max(var(--page-pad), clamp(24px, 6vw, 80px)))",
   maxWidth: 1100,
   margin: "0 auto",
   width: "100%",
@@ -314,7 +314,7 @@ function HeroSection({
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "flex-start",
-          padding: "max(120px, calc(80px + env(safe-area-inset-top, 0px))) max(var(--page-pad), clamp(24px, 6vw, 80px)) 80px",
+          padding: "max(120px, calc(80px + env(safe-area-inset-top, 0px))) max(var(--page-pad), clamp(1.5rem, 6vw, 5.0000rem)) 80px",
           maxWidth: 1100,
           margin: "0 auto",
           width: "100%",
@@ -351,7 +351,7 @@ function HeroSection({
         <h1
           className="font-caslon"
           style={{
-            fontSize: "clamp(40px, 6vw, 86px)",
+            fontSize: "clamp(2.5rem, calc(1.5rem + 3.5vw), 5.375rem)",
             color: "rgba(225,223,216,0.95)",
             lineHeight: 1.0,
             letterSpacing: "0.01em",
@@ -366,7 +366,7 @@ function HeroSection({
         <p
           className="font-futura"
           style={{
-            fontSize: "clamp(14px, 1.1vw, 17px)",
+            fontSize: "1rem",
             color: "rgba(225,223,216,0.82)",
             fontWeight: 400,
             marginBottom: 40,
@@ -443,7 +443,7 @@ function MetaStrip({ study }: { study: CaseStudy }) {
       <div
         style={{
           ...sectionPad,
-          padding: "clamp(28px, 4vw, 48px) max(var(--page-pad), clamp(24px, 6vw, 80px))",
+          padding: "clamp(1.75rem, 4vw, 3rem) max(var(--page-pad), clamp(24px, 6vw, 80px))",
         }}
       >
         <div
@@ -451,7 +451,7 @@ function MetaStrip({ study }: { study: CaseStudy }) {
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr 1fr 2fr",
-            gap: "clamp(24px, 4vw, 48px)",
+            gap: "clamp(1.5rem, 4vw, 3rem)",
           }}
         >
           {metaItems.map((item) => (
@@ -472,7 +472,7 @@ function MetaStrip({ study }: { study: CaseStudy }) {
               <p
                 className="font-futura"
                 style={{
-                  fontSize: "clamp(14px, 1.2vw, 17px)",
+                  fontSize: "1rem",
                   color: "var(--ink)",
                   fontWeight: 400,
                   lineHeight: 1.4,
@@ -515,7 +515,7 @@ function MetaStrip({ study }: { study: CaseStudy }) {
                     <span
                       className="font-futura"
                       style={{
-                        fontSize: "clamp(14px, 1.2vw, 17px)",
+                        fontSize: "1rem",
                         color: "var(--ink)",
                         fontWeight: 400,
                         lineHeight: 1.4,
@@ -556,7 +556,7 @@ function OverviewSection({ chapters }: { chapters: CaseStudyChapter[] }) {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-            gap: "clamp(40px, 6vw, 80px)",
+            gap: "clamp(2.5rem, 6vw, 5.0000rem)",
             alignItems: "center",
           }}
         >
@@ -566,7 +566,7 @@ function OverviewSection({ chapters }: { chapters: CaseStudyChapter[] }) {
             <h2
               className="font-caslon"
               style={{
-                fontSize: "clamp(28px, 3.5vw, 48px)",
+                fontSize: "clamp(1.75rem, calc(0.75rem + 2vw), 3rem)",
                 color: "var(--ink)",
                 lineHeight: 1.1,
                 marginBottom: 24,
@@ -577,7 +577,7 @@ function OverviewSection({ chapters }: { chapters: CaseStudyChapter[] }) {
             <p
               className="font-futura"
               style={{
-                fontSize: "clamp(15px, 1.1vw, 17px)",
+                fontSize: "1rem",
                 color: "var(--ink)",
                 lineHeight: 1.8,
                 fontWeight: 400,
@@ -650,7 +650,7 @@ function ResearchSection({ chapters, study }: { chapters: CaseStudyChapter[]; st
           <h2
             className="font-caslon"
             style={{
-              fontSize: "clamp(28px, 3.5vw, 48px)",
+              fontSize: "clamp(1.75rem, calc(0.75rem + 2vw), 3rem)",
               color: "var(--ink)",
               lineHeight: 1.1,
               marginBottom: 48,
@@ -689,7 +689,7 @@ function ResearchSection({ chapters, study }: { chapters: CaseStudyChapter[]; st
                 <span
                   className="font-futura"
                   style={{
-                    fontSize: "clamp(17px, 1.5vw, 21px)",
+                    fontSize: "clamp(1.0625rem, calc(0.5rem + 0.8vw), 1.3125rem)",
                     fontWeight: 700,
                     letterSpacing: "0.08em",
                     color: study.accentColor,
@@ -704,7 +704,7 @@ function ResearchSection({ chapters, study }: { chapters: CaseStudyChapter[]; st
                 <p
                   className="font-futura"
                   style={{
-                    fontSize: "clamp(17px, 1.6vw, 24px)",
+                    fontSize: "clamp(1.0625rem, calc(0.5rem + 0.9vw), 1.5rem)",
                     color: "var(--ink)",
                     lineHeight: 1.45,
                     fontWeight: 400,
@@ -768,7 +768,7 @@ function ProcessSection({ chapters }: { chapters: CaseStudyChapter[] }) {
           <h2
             className="font-caslon"
             style={{
-              fontSize: "clamp(28px, 3.5vw, 48px)",
+              fontSize: "clamp(1.75rem, calc(0.75rem + 2vw), 3rem)",
               color: "var(--ink)",
               lineHeight: 1.1,
               marginBottom: 48,
@@ -798,7 +798,7 @@ function ProcessSection({ chapters }: { chapters: CaseStudyChapter[] }) {
                     flexDirection: "column",
                     alignItems: "center",
                     gap: 10,
-                    padding: "0 clamp(12px, 2vw, 28px)",
+                    padding: "0 clamp(0.75rem, 2vw, 1.75rem)",
                   }}
                 >
                   {/* Step circle */}
@@ -868,7 +868,7 @@ function ProcessSection({ chapters }: { chapters: CaseStudyChapter[] }) {
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-              gap: "clamp(24px, 4vw, 56px)",
+              gap: "clamp(1.5rem, 4vw, 3.5000rem)",
               marginBottom: 56,
             }}
           >
@@ -876,7 +876,7 @@ function ProcessSection({ chapters }: { chapters: CaseStudyChapter[] }) {
               <p
                 className="font-futura"
                 style={{
-                  fontSize: "clamp(15px, 1.1vw, 17px)",
+                  fontSize: "1rem",
                   color: "var(--ink)",
                   lineHeight: 1.8,
                   fontWeight: 400,
@@ -890,7 +890,7 @@ function ProcessSection({ chapters }: { chapters: CaseStudyChapter[] }) {
               <p
                 className="font-futura"
                 style={{
-                  fontSize: "clamp(15px, 1.1vw, 17px)",
+                  fontSize: "1rem",
                   color: "var(--ink)",
                   lineHeight: 1.8,
                   fontWeight: 400,
@@ -989,7 +989,7 @@ function SolutionSection({ study }: { study: CaseStudy }) {
           <h2
             className="font-caslon"
             style={{
-              fontSize: "clamp(28px, 3.5vw, 48px)",
+              fontSize: "clamp(1.75rem, calc(0.75rem + 2vw), 3rem)",
               color: "var(--ink)",
               lineHeight: 1.1,
               marginBottom: 40,
@@ -1061,7 +1061,7 @@ function SolutionSection({ study }: { study: CaseStudy }) {
                 <p
                   className="font-futura"
                   style={{
-                    fontSize: "clamp(17px, 1.35vw, 21px)",
+                    fontSize: "clamp(1.0625rem, calc(0.5rem + 0.7vw), 1.3125rem)",
                     color: "var(--ink)",
                     fontWeight: 600,
                     marginBottom: 14,
@@ -1073,7 +1073,7 @@ function SolutionSection({ study }: { study: CaseStudy }) {
                 <p
                   className="font-futura"
                   style={{
-                    fontSize: "clamp(15px, 1.1vw, 17px)",
+                    fontSize: "1rem",
                     color: "var(--ink-muted)",
                     lineHeight: 1.8,
                     fontWeight: 400,
@@ -1135,7 +1135,7 @@ function ReflectionSection({ chapters, study }: { chapters: CaseStudyChapter[]; 
           position: "relative",
           zIndex: 1,
           ...sectionPad,
-          padding: "clamp(80px, 12vw, 140px) max(var(--page-pad), clamp(24px, 6vw, 80px))",
+          padding: "clamp(5.0000rem, 12vw, 8.7500rem) max(var(--page-pad), clamp(24px, 6vw, 80px))",
         }}
       >
         <FadeUp>
@@ -1143,7 +1143,7 @@ function ReflectionSection({ chapters, study }: { chapters: CaseStudyChapter[]; 
           <h2
             className="font-caslon"
             style={{
-              fontSize: "clamp(28px, 3.5vw, 52px)",
+              fontSize: "clamp(1.75rem, calc(0.75rem + 2vw), 3.25rem)",
               color: "rgba(225,223,216,0.95)",
               lineHeight: 1.1,
               marginBottom: 40,
@@ -1167,7 +1167,7 @@ function ReflectionSection({ chapters, study }: { chapters: CaseStudyChapter[]; 
             <p
               className="font-caslon"
               style={{
-                fontSize: "clamp(22px, 2.8vw, 38px)",
+                fontSize: "clamp(1.375rem, calc(0.5rem + 1.75vw), 2.375rem)",
                 color: "rgba(225,223,216,0.88)",
                 lineHeight: 1.45,
                 fontStyle: "italic",
@@ -1223,7 +1223,7 @@ function NextProjectSection({ study }: { study: CaseStudy }) {
       <div
         style={{
           ...sectionPad,
-          padding: "clamp(64px, 10vw, 120px) max(var(--page-pad), clamp(24px, 6vw, 80px))",
+          padding: "clamp(4rem, 10vw, 7.5000rem) max(var(--page-pad), clamp(24px, 6vw, 80px))",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -1285,7 +1285,7 @@ function NextProjectSection({ study }: { study: CaseStudy }) {
                     <span
                       className="font-caslon"
                       style={{
-                        fontSize: "clamp(18px, 1.8vw, 26px)",
+                        fontSize: "clamp(1.125rem, calc(0.5rem + 1vw), 1.625rem)",
                         color: "var(--ink)",
                         lineHeight: 1.2,
                       }}
@@ -1342,7 +1342,7 @@ function NextProjectSection({ study }: { study: CaseStudy }) {
                     <span
                       className="font-caslon"
                       style={{
-                        fontSize: "clamp(18px, 1.8vw, 26px)",
+                        fontSize: "clamp(1.125rem, calc(0.5rem + 1vw), 1.625rem)",
                         color: "var(--ink)",
                         lineHeight: 1.2,
                       }}

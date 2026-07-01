@@ -89,8 +89,8 @@ function FooterPhoto({
 
           {/* Glitch + visual layer */}
           <div style={{
-            width:  "clamp(140px, 18vw, 220px)",
-            height: "clamp(140px, 18vw, 220px)",
+            width:  "clamp(8.7500rem, 18vw, 13.7500rem)",
+            height: "clamp(8.7500rem, 18vw, 13.7500rem)",
             borderRadius: "50%",
             background: faceBg,
             overflow: "hidden",
@@ -347,7 +347,7 @@ export default function HomePage() {
             <h1
               className="font-caslon hero-title"
               style={{
-                fontSize: "clamp(4rem, 9vw, 8.5rem)",
+                fontSize: "clamp(4rem, calc(2rem + 5vw), 8.5rem)",
                 color: "var(--ink)",
                 lineHeight: 1,
                 letterSpacing: "-0.01em",
@@ -362,7 +362,7 @@ export default function HomePage() {
             <p
               className="font-futura"
               style={{
-                fontSize: "clamp(1.2rem, 2.5vw, 3rem)",
+                fontSize: "clamp(1.2rem, calc(0.75rem + 1.25vw), 3rem)",
                 fontWeight: 300,
                 color: "var(--ink)",
                 letterSpacing: "0.04em",
@@ -463,7 +463,7 @@ export default function HomePage() {
                     <h2
                       className="font-caslon"
                       style={{
-                        fontSize: "clamp(2rem, 3.5vw, 3.2rem)",
+                        fontSize: "clamp(2rem, calc(0.75rem + 2vw), 3.2rem)",
                         color: "var(--ink)",
                         lineHeight: 1.05,
                         marginBottom: "1rem",
@@ -477,7 +477,7 @@ export default function HomePage() {
                   <p
                     className="font-futura"
                     style={{
-                      fontSize: "clamp(15px, 1.1vw, 17px)",
+                      fontSize: "1rem",
                       fontWeight: 400,
                       color: "var(--ink-muted)",
                       lineHeight: 1.8,
@@ -613,8 +613,8 @@ export default function HomePage() {
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
             <div style={{
-              width: "clamp(360px, 55vw, 700px)",
-              height: "clamp(360px, 55vw, 700px)",
+              width: "clamp(22.5000rem, 55vw, 43.7500rem)",
+              height: "clamp(22.5000rem, 55vw, 43.7500rem)",
               borderRadius: "50%",
               background: "radial-gradient(circle, rgba(197,209,0,0.07) 0%, transparent 65%)",
               filter: "blur(40px)",
@@ -645,7 +645,7 @@ export default function HomePage() {
 
           {/* Mouse coordinate HUD — bottom right */}
           <div className="font-futura" style={{
-            position: "absolute", bottom: "clamp(16px, 2.5vw, 28px)", right: "clamp(20px, 3vw, 36px)",
+            position: "absolute", bottom: "clamp(1rem, 2.5vw, 1.75rem)", right: "clamp(20px, 3vw, 36px)",
             fontSize: 9, letterSpacing: "0.1em",
             color: "rgba(225,223,216,0.28)",
             fontVariantNumeric: "tabular-nums",
@@ -662,8 +662,8 @@ export default function HomePage() {
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
             alignItems: "center",
-            gap: isMobile ? "clamp(28px, 5vw, 40px)" : "clamp(48px, 7vw, 100px)",
-            padding: "clamp(32px, 5vw, 56px) clamp(32px, 9vw, 100px)",
+            gap: isMobile ? "clamp(1.75rem, 5vw, 2.5rem)" : "clamp(48px, 7vw, 100px)",
+            padding: "clamp(2rem, 5vw, 3.5000rem) clamp(32px, 9vw, 100px)",
             maxWidth: 900,
             width: "100%",
           }}>
@@ -683,11 +683,11 @@ export default function HomePage() {
               <h2
                 className="font-caslon"
                 style={{
-                  fontSize: "clamp(1.8rem, 4vw, 3.4rem)",
+                  fontSize: "clamp(1.8rem, calc(0.75rem + 2.25vw), 3.4rem)",
                   color: "#e1dfd8",
                   lineHeight: 1.06,
                   letterSpacing: "-0.01em",
-                  marginBottom: "clamp(8px, 1.2vw, 14px)",
+                  marginBottom: "clamp(0.5000rem, 1.2vw, 0.875rem)",
                   opacity: isFooterSeen ? 1 : 0,
                   transform: isFooterSeen ? "none" : "translateY(36px)",
                   transition: "opacity 0.95s ease 260ms, transform 0.95s cubic-bezier(0.22,1,0.36,1) 260ms",
@@ -700,7 +700,7 @@ export default function HomePage() {
               <p
                 className="font-futura"
                 style={{
-                  fontSize: "clamp(11px, 0.9vw, 13px)",
+                  fontSize: "0.75rem",
                   color: "rgba(225,223,216,0.45)",
                   letterSpacing: "0.13em",
                   textTransform: "uppercase",
@@ -719,8 +719,8 @@ export default function HomePage() {
                 height: 1,
                 background: "rgba(225,223,216,0.18)",
                 margin: isMobile
-                  ? "clamp(18px, 3vw, 28px) auto"
-                  : "clamp(18px, 3vw, 28px) 0",
+                  ? "clamp(1.125rem, 3vw, 1.75rem) auto"
+                  : "clamp(1.125rem, 3vw, 1.75rem) 0",
                 transition: "width 1s cubic-bezier(0.22,1,0.36,1) 480ms",
               }} />
 

@@ -116,7 +116,7 @@ function OverviewBlock({ block }: { block: ChapterBlock & { type: "overview" } }
       style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: "clamp(48px, 8.9vw, 128px)",
+        gap: "clamp(3rem, 8.9vw, 8.0000rem)",
       }}
     >
       <p
@@ -145,14 +145,14 @@ function DarkQuoteBlock({ block }: { block: ChapterBlock & { type: "dark-quote" 
       style={{
         background: "linear-gradient(-24deg, #242424 7.637%, rgba(36,36,36,0.82) 92.363%)",
         borderRadius: 8,
-        padding: "clamp(32px, 3.3vw, 48px) clamp(32px, 4.4vw, 64px)",
+        padding: "clamp(2rem, 3.3vw, 3rem) clamp(32px, 4.4vw, 64px)",
         marginBottom: 40,
       }}
     >
       <p
         className="font-futura"
         style={{
-          fontSize: "clamp(16px, 1.67vw, 22px)",
+          fontSize: "clamp(1rem, calc(0.5rem + 0.8vw), 1.375rem)",
           lineHeight: 1.7,
           color: "#e1dfd8",
           fontWeight: 300,
@@ -171,7 +171,7 @@ function TwoColBulletsBlock({ block }: { block: ChapterBlock & { type: "two-col-
       style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: "clamp(48px, 8.9vw, 128px)",
+        gap: "clamp(3rem, 8.9vw, 8.0000rem)",
       }}
     >
       <div>
@@ -241,7 +241,7 @@ function TwoColFindingsBlock({
       style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: "clamp(48px, 8.9vw, 128px)",
+        gap: "clamp(3rem, 8.9vw, 8.0000rem)",
       }}
     >
       <div>
@@ -320,7 +320,7 @@ function TwoColTextBlock({ block }: { block: ChapterBlock & { type: "two-col-tex
       style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: "clamp(48px, 8.9vw, 128px)",
+        gap: "clamp(3rem, 8.9vw, 8.0000rem)",
         marginBottom: 40,
       }}
     >
@@ -359,7 +359,7 @@ function MetricsTakeawaysBlock({
       style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: "clamp(48px, 8.9vw, 128px)",
+        gap: "clamp(3rem, 8.9vw, 8.0000rem)",
       }}
     >
       {/* Left: numbered metric cards */}
@@ -550,7 +550,7 @@ function ChapterContent({
       )}
 
       {/* Chapter content — natural gap below the line */}
-      <div style={{ padding: isMobile ? "32px 20px 80px" : "48px clamp(40px, 19.2vw, 276px) 100px" }}>
+      <div style={{ padding: isMobile ? "32px 20px 80px" : "48px clamp(2.5rem, 19.2vw, 17.2500rem) 100px" }}>
 
       {/* Chapter header — centered */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 48 }}>
@@ -578,7 +578,7 @@ function ChapterContent({
         <h2
           className="font-caslon"
           style={{
-            fontSize: "clamp(28px, 2.8vw, 40px)",
+            fontSize: "clamp(1.75rem, calc(0.75rem + 1.5vw), 2.5rem)",
             letterSpacing: "0.02em",
             color: "var(--ink)",
             lineHeight: 1.15,
@@ -784,7 +784,7 @@ function HeroPanel({
         <h1
           className="font-caslon"
           style={{
-            fontSize: "clamp(32px, 4.4vw, 64px)",
+            fontSize: "clamp(2rem, calc(1rem + 2.5vw), 4rem)",
             letterSpacing: "0.02em",
             color: "var(--ink)",
             lineHeight: 1.05,
@@ -798,7 +798,7 @@ function HeroPanel({
         <p
           className="font-futura"
           style={{
-            fontSize: "clamp(13px, 1.4vw, 20px)",
+            fontSize: "1rem",
             fontWeight: 300,
             color: "var(--ink-muted)",
             lineHeight: 1.55,
@@ -820,7 +820,7 @@ function HeroPanel({
             display: "flex",
             alignItems: "flex-start",
             justifyContent: "center",
-            padding: "0 clamp(24px, 5vw, 80px)",
+            padding: "0 clamp(1.5rem, 5vw, 5.0000rem)",
             paddingBottom: 140, // whitespace above scroll indicator
           }}
         >

@@ -367,13 +367,13 @@ export default function AboutPage() {
           position: "relative",
           zIndex: 1,
           minHeight: "100dvh",
-          paddingTop: "clamp(96px, 8vw, 128px)",
+          paddingTop: "clamp(6.0000rem, 8vw, 8.0000rem)",
           paddingBottom: "80px",
           // ≤840px  → 8vw (matches nav gutter)
           // 841–1280px → 15vw (narrower content band)
           // >1280px → 10vw capped at 120px (wider content)
-          paddingLeft:  vw <= 840 ? "var(--page-pad)" : vw <= 1280 ? "clamp(60px, 15vw, 160px)" : "clamp(40px, 10vw, 120px)",
-          paddingRight: vw <= 840 ? "var(--page-pad)" : vw <= 1280 ? "clamp(60px, 15vw, 160px)" : "clamp(40px, 10vw, 120px)",
+          paddingLeft:  vw <= 840 ? "var(--page-pad)" : vw <= 1280 ? "clamp(3.7500rem, 15vw, 10.0000rem)" : "clamp(40px, 10vw, 120px)",
+          paddingRight: vw <= 840 ? "var(--page-pad)" : vw <= 1280 ? "clamp(3.7500rem, 15vw, 10.0000rem)" : "clamp(40px, 10vw, 120px)",
         }}
       >
       <div
@@ -382,7 +382,7 @@ export default function AboutPage() {
           margin: "0 auto",
           display: "flex",
           flexDirection: isStacked ? "column" : "row",
-          gap: isStacked ? "48px" : "clamp(40px, 4vw, 60px)",
+          gap: isStacked ? "48px" : "clamp(2.5rem, 4vw, 3.7500rem)",
           alignItems: "start",
         }}
       >
@@ -400,7 +400,7 @@ export default function AboutPage() {
           <p
             className="font-futura"
             style={{
-              fontSize: "clamp(17px, 1.35vw, 21px)",
+              fontSize: "clamp(1.0625rem, calc(0.5rem + 0.7vw), 1.3125rem)",
               fontWeight: 600,
               color: "var(--ink)",
               lineHeight: 1.45,
@@ -416,7 +416,7 @@ export default function AboutPage() {
           <p
             className="font-futura"
             style={{
-              fontSize: "clamp(15px, 1.1vw, 17px)",
+              fontSize: "1rem",
               fontWeight: 400,
               color: "var(--ink)",
               lineHeight: 1.75,
@@ -432,7 +432,7 @@ export default function AboutPage() {
           <p
             className="font-futura"
             style={{
-              fontSize: "clamp(15px, 1.1vw, 17px)",
+              fontSize: "1rem",
               fontWeight: 400,
               color: "var(--ink)",
               lineHeight: 1.75,
@@ -448,7 +448,7 @@ export default function AboutPage() {
           <p
             className="font-futura"
             style={{
-              fontSize: "clamp(15px, 1.1vw, 17px)",
+              fontSize: "1rem",
               fontWeight: 400,
               color: "var(--ink)",
               lineHeight: 1.75,
@@ -482,7 +482,7 @@ export default function AboutPage() {
         <div ref={timelineRef} style={{
           // simple: auto-size to list content (no gap on right)
           // fancy: fixed basis growing from 520px min → 640px max with viewport
-          flex: isStacked ? "1 1 auto" : isSimple ? "0 0 auto" : "0 0 clamp(520px, 40vw, 640px)",
+          flex: isStacked ? "1 1 auto" : isSimple ? "0 0 auto" : "0 0 clamp(32.5000rem, 40vw, 40.0000rem)",
           minWidth: 0,
         }}>
           {isSimple ? (

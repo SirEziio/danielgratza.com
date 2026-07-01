@@ -490,7 +490,7 @@ html.dark .cs-glass-card {
 
   /* Homepage hero title */
   .hero-title {
-    font-size: clamp(3rem, 14vw, 5rem) !important;
+    font-size: clamp(3rem, calc(1.5rem + 8vw), 5rem) !important;
   }
 
   /* Case-study chapter padding */

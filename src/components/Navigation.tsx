@@ -150,7 +150,9 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
         style={{
           position: "fixed",
           inset: 0,
-          background: "rgba(0,0,0,0.3)",
+          // transparent in the safe-area-inset-top zone so the glass
+          // keeps seeing page content (e.g. dark case-study hero) behind it
+          background: "linear-gradient(to bottom, transparent 0px, transparent env(safe-area-inset-top, 0px), rgba(0,0,0,0.3) env(safe-area-inset-top, 0px))",
           zIndex: 120,
           opacity: menuOpen ? 1 : 0,
           pointerEvents: menuOpen ? "auto" : "none",
@@ -167,7 +169,8 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
           width: "72vw",
           maxWidth: 300,
           height: "100dvh",
-          background: "var(--bg)",
+          // transparent in status-bar zone, panel bg below it
+          background: "linear-gradient(to bottom, transparent 0px, transparent env(safe-area-inset-top, 0px), var(--bg) env(safe-area-inset-top, 0px))",
           zIndex: 130,
           display: "flex",
           flexDirection: "column",
