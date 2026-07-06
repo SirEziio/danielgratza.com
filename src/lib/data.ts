@@ -72,6 +72,36 @@ export const portfolioItems: PortfolioItem[] = [
     iconBg: "#2D3626",
     iconSrc: "/images/icon-arma4.png",
   },
+  {
+    slug: "eon-app",
+    title: "E.ON Digital App",
+    tags: ["UX Design", "Mobile", "Design System"],
+    date: "14th Sep 2024",
+    description: "UX, design system and full digital ecosystem for one of Europe's largest energy brands",
+    coverImage: "/images/cs-eon-cover.png",
+    iconBg: "#E2001A",
+    iconSrc: "/images/icon-eon.png",
+  },
+  {
+    slug: "wireframe-ds",
+    title: "Wireframe Design System",
+    tags: ["Design System", "UX Design", "Mobile"],
+    date: "3rd Mar 2024",
+    description: "A shared wireframing language and component library for Ackee's mobile design team",
+    coverImage: "/images/cs-wireframe-cover.png",
+    iconBg: "#4B5AF5",
+    iconSrc: "/images/icon-wireframe.png",
+  },
+  {
+    slug: "space-arena",
+    title: "SPACE Arena",
+    tags: ["UX Design", "Mobile", "App Design"],
+    date: "7th May 2025",
+    description: "Fan experience app and website for Czech Republic's most modern multi-purpose arena",
+    coverImage: "/images/cs-arena-cover.png",
+    iconBg: "#7C3AED",
+    iconSrc: "/images/icon-arena.png",
+  },
 ];
 
 // ─── Chapters for each case study ─────────────────────────────────
@@ -852,6 +882,441 @@ const redditChapters: CaseStudyChapter[] = [
   },
 ];
 
+// ─── E.ON Digital App ─────────────────────────────────────────────
+const eonChapters: CaseStudyChapter[] = [
+  {
+    id: "background",
+    num: 1,
+    title: "Background & Context",
+    blocks: [
+      {
+        type: "meta",
+        timeline: "1 Year",
+        position: "UX / UI Designer",
+        tools: ["Figma", "Design Tokens", "Zeroheight"],
+      },
+      {
+        type: "overview",
+        leftText:
+          "E.ON is one of Europe's leading energy companies, serving over a million customers in the Czech Republic alone. Ackee was brought in to systematically translate E.ON's new corporate identity into a coherent digital experience across all touchpoints — mobile apps, web portals, and branded digital materials. My role spanned UX research, UI design, and contributing to a scalable design system used across the full product suite.",
+        rightHeading: "Key Objectives",
+        rightItems: [
+          "Translate E.ON's new corporate identity into a unified digital experience across all platforms",
+          "Design a scalable, token-driven component library for the full digital ecosystem",
+          "Improve UX across web and mobile for 1M+ Czech customers",
+          "Maintain brand consistency across all touchpoints: app, web portal, and communications",
+        ],
+      },
+    ],
+  },
+  {
+    id: "problem",
+    num: 2,
+    title: "Problem Statement",
+    blocks: [
+      {
+        type: "dark-quote",
+        text:
+          "E.ON had a brand new corporate identity but a fragmented, inconsistent digital estate — different UIs on different platforms, no shared component language, and no design governance. The challenge was to build a cohesive digital ecosystem without disrupting millions of active users.",
+      },
+      {
+        type: "two-col-bullets",
+        leftHeading: "Product Challenges",
+        leftItems: [
+          "Multiple digital products had diverged over time — inconsistent typography, colour, and UI patterns across web and mobile",
+          "No shared design system meant every new feature required bespoke design and engineering work from scratch",
+          "The new corporate identity defined brand-level standards but not the UI component layer",
+        ],
+        rightHeading: "Business Constraints",
+        rightItems: [
+          "Millions of active customers meant changes had to be evolutionary, not revolutionary",
+          "Tight cross-team coordination required between Ackee designers, E.ON product teams, and engineering",
+          "All UI work had to meet strict accessibility standards for a regulated public utility product",
+        ],
+      },
+    ],
+  },
+  {
+    id: "research",
+    num: 3,
+    title: "Research & Discovery",
+    blocks: [
+      {
+        type: "image-row",
+        images: ["/images/cs-eon-1.jpg", "/images/cs-eon-2.jpg", "/images/cs-eon-3.jpg"],
+      },
+      {
+        type: "two-col-findings",
+        leftHeading: "Methods",
+        leftItems: [
+          "UX audit across the existing E.ON digital estate — web portal, mobile app, and customer-facing communications",
+          "Competitor benchmarking of leading European utility app experiences (Vattenfall, RWE, innogy)",
+          "Design token mapping: cataloguing every colour, typeface, and spacing value in active use across products",
+          "Stakeholder alignment workshops with E.ON product and brand teams to define priorities and constraints",
+        ],
+        rightHeading: "Key Findings",
+        findings: [
+          {
+            num: "#1",
+            text: "The biggest inconsistency source was the gap between print brand guidelines and digital UI — colours, type scales, and spacing were interpreted differently across teams and products",
+          },
+          {
+            num: "#2",
+            text: "Users most often accessed E.ON digitally to check usage data and pay bills — both flows had unnecessary friction from outdated information architecture",
+          },
+          {
+            num: "#3",
+            text: "The design system needed token-based theming from the outset — E.ON operates across multiple markets, each requiring slight brand variations without forking the codebase",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "process",
+    num: 4,
+    title: "Design Process",
+    blocks: [
+      {
+        type: "process-steps",
+        steps: ["Audit", "Token System", "Component Library", "Screen Design", "Handoff"],
+      },
+      {
+        type: "two-col-text",
+        leftHeading: "Design System",
+        leftText:
+          "The work centred on building a robust, token-driven design system — not just a component library. Every colour, typeface, spacing unit, and elevation value was captured as a named token, allowing the system to flex across E.ON's regional brands while maintaining structural consistency. The component library was built mobile-first, then extended to web, reflecting platform priority.",
+        rightHeading: "Product Design",
+        rightText:
+          "With the system in place, I designed core screens for the mobile app and web portal — account overview, usage tracking, billing, and customer communications. Each screen was validated against the token system and built as modular components. Working closely with E.ON's product team, I produced interactive prototypes for key user journeys before engineering handoff.",
+      },
+    ],
+  },
+  {
+    id: "results",
+    num: 5,
+    title: "Results & Impact",
+    blocks: [
+      {
+        type: "metrics-takeaways",
+        metricsHeading: "Deliverables & Impact",
+        metrics: [
+          {
+            num: "#1",
+            text: "Full design system delivered — tokens, components, documentation — adopted across E.ON Czech and Slovak digital products",
+          },
+          {
+            num: "#2",
+            text: "Unified web portal and mobile app interface covering the complete customer journey end-to-end",
+          },
+          {
+            num: "#3",
+            text: "1M+ Czech customers served by the redesigned digital ecosystem at launch",
+          },
+          {
+            num: "#4",
+            text: "Token infrastructure enabling multi-market brand variants without forking the component codebase",
+          },
+        ],
+        image: "/images/cs-eon-4.jpg",
+        takeawaysHeading: "Takeaways",
+        takeaways:
+          "The E.ON project taught me that design systems live or die on governance, not components. The most important work wasn't building the library — it was establishing shared naming conventions, token architecture, and contribution workflows that let multiple teams build consistently without constant designer involvement. When the system works, the designer's job becomes teaching, not approving.",
+      },
+    ],
+  },
+];
+
+// ─── Wireframe Design System ───────────────────────────────────────
+const wireframeDsChapters: CaseStudyChapter[] = [
+  {
+    id: "background",
+    num: 1,
+    title: "Background & Context",
+    blocks: [
+      {
+        type: "meta",
+        timeline: "3 Months",
+        position: "Product Designer",
+        tools: ["Figma", "Tokens Studio", "Notion"],
+      },
+      {
+        type: "overview",
+        leftText:
+          "At Ackee, most new mobile projects began with a wireframing phase — but each designer approached it differently, creating inconsistency in handoffs, review quality, and client communication. I was tasked with creating a shared wireframe design system: a common visual language and component library that every designer at Ackee could use to wireframe mobile projects, regardless of their individual style.",
+        rightHeading: "Key Objectives",
+        rightItems: [
+          "Build a comprehensive mobile wireframe component library usable across all Ackee projects",
+          "Establish consistent visual conventions for wireframe fidelity — enough for client reviews, without over-detailing",
+          "Document a design token architecture for all primitive values: spacing, colour, and typography",
+          "Define a contribution model so the system could grow as new patterns emerged from live projects",
+        ],
+      },
+    ],
+  },
+  {
+    id: "problem",
+    num: 2,
+    title: "Problem Statement",
+    blocks: [
+      {
+        type: "dark-quote",
+        text:
+          "Without a shared wireframing language, every Ackee project re-invented the wheel. Different designers used different component sizes, label conventions, and interaction patterns — leading to inconsistent presentations, confused clients, and duplicated effort across teams.",
+      },
+      {
+        type: "two-col-bullets",
+        leftHeading: "Team Pain Points",
+        leftItems: [
+          "No standard for spacing, sizing, or visual weight — each project's wireframes looked noticeably different",
+          "Inconsistent fidelity: some designers over-detailed while others left too many decisions undefined for engineers",
+          "New designers at Ackee had to learn the craft from scratch, with no reference point or foundation to build from",
+        ],
+        rightHeading: "Project Constraints",
+        rightItems: [
+          "The system had to be lightweight — a wireframing-specific toolkit, not a full production design system",
+          "Components needed to cover the full mobile surface: navigation, forms, lists, modals, maps, and media",
+          "The system had to be immediately adoptable — designers couldn't afford a steep learning curve mid-project",
+        ],
+      },
+    ],
+  },
+  {
+    id: "research",
+    num: 3,
+    title: "Research & Discovery",
+    blocks: [
+      {
+        type: "image-row",
+        images: ["/images/cs-wireframe-1.jpg", "/images/cs-wireframe-2.jpg", "/images/cs-wireframe-3.jpg"],
+      },
+      {
+        type: "two-col-findings",
+        leftHeading: "Methods",
+        leftItems: [
+          "Audit of 12 past Ackee mobile projects to catalogue recurring component patterns and identify gaps",
+          "Interviews with 8 Ackee designers on pain points, current workarounds, and wishlist features",
+          "Benchmarking against leading wireframe systems: Mobbin, internal agency references, and Figma community kits",
+          "Token inventory: mapping every spacing, colour, and type value used in practice across projects",
+        ],
+        rightHeading: "Key Findings",
+        findings: [
+          {
+            num: "#1",
+            text: "80% of mobile screens across Ackee's project history used the same 30 core component patterns — a focused library could cover almost everything",
+          },
+          {
+            num: "#2",
+            text: "The biggest time sink was not component creation, but aligning on annotation and label conventions between designers and developers at review",
+          },
+          {
+            num: "#3",
+            text: "A two-tier colour system — neutral greys for wireframe elements plus one accent for interactive states — provided maximum clarity with minimal visual noise",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "process",
+    num: 4,
+    title: "Design Process",
+    blocks: [
+      {
+        type: "process-steps",
+        steps: ["Inventory", "Primitives", "Component Library", "Documentation", "Rollout"],
+      },
+      {
+        type: "two-col-text",
+        leftHeading: "Token Architecture",
+        leftText:
+          "I began with the primitive token layer: a spacing scale (4 → 64px), a type scale (10–32px), and a nine-step neutral colour ramp (white to near-black). From primitives, I derived semantic tokens — background, border, text, interactive — applied consistently regardless of the specific component. Every component auto-layouts and updates cleanly when a primitive token changes.",
+        rightHeading: "Component System",
+        rightText:
+          "The library was organised into six categories: Navigation, Layout, Forms, Data Display, Feedback, and Media. Each component included defined variants (default, filled, disabled, error) and was fully auto-layouted. A ready-made annotation layer let designers document specs without building a separate red-line file, cutting review preparation time significantly.",
+      },
+    ],
+  },
+  {
+    id: "results",
+    num: 5,
+    title: "Results & Impact",
+    blocks: [
+      {
+        type: "metrics-takeaways",
+        metricsHeading: "Deliverables & Impact",
+        metrics: [
+          {
+            num: "#1",
+            text: "120+ components across six categories — fully token-driven and auto-layouted for fast customisation",
+          },
+          {
+            num: "#2",
+            text: "Adopted by the full Ackee design team within two weeks of launch, covering all new mobile project starts",
+          },
+          {
+            num: "#3",
+            text: "Estimated 2–3 days saved per project in wireframe setup and alignment time across the team",
+          },
+          {
+            num: "#4",
+            text: "Complete documentation covering component usage, annotation conventions, and team contribution guidelines",
+          },
+        ],
+        image: "/images/cs-wireframe-4.jpg",
+        takeawaysHeading: "Takeaways",
+        takeaways:
+          "Building for other designers is the strictest possible test of clarity. Every ambiguous naming convention, every missing variant, every undocumented exception became a question in my inbox within the first week. The systems that survive long-term in fast-paced agencies are the ones that make the most common task effortless — not the ones with the most components.",
+      },
+    ],
+  },
+];
+
+// ─── SPACE Arena ──────────────────────────────────────────────────
+const spaceArenaChapters: CaseStudyChapter[] = [
+  {
+    id: "background",
+    num: 1,
+    title: "Background & Context",
+    blocks: [
+      {
+        type: "meta",
+        timeline: "3 Months",
+        position: "UX / UI Designer",
+        tools: ["Figma", "Principle", "Miro"],
+      },
+      {
+        type: "overview",
+        leftText:
+          "SPACE Arena is a modern multi-purpose venue in Pardubice — home to HC Dynamo Pardubice hockey and a major Czech concert destination. Ackee was asked to design a concept for a mobile app and website that would reimagine the fan and visitor experience: from buying tickets to arriving at the event, navigating the arena, and sharing the night. This was a design concept project, developed end-to-end by the Ackee design team.",
+        rightHeading: "Key Objectives",
+        rightItems: [
+          "Design an end-to-end mobile app for event ticketing, venue navigation, and in-arena services",
+          "Create a website that works as both event calendar and brand platform for the arena",
+          "Build a visual language that works across sports and live entertainment — two very different audience expectations",
+          "Explore features beyond ticketing: seat finder, food pre-ordering, real-time countdown, and a fan poster maker",
+        ],
+      },
+    ],
+  },
+  {
+    id: "problem",
+    num: 2,
+    title: "Problem Statement",
+    blocks: [
+      {
+        type: "dark-quote",
+        text:
+          "Modern sports and entertainment venues are still stuck with fragmented digital experiences — one app for tickets, another for food, a third for navigation. Visitors arrive over-informed and under-guided. SPACE Arena needed a single, immersive platform that made the evening feel seamless, from the moment tickets were bought to the moment the lights went down.",
+      },
+      {
+        type: "two-col-bullets",
+        leftHeading: "Visitor Pain Points",
+        leftItems: [
+          "Ticketing, food ordering, seat finding, and event info were spread across multiple disconnected platforms and apps",
+          "The venue serves two very different audiences — hockey fans and concert-goers — with entirely different expectations",
+          "No personalisation: the digital experience couldn't distinguish a season ticket holder from a first-time visitor",
+        ],
+        rightHeading: "Design Challenges",
+        rightItems: [
+          "Creating a visual identity that felt right for both a Dua Lipa concert and a playoff hockey match without defaulting to a generic events aesthetic",
+          "The app had to work as both a planning tool (days before the event) and a real-time companion (during the night)",
+          "Designing for ambient, dark-room conditions demanded unusually strict contrast and touch-target requirements",
+        ],
+      },
+    ],
+  },
+  {
+    id: "research",
+    num: 3,
+    title: "Research & Discovery",
+    blocks: [
+      {
+        type: "image-row",
+        images: ["/images/cs-arena-1.jpg", "/images/cs-arena-2.jpg", "/images/cs-arena-3.jpg"],
+      },
+      {
+        type: "two-col-findings",
+        leftHeading: "Methods",
+        leftItems: [
+          "Benchmark research across leading arena and festival apps — O2 Arena, Rogers Arena, Ticketmaster, and Spotify Concerts",
+          "User flow mapping across both event types: a hockey season ticket holder vs. a single-event concert visitor",
+          "Jobs-to-be-done analysis at each moment of the fan journey: planning, arriving, inside the venue, and post-event",
+          "Dark-room usability research and high-contrast UI pattern analysis for ambient-lighting conditions",
+        ],
+        rightHeading: "Key Findings",
+        findings: [
+          {
+            num: "#1",
+            text: "The highest-stress moment of any arena visit is arrival — not knowing where to go, how to queue, or how to access the venue. Solving this had the highest payoff for satisfaction",
+          },
+          {
+            num: "#2",
+            text: "Both concert and sports fans wanted anticipation design — countdowns, build-up content, and personalised event previews — not just utility features",
+          },
+          {
+            num: "#3",
+            text: "A single 'My Evening' view consolidating ticket, seat, countdown, and pre-orders resolved 80% of questions visitors currently answered across multiple separate apps",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "process",
+    num: 4,
+    title: "Design Process",
+    blocks: [
+      {
+        type: "process-steps",
+        steps: ["Research", "Journey Mapping", "Visual Direction", "Screen Design", "Prototype"],
+      },
+      {
+        type: "two-col-text",
+        leftHeading: "Visual Language",
+        leftText:
+          "The visual direction was inspired by the liminal feel of a venue just before a show — deep dark purples and blacks, soft gradient bleeds, photographic textures of live performances. Typography was large and confident with display faces for impact moments (artist names, scores, countdowns) and a clean sans for functional navigation. The result felt cinematic without sacrificing usability.",
+        rightHeading: "Feature Design",
+        rightText:
+          "The app's centrepiece was the 'My Evening' home screen — a context-aware view showing your ticket, event countdown, seat location, and pre-order status in one glance. Additional features included an in-app poster maker letting fans create shareable event art, real-time arena maps with food and facilities, and a CMS-powered editorial layer letting the arena publish content directly through the app.",
+      },
+    ],
+  },
+  {
+    id: "results",
+    num: 5,
+    title: "Results & Impact",
+    blocks: [
+      {
+        type: "metrics-takeaways",
+        metricsHeading: "Deliverables & Outcomes",
+        metrics: [
+          {
+            num: "#1",
+            text: "Full concept for mobile app and website — production-ready high-fidelity designs across all core user journeys",
+          },
+          {
+            num: "#2",
+            text: "12 complete feature flows: ticketing, My Evening view, seat finder, food pre-order, poster maker, arena map, and push notifications",
+          },
+          {
+            num: "#3",
+            text: "Scalable visual design system — tokens and components adaptable across both sports and entertainment event contexts",
+          },
+          {
+            num: "#4",
+            text: "Concept presented and approved by the arena's management team as the design direction for their upcoming digital platform",
+          },
+        ],
+        image: "/images/cs-arena-4.jpg",
+        takeawaysHeading: "Takeaways",
+        takeaways:
+          "Designing for a multi-purpose venue forced me to think about emotion as much as function. A hockey playoff and a concert are two completely different emotional registers — but the same person buys both tickets through the same app. The visual language had to have enough personality to amplify each event's identity, while the UX had to be consistent enough that no return visitor ever felt lost. That tension between expressive and reliable is what makes entertainment product design one of the richest challenges in the field.",
+      },
+    ],
+  },
+];
+
 export const caseStudies: CaseStudy[] = [
   {
     slug: "ab-testing-liveport",
@@ -972,6 +1437,69 @@ export const caseStudies: CaseStudy[] = [
     version: 2,
     chapters: arma4Chapters,
     sections: [],
+  },
+  {
+    slug: "eon-app",
+    title: "E.ON Digital App",
+    subtitle: "UX, design system and full digital ecosystem for one of Europe's largest energy brands",
+    thumbnail: "/images/cs-eon-thumb.png",
+    coverImage: "/images/cs-eon-cover.png",
+    role: "UX / UI Designer",
+    timeline: "1 Year",
+    tools: "Figma · Design Tokens · Zeroheight",
+    year: 2024,
+    accentColor: "#E2001A",
+    chapters: eonChapters,
+    sections: [
+      { id: "intro", type: "intro", heading: "E.ON Digital App", body: "How a token-driven design system unified E.ON's digital estate across web and mobile for over a million Czech customers." },
+      { id: "context", type: "text", heading: "Context", body: "After a new corporate identity, E.ON needed a complete digital transformation — consistent UX across web portals, mobile apps, and branded touchpoints." },
+      { id: "images-1", type: "images", images: ["/images/cs-eon-1.jpg", "/images/cs-eon-2.jpg"] },
+      { id: "metrics", type: "metrics", metrics: [{ label: "Customers reached", value: "1M+" }, { label: "Products unified", value: "4" }, { label: "System adoption", value: "100%" }] },
+      { id: "images-2", type: "images", images: ["/images/cs-eon-3.jpg", "/images/cs-eon-4.jpg"] },
+      { id: "outro", type: "outro", heading: "Key Takeaway", body: "Design systems live or die on governance, not components. The real work is teaching teams to build consistently without constant designer involvement." },
+    ],
+  },
+  {
+    slug: "wireframe-ds",
+    title: "Wireframe Design System",
+    subtitle: "A shared wireframing language and component library for Ackee's mobile design team",
+    thumbnail: "/images/cs-wireframe-thumb.png",
+    coverImage: "/images/cs-wireframe-cover.png",
+    role: "Product Designer",
+    timeline: "3 Months",
+    tools: "Figma · Tokens Studio · Notion",
+    year: 2024,
+    accentColor: "#4B5AF5",
+    chapters: wireframeDsChapters,
+    sections: [
+      { id: "intro", type: "intro", heading: "Wireframe Design System", body: "A shared component library and token system that gave the Ackee design team a common wireframing language for every mobile project." },
+      { id: "context", type: "text", heading: "The Problem", body: "Without a shared system, each designer approached wireframing differently — inconsistent fidelity, duplicate work, and confused client reviews." },
+      { id: "images-1", type: "images", images: ["/images/cs-wireframe-1.jpg", "/images/cs-wireframe-2.jpg"] },
+      { id: "metrics", type: "metrics", metrics: [{ label: "Components", value: "120+" }, { label: "Time saved / project", value: "2–3 days" }, { label: "Adoption", value: "Full team" }] },
+      { id: "images-2", type: "images", images: ["/images/cs-wireframe-3.jpg", "/images/cs-wireframe-4.jpg"] },
+      { id: "outro", type: "outro", heading: "Takeaway", body: "The systems that survive in fast-paced agencies are the ones that make the most common task effortless — not the ones with the most components." },
+    ],
+  },
+  {
+    slug: "space-arena",
+    title: "SPACE Arena",
+    subtitle: "Fan experience app and website for Czech Republic's most modern multi-purpose arena",
+    thumbnail: "/images/cs-arena-thumb.png",
+    coverImage: "/images/cs-arena-cover.png",
+    role: "UX / UI Designer",
+    timeline: "3 Months",
+    tools: "Figma · Principle · Miro",
+    year: 2025,
+    accentColor: "#7C3AED",
+    chapters: spaceArenaChapters,
+    sections: [
+      { id: "intro", type: "intro", heading: "SPACE Arena", body: "A cinematic fan experience app for a Czech multi-purpose venue — concerts, hockey, and everything in between, all in one place." },
+      { id: "context", type: "text", heading: "The Brief", body: "Ackee designed a concept for the arena's mobile app and website, covering the full fan journey from ticket purchase to post-event sharing." },
+      { id: "images-1", type: "images", images: ["/images/cs-arena-1.jpg", "/images/cs-arena-2.jpg"] },
+      { id: "metrics", type: "metrics", metrics: [{ label: "Feature flows", value: "12" }, { label: "Event types", value: "2" }, { label: "Concept status", value: "Approved" }] },
+      { id: "images-2", type: "images", images: ["/images/cs-arena-3.jpg", "/images/cs-arena-4.jpg"] },
+      { id: "outro", type: "outro", heading: "Takeaway", body: "That tension between expressive and reliable — where emotion amplifies the event but the UX never loses the visitor — is what makes entertainment product design so compelling." },
+    ],
   },
 ];
 
