@@ -893,7 +893,7 @@ const eonChapters: CaseStudyChapter[] = [
         type: "meta",
         timeline: "1 Year",
         position: "UX / UI Designer",
-        tools: ["Figma", "Design Tokens", "Zeroheight"],
+        tools: ["Figma", "Miro", "Jira", "Claude"],
       },
       {
         type: "overview",
@@ -1038,7 +1038,7 @@ const wireframeDsChapters: CaseStudyChapter[] = [
         type: "meta",
         timeline: "3 Months",
         position: "Design System Architect",
-        tools: ["Figma", "Tokens Studio", "Notion"],
+        tools: ["Figma", "Claude", "Notion"],
       },
       {
         type: "overview",
@@ -1181,9 +1181,9 @@ const spaceArenaChapters: CaseStudyChapter[] = [
     blocks: [
       {
         type: "meta",
-        timeline: "3 Months",
+        timeline: "1 Month",
         position: "UX / UI Designer",
-        tools: ["Figma", "Principle", "Miro"],
+        tools: ["Figma", "Claude", "Adobe"],
       },
       {
         type: "overview",
@@ -1347,7 +1347,7 @@ export const caseStudies: CaseStudy[] = [
     coverImage: "/images/cs-eon-cover.png",
     role: "UX / UI Designer",
     timeline: "1 Year",
-    tools: "Figma · Design Tokens · Zeroheight",
+    tools: "Figma · Miro · Jira · Claude",
     year: 2024,
     accentColor: "#E2001A",
     chapters: eonChapters,
@@ -1367,8 +1367,8 @@ export const caseStudies: CaseStudy[] = [
     thumbnail: "/images/cs-space-thumb.jpg",
     coverImage: "/images/cs-space-cover.jpg",
     role: "UX / UI Designer",
-    timeline: "3 Months",
-    tools: "Figma · Principle · Miro",
+    timeline: "1 Month",
+    tools: "Figma · Claude · Adobe",
     year: 2025,
     accentColor: "#7C3AED",
     chapters: spaceArenaChapters,
@@ -1389,7 +1389,7 @@ export const caseStudies: CaseStudy[] = [
     coverImage: "/images/cs-wireframe-cover.png",
     role: "Design System Architect",
     timeline: "3 Months",
-    tools: "Figma · Tokens Studio · Notion",
+    tools: "Figma · Claude · Notion",
     year: 2024,
     accentColor: "#4B5AF5",
     chapters: wireframeDsChapters,
