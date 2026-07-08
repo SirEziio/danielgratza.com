@@ -1233,7 +1233,7 @@ const spaceArenaChapters: CaseStudyChapter[] = [
     blocks: [
       {
         type: "image-row",
-        images: ["/images/cs-space-1.png", "/images/cs-space-2.png", "/images/cs-space-3.png", "/images/cs-space-6.png"],
+        images: ["/images/cs-space-1.png", "/images/cs-space-2.png", "/images/cs-space-3.png", "/images/cs-space-5.png", "/images/cs-space-6.png"],
       },
       {
         type: "two-col-findings",
@@ -1377,7 +1377,7 @@ export const caseStudies: CaseStudy[] = [
       { id: "context", type: "text", heading: "The Brief", body: "Ackee designed a concept for the arena's mobile app and website, covering the full fan journey from ticket purchase to post-event sharing." },
       { id: "images-1", type: "images", images: ["/images/cs-space-1.png", "/images/cs-space-2.png"] },
       { id: "metrics", type: "metrics", metrics: [{ label: "Feature flows", value: "12" }, { label: "Event types", value: "2" }, { label: "Concept status", value: "Approved" }] },
-      { id: "images-2", type: "images", images: ["/images/cs-space-3.png", "/images/cs-space-4.png", "/images/cs-space-6.png"] },
+      { id: "images-2", type: "images", images: ["/images/cs-space-3.png", "/images/cs-space-4.png", "/images/cs-space-5.png", "/images/cs-space-6.png"] },
       { id: "outro", type: "outro", heading: "Takeaway", body: "That tension between expressive and reliable — where emotion amplifies the event but the UX never loses the visitor — is what makes entertainment product design so compelling." },
     ],
   },
