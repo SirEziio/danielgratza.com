@@ -45,7 +45,7 @@ export const portfolioItems: PortfolioItem[] = [
   {
     slug: "wireframe-ds",
     title: "Wireframe Design System",
-    tags: ["Design Sys", "AI", "UX Design"],
+    tags: ["Design System", "AI", "UX Design"],
     date: "3rd Mar 2024",
     description: "A shared wireframing language and component library for Ackee's mobile design team",
     coverImage: "/images/cs-wireframe-cover.png",
