@@ -25,7 +25,7 @@ export const portfolioItems: PortfolioItem[] = [
   {
     slug: "eon-app",
     title: "E.ON Digital App",
-    tags: ["UX Design", "Web", "Design Sys"],
+    tags: ["Wireframe", "Design Sys", "UX/UI"],
     date: "14th Sep 2024",
     description: "UX, design system and full digital ecosystem for one of Europe's largest energy brands",
     coverImage: "/images/cs-eon-cover.png",
@@ -45,7 +45,7 @@ export const portfolioItems: PortfolioItem[] = [
   {
     slug: "wireframe-ds",
     title: "Wireframe Design System",
-    tags: ["Design Sys", "UX Design", "Tokens"],
+    tags: ["Design Sys", "AI", "UX Design"],
     date: "3rd Mar 2024",
     description: "A shared wireframing language and component library for Ackee's mobile design team",
     coverImage: "/images/cs-wireframe-cover.png",
