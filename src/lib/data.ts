@@ -30,7 +30,7 @@ export const portfolioItems: PortfolioItem[] = [
     description: "UX, design system and full digital ecosystem for one of Europe's largest energy brands",
     coverImage: "/images/cs-eon-cover.png",
     iconBg: "#E2001A",
-    iconSrc: "/images/icon-eon.png",
+    iconSrc: "/images/icon-eon.svg",
   },
   {
     slug: "space-arena",
@@ -38,9 +38,9 @@ export const portfolioItems: PortfolioItem[] = [
     tags: ["UX Design", "Mobile", "App Design"],
     date: "7th May 2025",
     description: "Fan experience app and website for Czech Republic's most modern multi-purpose arena",
-    coverImage: "/images/cs-arena-cover.png",
+    coverImage: "/images/cs-space-cover.jpg",
     iconBg: "#7C3AED",
-    iconSrc: "/images/icon-arena.png",
+    iconSrc: "/images/logo-space.svg",
   },
   {
     slug: "wireframe-ds",
@@ -50,7 +50,7 @@ export const portfolioItems: PortfolioItem[] = [
     description: "A shared wireframing language and component library for Ackee's mobile design team",
     coverImage: "/images/cs-wireframe-cover.png",
     iconBg: "#4B5AF5",
-    iconSrc: "/images/icon-wireframe.png",
+    iconSrc: "/images/icon-ackee.svg",
   },
   {
     slug: "personal-brand",
@@ -943,7 +943,7 @@ const eonChapters: CaseStudyChapter[] = [
     blocks: [
       {
         type: "image-row",
-        images: ["/images/cs-eon-1.jpg", "/images/cs-eon-2.jpg", "/images/cs-eon-3.jpg"],
+        images: ["/images/cs-eon-1.png", "/images/cs-eon-2.png", "/images/cs-eon-3.png"],
       },
       {
         type: "two-col-findings",
@@ -1018,7 +1018,7 @@ const eonChapters: CaseStudyChapter[] = [
             text: "Token infrastructure enabling multi-market brand variants without forking the component codebase",
           },
         ],
-        image: "/images/cs-eon-4.jpg",
+        image: "/images/cs-eon-4.png",
         takeawaysHeading: "Takeaways",
         takeaways:
           "The E.ON project taught me that design systems live or die on governance, not components. The most important work wasn't building the library — it was establishing shared naming conventions, token architecture, and contribution workflows that let multiple teams build consistently without constant designer involvement. When the system works, the designer's job becomes teaching, not approving.",
@@ -1233,7 +1233,7 @@ const spaceArenaChapters: CaseStudyChapter[] = [
     blocks: [
       {
         type: "image-row",
-        images: ["/images/cs-arena-1.jpg", "/images/cs-arena-2.jpg", "/images/cs-arena-3.jpg"],
+        images: ["/images/cs-space-1.jpg", "/images/cs-space-2.jpg", "/images/cs-space-3.jpg"],
       },
       {
         type: "two-col-findings",
@@ -1308,7 +1308,7 @@ const spaceArenaChapters: CaseStudyChapter[] = [
             text: "Concept presented and approved by the arena's management team as the design direction for their upcoming digital platform",
           },
         ],
-        image: "/images/cs-arena-4.jpg",
+        image: "/images/cs-space-4.jpg",
         takeawaysHeading: "Takeaways",
         takeaways:
           "Designing for a multi-purpose venue forced me to think about emotion as much as function. A hockey playoff and a concert are two completely different emotional registers — but the same person buys both tickets through the same app. The visual language had to have enough personality to amplify each event's identity, while the UX had to be consistent enough that no return visitor ever felt lost. That tension between expressive and reliable is what makes entertainment product design one of the richest challenges in the field.",
@@ -1343,7 +1343,7 @@ export const caseStudies: CaseStudy[] = [
     slug: "eon-app",
     title: "E.ON Digital App",
     subtitle: "UX, design system and full digital ecosystem for one of Europe's largest energy brands",
-    thumbnail: "/images/cs-eon-thumb.png",
+    thumbnail: "/images/cs-eon-cover.png",
     coverImage: "/images/cs-eon-cover.png",
     role: "UX / UI Designer",
     timeline: "1 Year",
@@ -1354,9 +1354,9 @@ export const caseStudies: CaseStudy[] = [
     sections: [
       { id: "intro", type: "intro", heading: "E.ON Digital App", body: "How a token-driven design system unified E.ON's digital estate across web and mobile for over a million Czech customers." },
       { id: "context", type: "text", heading: "Context", body: "After a new corporate identity, E.ON needed a complete digital transformation — consistent UX across web portals, mobile apps, and branded touchpoints." },
-      { id: "images-1", type: "images", images: ["/images/cs-eon-1.jpg", "/images/cs-eon-2.jpg"] },
+      { id: "images-1", type: "images", images: ["/images/cs-eon-1.png", "/images/cs-eon-2.png"] },
       { id: "metrics", type: "metrics", metrics: [{ label: "Customers reached", value: "1M+" }, { label: "Products unified", value: "4" }, { label: "System adoption", value: "100%" }] },
-      { id: "images-2", type: "images", images: ["/images/cs-eon-3.jpg", "/images/cs-eon-4.jpg"] },
+      { id: "images-2", type: "images", images: ["/images/cs-eon-3.png", "/images/cs-eon-4.png"] },
       { id: "outro", type: "outro", heading: "Key Takeaway", body: "Design systems live or die on governance, not components. The real work is teaching teams to build consistently without constant designer involvement." },
     ],
   },
@@ -1364,8 +1364,8 @@ export const caseStudies: CaseStudy[] = [
     slug: "space-arena",
     title: "SPACE Arena",
     subtitle: "Fan experience app and website for Czech Republic's most modern multi-purpose arena",
-    thumbnail: "/images/cs-arena-thumb.png",
-    coverImage: "/images/cs-arena-cover.png",
+    thumbnail: "/images/cs-space-thumb.jpg",
+    coverImage: "/images/cs-space-cover.jpg",
     role: "UX / UI Designer",
     timeline: "3 Months",
     tools: "Figma · Principle · Miro",
@@ -1375,9 +1375,9 @@ export const caseStudies: CaseStudy[] = [
     sections: [
       { id: "intro", type: "intro", heading: "SPACE Arena", body: "A cinematic fan experience app for a Czech multi-purpose venue — concerts, hockey, and everything in between, all in one place." },
       { id: "context", type: "text", heading: "The Brief", body: "Ackee designed a concept for the arena's mobile app and website, covering the full fan journey from ticket purchase to post-event sharing." },
-      { id: "images-1", type: "images", images: ["/images/cs-arena-1.jpg", "/images/cs-arena-2.jpg"] },
+      { id: "images-1", type: "images", images: ["/images/cs-space-1.jpg", "/images/cs-space-2.jpg"] },
       { id: "metrics", type: "metrics", metrics: [{ label: "Feature flows", value: "12" }, { label: "Event types", value: "2" }, { label: "Concept status", value: "Approved" }] },
-      { id: "images-2", type: "images", images: ["/images/cs-arena-3.jpg", "/images/cs-arena-4.jpg"] },
+      { id: "images-2", type: "images", images: ["/images/cs-space-3.jpg", "/images/cs-space-4.jpg"] },
       { id: "outro", type: "outro", heading: "Takeaway", body: "That tension between expressive and reliable — where emotion amplifies the event but the UX never loses the visitor — is what makes entertainment product design so compelling." },
     ],
   },
