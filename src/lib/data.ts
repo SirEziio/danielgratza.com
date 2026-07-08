@@ -25,7 +25,7 @@ export const portfolioItems: PortfolioItem[] = [
   {
     slug: "eon-app",
     title: "E.ON Digital App",
-    tags: ["Design System", "UX/UI"],
+    tags: ["Design System", "UX/UI design"],
     date: "14th Sep 2024",
     description: "UX, design system and full digital ecosystem for one of Europe's largest energy brands",
     coverImage: "/images/cs-eon-cover.png",
