@@ -15,7 +15,7 @@ export const portfolioItems: PortfolioItem[] = [
   {
     slug: "ab-testing-liveport",
     title: "Livesport AB Testing",
-    tags: ["CRO", "UX Design", "AB Testing"],
+    tags: ["CRO", "UX Design", "A/B Testing"],
     date: "28th Mar 2025",
     description: "Extensive AB testing optimization of a multi-national product",
     coverImage: "/images/cs-liveport-cover.png",
@@ -25,7 +25,7 @@ export const portfolioItems: PortfolioItem[] = [
   {
     slug: "eon-app",
     title: "E.ON Digital App",
-    tags: ["UX Design", "Mobile", "Design System"],
+    tags: ["UX Design", "Mobile", "Design Sys"],
     date: "14th Sep 2024",
     description: "UX, design system and full digital ecosystem for one of Europe's largest energy brands",
     coverImage: "/images/cs-eon-cover.png",
@@ -45,7 +45,7 @@ export const portfolioItems: PortfolioItem[] = [
   {
     slug: "wireframe-ds",
     title: "Wireframe Design System",
-    tags: ["Design System", "UX Design", "Mobile"],
+    tags: ["Design Sys", "UX Design", "Mobile"],
     date: "3rd Mar 2024",
     description: "A shared wireframing language and component library for Ackee's mobile design team",
     coverImage: "/images/cs-wireframe-cover.png",
@@ -55,7 +55,7 @@ export const portfolioItems: PortfolioItem[] = [
   {
     slug: "personal-brand",
     title: "Personal Brand",
-    tags: ["Brand", "UX Design", "UX Research"],
+    tags: ["Brand", "UX Design", "Research"],
     date: "19th Feb 2024",
     description: "Building a cohesive personal design identity and brand system",
     coverImage: "/images/cs-brand-cover.png",
@@ -65,7 +65,7 @@ export const portfolioItems: PortfolioItem[] = [
   {
     slug: "ambienten-vip",
     title: "Ambienten VIP",
-    tags: ["Brand", "Graphic Design", "Print"],
+    tags: ["Brand", "Graphic", "Print"],
     date: "31st Jul 2022",
     description: "Visual design and brand materials for a premium interior design studio",
     coverImage: "/images/cs-ambienten-cover.png",
@@ -983,7 +983,7 @@ const eonChapters: CaseStudyChapter[] = [
       },
       {
         type: "two-col-text",
-        leftHeading: "Design System",
+        leftHeading: "Design Sys",
         leftText:
           "The work centred on building a robust, token-driven design system — not just a component library. Every colour, typeface, spacing unit, and elevation value was captured as a named token, allowing the system to flex across E.ON's regional brands while maintaining structural consistency. The component library was built mobile-first, then extended to web, reflecting platform priority.",
         rightHeading: "Product Design",
