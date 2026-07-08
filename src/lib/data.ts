@@ -1233,7 +1233,7 @@ const spaceArenaChapters: CaseStudyChapter[] = [
     blocks: [
       {
         type: "image-row",
-        images: ["/images/cs-space-1.jpg", "/images/cs-space-2.jpg", "/images/cs-space-3.jpg"],
+        images: ["/images/cs-space-1.png", "/images/cs-space-2.png", "/images/cs-space-3.png", "/images/cs-space-6.png"],
       },
       {
         type: "two-col-findings",
@@ -1308,7 +1308,7 @@ const spaceArenaChapters: CaseStudyChapter[] = [
             text: "Concept presented and approved by the arena's management team as the design direction for their upcoming digital platform",
           },
         ],
-        image: "/images/cs-space-4.jpg",
+        image: "/images/cs-space-4.png",
         takeawaysHeading: "Takeaways",
         takeaways:
           "Designing for a multi-purpose venue forced me to think about emotion as much as function. A hockey playoff and a concert are two completely different emotional registers — but the same person buys both tickets through the same app. The visual language had to have enough personality to amplify each event's identity, while the UX had to be consistent enough that no return visitor ever felt lost. That tension between expressive and reliable is what makes entertainment product design one of the richest challenges in the field.",
@@ -1375,9 +1375,9 @@ export const caseStudies: CaseStudy[] = [
     sections: [
       { id: "intro", type: "intro", heading: "SPACE Arena", body: "A cinematic fan experience app for a Czech multi-purpose venue — concerts, hockey, and everything in between, all in one place." },
       { id: "context", type: "text", heading: "The Brief", body: "Ackee designed a concept for the arena's mobile app and website, covering the full fan journey from ticket purchase to post-event sharing." },
-      { id: "images-1", type: "images", images: ["/images/cs-space-1.jpg", "/images/cs-space-2.jpg"] },
+      { id: "images-1", type: "images", images: ["/images/cs-space-1.png", "/images/cs-space-2.png"] },
       { id: "metrics", type: "metrics", metrics: [{ label: "Feature flows", value: "12" }, { label: "Event types", value: "2" }, { label: "Concept status", value: "Approved" }] },
-      { id: "images-2", type: "images", images: ["/images/cs-space-3.jpg", "/images/cs-space-4.jpg"] },
+      { id: "images-2", type: "images", images: ["/images/cs-space-3.png", "/images/cs-space-4.png", "/images/cs-space-6.png"] },
       { id: "outro", type: "outro", heading: "Takeaway", body: "That tension between expressive and reliable — where emotion amplifies the event but the UX never loses the visitor — is what makes entertainment product design so compelling." },
     ],
   },
