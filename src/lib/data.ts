@@ -1037,7 +1037,7 @@ const wireframeDsChapters: CaseStudyChapter[] = [
       {
         type: "meta",
         timeline: "3 Months",
-        position: "Product Designer",
+        position: "Design System Architect",
         tools: ["Figma", "Tokens Studio", "Notion"],
       },
       {
@@ -1387,7 +1387,7 @@ export const caseStudies: CaseStudy[] = [
     subtitle: "A shared wireframing language and component library for Ackee's mobile design team",
     thumbnail: "/images/cs-wireframe-thumb.png",
     coverImage: "/images/cs-wireframe-cover.png",
-    role: "Product Designer",
+    role: "Design System Architect",
     timeline: "3 Months",
     tools: "Figma · Tokens Studio · Notion",
     year: 2024,
