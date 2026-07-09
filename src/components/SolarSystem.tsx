@@ -159,6 +159,7 @@ export default function SolarSystem() {
     /* Mobile: tap → card, same-planet tap → Wikipedia, card tap → close */
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
     let mobileCard = -1;
+    let touchHintDone = false; // one-time "how to play" caption on touch
 
     /* Cached hero-title dodge zone */
     let titleEl: Element | null = null;
@@ -277,6 +278,7 @@ export default function SolarSystem() {
       const rect = canvas.getBoundingClientRect();
       const cx = e.clientX - rect.left;
       const cy = e.clientY - rect.top;
+      if (cx >= 0 && cy >= 0 && geom && cx <= geom.w && cy <= geom.h) touchHintDone = true;
       /* Mobile: a tap on the open card closes it */
       if (isTouch && mobileCard >= 0 && tipRef.current) {
         const tr = tipRef.current.getBoundingClientRect();
@@ -874,6 +876,26 @@ export default function SolarSystem() {
           try { (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = "0.14em"; } catch { /* older browsers */ }
           ctx.fillStyle = ink(a);
           ctx.fillText("CLICK TO RELEASE", mouse.x + 16, mouse.y + 28);
+        }
+      }
+
+      /* Touch devices get no hover — spell out the interactions once,
+         after the arrival animation settles, until the first tap */
+      if (isTouch && !touchHintDone) {
+        const tH = now - t0 - 3200;
+        if (tH > 0) {
+          const a =
+            Math.min(tH / 500, 1) * 0.5 * clamp(1 - (tH - 9000) / 800, 0, 1);
+          if (a <= 0.005 && tH > 9000) {
+            touchHintDone = true;
+          } else if (a > 0.005) {
+            ctx.font = `700 10px ${bodyFont}`;
+            try { (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = "0.14em"; } catch { /* older browsers */ }
+            ctx.fillStyle = ink(a);
+            ctx.textAlign = "center";
+            ctx.fillText("TAP A PLANET · TAP SPACE TO LAUNCH A COMET", w / 2, h - 96);
+            ctx.textAlign = "left";
+          }
         }
       }
 
