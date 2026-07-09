@@ -5,58 +5,6 @@ import Navigation from "@/components/Navigation";
 import GridBackground from "@/components/GridBackground";
 import { useTheme } from "@/components/ThemeProvider";
 
-/* ──────────────────────────────────────────────────────────────
-   Social icon SVGs
-────────────────────────────────────────────────────────────── */
-function IconLinkedIn() {
-  return (
-    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="36" height="36">
-      <rect x="3" y="3" width="30" height="30" rx="5" stroke="currentColor" strokeWidth="1.5"/>
-      <rect x="9" y="15" width="3" height="12" fill="currentColor"/>
-      <circle cx="10.5" cy="11.5" r="1.8" fill="currentColor"/>
-      <path d="M15 15h3v1.6c.7-1.1 2-1.8 3.5-1.8 2.8 0 4.5 1.9 4.5 5.2V27h-3v-6.5c0-1.7-.8-2.7-2.2-2.7-1.5 0-2.3 1-2.3 2.8V27h-3V15z" fill="currentColor"/>
-    </svg>
-  );
-}
-
-function IconInstagram() {
-  return (
-    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="36" height="36">
-      <rect x="3" y="3" width="30" height="30" rx="7" stroke="currentColor" strokeWidth="1.5"/>
-      <circle cx="18" cy="18" r="5.5" stroke="currentColor" strokeWidth="1.5"/>
-      <circle cx="26" cy="10" r="1.2" fill="currentColor"/>
-    </svg>
-  );
-}
-
-function IconWhatsApp() {
-  return (
-    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="36" height="36">
-      <path d="M18 3C10 3 3.5 9.4 3.5 17.4c0 2.5.7 4.9 1.9 7L3 33l8.9-2.3c2 1.1 4.3 1.7 6.6 1.7 8 0 14.5-6.4 14.5-14.4C33 10 27 3 18 3z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-      <path d="M13.5 12.5c-.3-.6-.6-.6-.9-.6-.3 0-.5 0-.8.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.2 2.5 1 3 .8 3.5.7.5-.1 1.6-.6 1.8-1.2.2-.6.2-1.1.1-1.2-.1-.1-.3-.2-.6-.3-.3-.2-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1-.2.2-.8.9-1 1.1-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.5-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.2-.7-1.6-.9-2.1z" fill="currentColor"/>
-    </svg>
-  );
-}
-
-function IconMedium() {
-  return (
-    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="36" height="36">
-      <circle cx="18" cy="18" r="15" stroke="currentColor" strokeWidth="1.5"/>
-      <ellipse cx="12.5" cy="18" rx="4.5" ry="6" stroke="currentColor" strokeWidth="1.5"/>
-      <ellipse cx="23" cy="18" rx="2" ry="5.5" stroke="currentColor" strokeWidth="1.5"/>
-      <ellipse cx="29.5" cy="18" rx="1" ry="5" stroke="currentColor" strokeWidth="1.5"/>
-    </svg>
-  );
-}
-
-function IconDribbble() {
-  return (
-    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="36" height="36">
-      <circle cx="18" cy="18" r="14" stroke="currentColor" strokeWidth="1.5"/>
-      <path d="M5 13c3 1 7 2 11 1.5M10 30c1-4 4-8 9-10M21 4c-2 4-3 9-2 16M32 22c-3-1-6-1.5-10-.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-    </svg>
-  );
-}
 
 /* ──────────────────────────────────────────────────────────────
    Crosshair location pin
@@ -166,19 +114,20 @@ function CopyButton({ text }: { text: string }) {
 }
 
 /* ──────────────────────────────────────────────────────────────
-   Social link
+   Social link — uses CSS mask so the SVG recolours via JS
 ────────────────────────────────────────────────────────────── */
-function SocialLink({ href, label, children, delay = 0, isVisible, brandColor }: {
-  href: string; label: string; children: React.ReactNode; delay?: number; isVisible: boolean; brandColor?: string;
+function SocialLink({ href, label, iconSrc, delay = 0, isVisible, brandColor }: {
+  href: string; label: string; iconSrc: string; delay?: number; isVisible: boolean; brandColor?: string;
 }) {
   const [hovered, setHovered] = useState(false);
-  // Once the entrance animation completes, switch to instant hover transitions
   const [entered, setEntered] = useState(false);
   useEffect(() => {
     if (!isVisible) return;
     const t = setTimeout(() => setEntered(true), delay + 650);
     return () => clearTimeout(t);
   }, [isVisible, delay]);
+
+  const iconColor = hovered && brandColor ? brandColor : "var(--ink)";
 
   return (
     <a
@@ -191,16 +140,31 @@ function SocialLink({ href, label, children, delay = 0, isVisible, brandColor }:
       style={{
         display: "flex", alignItems: "center", justifyContent: "center",
         width: 36, height: 36,
-        color: hovered && brandColor ? brandColor : "var(--ink)",
         opacity: isVisible ? (hovered ? 1 : 0.5) : 0,
         transform: isVisible ? (hovered ? "translateY(-3px) scale(1.1)" : "none") : "translateY(12px)",
         transition: entered
-          ? "opacity 0.18s ease, transform 0.22s cubic-bezier(0.22,1,0.36,1), color 0.18s ease"
+          ? "opacity 0.18s ease, transform 0.22s cubic-bezier(0.22,1,0.36,1)"
           : `opacity 0.6s ease ${delay}ms, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
         textDecoration: "none",
       }}
     >
-      {children}
+      {/* Mask approach: SVG shape + background-color = theme-aware + brand-colour on hover */}
+      <div
+        style={{
+          width: 36,
+          height: 36,
+          maskImage: `url(${iconSrc})`,
+          WebkitMaskImage: `url(${iconSrc})`,
+          maskSize: "contain",
+          WebkitMaskSize: "contain",
+          maskRepeat: "no-repeat",
+          WebkitMaskRepeat: "no-repeat",
+          maskPosition: "center",
+          WebkitMaskPosition: "center",
+          backgroundColor: iconColor,
+          transition: "background-color 0.18s ease",
+        }}
+      />
     </a>
   );
 }
@@ -479,7 +443,8 @@ export default function ContactPage() {
                   <div
                     onMouseEnter={() => setMapHovered(true)}
                     onMouseLeave={() => setMapHovered(false)}
-                    style={{ position: "relative", width: "100%", paddingTop: "56.79%", overflow: "hidden" }}
+                    onClick={() => window.open("https://www.google.com/maps/place/Prague/@50.0755381,14.4378005,13z", "_blank", "noopener noreferrer")}
+                    style={{ position: "relative", width: "100%", paddingTop: "56.79%", overflow: "hidden", cursor: "pointer" }}
                   >
                     {/* Outline map — fades out on hover; inverted in dark mode so lines read white */}
                     <img
@@ -556,15 +521,13 @@ export default function ContactPage() {
         {/* ── Social icons ─────────────────────────────────────── */}
         <div style={{ display: "flex", gap: 16, alignItems: "center", justifyContent: "center", padding: 10, marginTop: isMobile ? 40 : 0 }}>
           {[
-            { href: "https://www.linkedin.com/in/daniel-gratza-82b893210/", label: "LinkedIn",  icon: <IconLinkedIn />,  brandColor: "#0A66C2" },
-            { href: "https://www.instagram.com/dxgratza/",                  label: "Instagram", icon: <IconInstagram />, brandColor: "#E1306C" },
-            { href: "https://wa.me/420601338213",                            label: "WhatsApp",  icon: <IconWhatsApp />,  brandColor: "#25D366" },
-            { href: "https://medium.com/@danielgratza",                      label: "Medium",    icon: <IconMedium />,    brandColor: "#000000" },
-            { href: "https://dribbble.com/danielgratza",                     label: "Dribbble",  icon: <IconDribbble />,  brandColor: "#EA4C89" },
-          ].map(({ href, label, icon, brandColor }, i) => (
-            <SocialLink key={label} href={href} label={label} delay={400 + i * 60} isVisible={isVisible} brandColor={brandColor}>
-              {icon}
-            </SocialLink>
+            { href: "https://www.linkedin.com/in/daniel-gratza-82b893210/", label: "LinkedIn",  iconSrc: "/icons/socials/linkedin.svg",  brandColor: "#0A66C2" },
+            { href: "https://www.instagram.com/dxgratza/",                  label: "Instagram", iconSrc: "/icons/socials/instagram.svg", brandColor: "#E1306C" },
+            { href: "https://wa.me/420601338213",                            label: "WhatsApp",  iconSrc: "/icons/socials/whatsapp.svg",  brandColor: "#25D366" },
+            { href: "https://medium.com/@danielgratza",                      label: "Medium",    iconSrc: "/icons/socials/medium.svg",    brandColor: isDark ? "#ffffff" : "#000000" },
+            { href: "https://dribbble.com/danielgratza",                     label: "Dribbble",  iconSrc: "/icons/socials/dribbble.svg",  brandColor: "#EA4C89" },
+          ].map(({ href, label, iconSrc, brandColor }, i) => (
+            <SocialLink key={label} href={href} label={label} iconSrc={iconSrc} delay={400 + i * 60} isVisible={isVisible} brandColor={brandColor} />
           ))}
         </div>
       </div>

@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import GridBackground from "@/components/GridBackground";
-import BouncingBall from "@/components/BouncingBall";
+import SolarSystem from "@/components/SolarSystem";
 import MouseScrollIcon from "@/components/MouseScrollIcon";
 import { caseStudies, portfolioItems } from "@/lib/data";
 import DotGrid from "@/components/DotGrid";
@@ -318,15 +318,15 @@ export default function HomePage() {
             opacity: heroStage >= 1 ? 1 : 0,
             transition: "opacity 0.6s ease",
           }}>
-            <GridBackground />
+            <GridBackground interactive={false} />
           </div>
 
-          {/* Bouncing ball — appears last */}
+          {/* Solar system — appears last */}
           <div style={{
             opacity: heroStage >= 4 ? 1 : 0,
             transition: "opacity 0.7s ease",
           }}>
-            <BouncingBall />
+            <SolarSystem />
           </div>
 
           <div

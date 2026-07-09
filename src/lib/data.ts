@@ -11,7 +11,10 @@ export type PortfolioItem = {
   iconSrc?: string;
 };
 
-export const portfolioItems: PortfolioItem[] = [
+/* ── Temporarily unlisted cases — remove a slug here to publish it ── */
+const HIDDEN_SLUGS = ["eon-app", "space-arena"];
+
+const allPortfolioItems: PortfolioItem[] = [
   {
     slug: "ab-testing-liveport",
     title: "Livesport AB Testing",
@@ -26,7 +29,7 @@ export const portfolioItems: PortfolioItem[] = [
     slug: "eon-app",
     title: "E.ON Digital App",
     tags: ["Design System", "UX/UI Design"],
-    date: "14th Sep 2024",
+    date: "31st Jul 2026",
     description: "UX, design system and full digital ecosystem for one of Europe's largest energy brands",
     coverImage: "/images/cs-eon-cover.png",
     iconBg: "#E2001A",
@@ -34,9 +37,9 @@ export const portfolioItems: PortfolioItem[] = [
   },
   {
     slug: "space-arena",
-    title: "SPACE Arena",
+    title: 'MHAP "SPACE" Arena',
     tags: ["UX Design", "Motion", "App Design"],
-    date: "7th May 2025",
+    date: "12th Jun 2025",
     description: "Fan experience app and website for Czech Republic's most modern multi-purpose arena",
     coverImage: "/images/cs-space-cover.jpg",
     iconBg: "#7C3AED",
@@ -46,7 +49,7 @@ export const portfolioItems: PortfolioItem[] = [
     slug: "wireframe-ds",
     title: "Wireframe Design System",
     tags: ["Design System", "AI", "UX Design"],
-    date: "3rd Mar 2024",
+    date: "1st Jun 2026",
     description: "A shared wireframing language and component library for Ackee's mobile design team",
     coverImage: "/images/cs-wireframe-cover.png",
     iconBg: "#4B5AF5",
@@ -943,7 +946,7 @@ const eonChapters: CaseStudyChapter[] = [
     blocks: [
       {
         type: "image-row",
-        images: ["/images/cs-eon-1.png", "/images/cs-eon-2.png", "/images/cs-eon-3.png"],
+        images: ["/images/cs-eon-1.png", "/images/cs-eon-2.png", "/images/cs-eon-3.png", "/images/cs-eon-4.png", "/images/cs-eon-5.png"],
       },
       {
         type: "two-col-findings",
@@ -1088,7 +1091,7 @@ const wireframeDsChapters: CaseStudyChapter[] = [
     blocks: [
       {
         type: "image-row",
-        images: ["/images/cs-wireframe-1.jpg", "/images/cs-wireframe-2.jpg", "/images/cs-wireframe-3.jpg"],
+        images: ["/images/cs-wireframe-1.jpg", "/images/cs-wireframe-2.jpg", "/images/cs-wireframe-3.jpg", "/images/cs-wireframe-4.jpg", "/images/cs-wireframe-5.jpg", "/images/cs-wireframe-6.jpg"],
       },
       {
         type: "two-col-findings",
@@ -1188,13 +1191,13 @@ const spaceArenaChapters: CaseStudyChapter[] = [
       {
         type: "overview",
         leftText:
-          "SPACE Arena is a modern multi-purpose venue in Pardubice — home to HC Dynamo Pardubice hockey and a major Czech concert destination. Ackee was asked to design a concept for a mobile app and website that would reimagine the fan and visitor experience: from buying tickets to arriving at the event, navigating the arena, and sharing the night. This was a design concept project, developed end-to-end by the Ackee design team.",
+          "MHAP \"SPACE\" Arena — Multifunkční hokejová aréna Pardubice — is a next-generation multi-purpose venue currently in development in Pardubice, set to become the most modern arena in the Czech Republic and one of the largest ice hockey facilities in the world. Ackee was commissioned to design the digital platform concept ahead of the arena's opening: a unified app and website serving two distinct audiences — HC Dynamo Pardubice fans and visitors attending concerts, cultural events, and international sports. The app is designed as a single personalised experience. At first launch, users declare their primary world — hockey or culture — and the platform adapts its tone, content, and defaults accordingly, while keeping both worlds fully accessible and intertwined throughout.",
         rightHeading: "Key Objectives",
         rightItems: [
-          "Design an end-to-end mobile app for event ticketing, venue navigation, and in-arena services",
-          "Create a website that works as both event calendar and brand platform for the arena",
-          "Build a visual language that works across sports and live entertainment — two very different audience expectations",
-          "Explore features beyond ticketing: seat finder, food pre-ordering, real-time countdown, and a fan poster maker",
+          "Define the full digital experience concept for a landmark Czech arena before it opens",
+          "Design a single app that elegantly serves two distinct audience types — hockey fans and cultural event visitors — personalised from first launch",
+          "Build an onboarding flow that captures user intent without siloing either world: hockey and culture remain intertwined",
+          "Bring the concept to life through a fully animated Figma prototype — making the pitch feel like a near-finished product, not a static mockup",
         ],
       },
     ],
@@ -1207,21 +1210,21 @@ const spaceArenaChapters: CaseStudyChapter[] = [
       {
         type: "dark-quote",
         text:
-          "Modern sports and entertainment venues are still stuck with fragmented digital experiences — one app for tickets, another for food, a third for navigation. Visitors arrive over-informed and under-guided. SPACE Arena needed a single, immersive platform that made the evening feel seamless, from the moment tickets were bought to the moment the lights went down.",
+          "SPACE Arena doesn't exist yet — which meant we weren't just designing an app. We were imagining the entire digital relationship between a world-class venue and its visitors, before the first puck drops or the first concert sells out.",
       },
       {
         type: "two-col-bullets",
-        leftHeading: "Visitor Pain Points",
+        leftHeading: "Design Challenges",
         leftItems: [
-          "Ticketing, food ordering, seat finding, and event info were spread across multiple disconnected platforms and apps",
-          "The venue serves two very different audiences — hockey fans and concert-goers — with entirely different expectations",
-          "No personalisation: the digital experience couldn't distinguish a season ticket holder from a first-time visitor",
+          "Designing for a venue that doesn't exist yet — working from architectural plans and ambition rather than observed user behaviour",
+          "Two fundamentally different audiences — HC Dynamo Pardubice season ticket holders and casual cultural event visitors — need to feel equally at home in a single app",
+          "The platform must function as both a pre-event planning tool (days out) and a real-time arena companion (the night itself), within one coherent experience",
         ],
-        rightHeading: "Design Challenges",
+        rightHeading: "The Opportunity",
         rightItems: [
-          "Creating a visual identity that felt right for both a Dua Lipa concert and a playoff hockey match without defaulting to a generic events aesthetic",
-          "The app had to work as both a planning tool (days before the event) and a real-time companion (during the night)",
-          "Designing for ambient, dark-room conditions demanded unusually strict contrast and touch-target requirements",
+          "With no legacy system to respect, the concept can define best-in-class from scratch — rather than improve what already exists",
+          "Personalised onboarding creates a rare chance to learn user intent from the very first screen, building a more relevant experience from day one",
+          "Designing the app before the arena opens means the digital and physical experiences can be architected in parallel, not retrofitted",
         ],
       },
     ],
@@ -1233,30 +1236,30 @@ const spaceArenaChapters: CaseStudyChapter[] = [
     blocks: [
       {
         type: "image-row",
-        images: ["/images/cs-space-1.png", "/images/cs-space-2.png", "/images/cs-space-3.png", "/images/cs-space-5.png", "/images/cs-space-6.png"],
+        images: ["/images/cs-space-1.jpg", "/images/cs-space-2.png", "/images/cs-space-3.png", "/images/cs-space-4.png", "/images/cs-space-5.png", "/images/cs-space-6.png"],
       },
       {
         type: "two-col-findings",
         leftHeading: "Methods",
         leftItems: [
-          "Benchmark research across leading arena and festival apps — O2 Arena, Rogers Arena, Ticketmaster, and Spotify Concerts",
-          "User flow mapping across both event types: a hockey season ticket holder vs. a single-event concert visitor",
-          "Jobs-to-be-done analysis at each moment of the fan journey: planning, arriving, inside the venue, and post-event",
-          "Dark-room usability research and high-contrast UI pattern analysis for ambient-lighting conditions",
+          "Benchmark research across the world's leading multi-purpose arena apps — O2 Arena Prague, Rogers Arena, Chase Center, Madison Square Garden, and Ticketmaster",
+          "Conceptual user journey mapping across both audience profiles: an HC Dynamo Pardubice season ticket holder vs. a first-time cultural event visitor",
+          "Jobs-to-be-done analysis at each phase of the fan journey: pre-event planning, arrival, venue navigation, in-arena experience, and post-event engagement",
+          "Ambient-condition usability research: studying high-contrast UI patterns for performance in dark arena environments during live events",
         ],
         rightHeading: "Key Findings",
         findings: [
           {
             num: "#1",
-            text: "The highest-stress moment of any arena visit is arrival — not knowing where to go, how to queue, or how to access the venue. Solving this had the highest payoff for satisfaction",
+            text: "Arrival is make-or-break — gate access and seat finding are where arena apps earn loyalty or lose it, regardless of event type",
           },
           {
             num: "#2",
-            text: "Both concert and sports fans wanted anticipation design — countdowns, build-up content, and personalised event previews — not just utility features",
+            text: "Both audience types share one unmet need: anticipation design. The experience should build emotional momentum before the doors open, not just serve utility on the night",
           },
           {
             num: "#3",
-            text: "A single 'My Evening' view consolidating ticket, seat, countdown, and pre-orders resolved 80% of questions visitors currently answered across multiple separate apps",
+            text: "'My Evening' — ticket, seat, countdown, pre-orders in one view — solves the core job for both hockey fans and cultural visitors without splitting the app in two",
           },
         ],
       },
@@ -1273,12 +1276,12 @@ const spaceArenaChapters: CaseStudyChapter[] = [
       },
       {
         type: "two-col-text",
-        leftHeading: "Visual Language",
+        leftHeading: "Personalisation System",
         leftText:
-          "The visual direction was inspired by the liminal feel of a venue just before a show — deep dark purples and blacks, soft gradient bleeds, photographic textures of live performances. Typography was large and confident with display faces for impact moments (artist names, scores, countdowns) and a clean sans for functional navigation. The result felt cinematic without sacrificing usability.",
-        rightHeading: "Feature Design",
+          "The central design challenge was building one app that felt native to two very different worlds. The solution begins at onboarding — a first-launch flow that captures user intent and uses it to personalise the home screen, content, notifications, and editorial tone. Crucially, users can always switch context; personalisation layers on top of a shared core, never gates either world. A Dynamo Pardubice fan can discover a concert mid-season; a first-time concert visitor can stumble onto a playoff run. The visual direction reinforces this: deep dark purples and blacks with cinematic typography that amplifies each event's identity without defaulting to a generic events aesthetic.",
+        rightHeading: "Animated Prototype",
         rightText:
-          "The app's centrepiece was the 'My Evening' home screen — a context-aware view showing your ticket, event countdown, seat location, and pre-order status in one glance. Additional features included an in-app poster maker letting fans create shareable event art, real-time arena maps with food and facilities, and a CMS-powered editorial layer letting the arena publish content directly through the app.",
+          "The defining challenge wasn't just designing the app — it was making the concept feel real before a single line of code existed. Using Claude with Figma's AI connectors, the entire presentation was put into motion: transitions, micro-interactions, and animated flows built directly in Figma to make the UI feel like a live product rather than a static deck. The goal was to prove the concept viscerally — to give the client not just a vision, but something they could experience. Every screen had to feel immersive, truthful to the product we were pitching, and genuinely impressive as a demonstration of what the final app could be.",
       },
     ],
   },
@@ -1293,31 +1296,31 @@ const spaceArenaChapters: CaseStudyChapter[] = [
         metrics: [
           {
             num: "#1",
-            text: "Full concept for mobile app and website — production-ready high-fidelity designs across all core user journeys",
+            text: "Fully animated Figma prototype — AI-assisted motion design bringing the concept to life as an interactive, immersive sales pitch before a single line of code was written",
           },
           {
             num: "#2",
-            text: "12 complete feature flows: ticketing, My Evening view, seat finder, food pre-order, poster maker, arena map, and push notifications",
+            text: "Personalised onboarding system — users declare their primary world at first launch, with hockey and culture remaining intertwined and fully accessible throughout the app",
           },
           {
             num: "#3",
-            text: "Scalable visual design system — tokens and components adaptable across both sports and entertainment event contexts",
+            text: "12 complete feature flows — personalised home, ticketing, My Evening view, seat finder, food pre-order, fan poster maker, arena map, editorial layer, and push notifications",
           },
           {
             num: "#4",
-            text: "Concept presented and approved by the arena's management team as the design direction for their upcoming digital platform",
+            text: "Concept presented to and approved by the arena's development team as the design direction for SPACE Arena's digital platform at launch",
           },
         ],
         image: "/images/cs-space-4.png",
         takeawaysHeading: "Takeaways",
         takeaways:
-          "Designing for a multi-purpose venue forced me to think about emotion as much as function. A hockey playoff and a concert are two completely different emotional registers — but the same person buys both tickets through the same app. The visual language had to have enough personality to amplify each event's identity, while the UX had to be consistent enough that no return visitor ever felt lost. That tension between expressive and reliable is what makes entertainment product design one of the richest challenges in the field.",
+          "Designing for a venue that doesn't exist yet forced a different kind of question: how do you make something feel real before it is? The answer was motion. Using Claude with Figma's AI connectors, the entire concept was animated directly in Figma — not as a polish step, but as the core of the pitch. The prototype had to feel alive, immersive, and convincing enough to sell a world-class arena on a vision. One frustration: Figma Motion launched just after the handover deadline. Its native animation engine would have resolved the performance constraints I was working around and unlocked significantly smoother, more cinematic transitions — both for the user experience and for the pitch itself. There's more to build here when the tools fully catch up to the ambition.",
       },
     ],
   },
 ];
 
-export const caseStudies: CaseStudy[] = [
+const allCaseStudies: CaseStudy[] = [
   {
     slug: "ab-testing-liveport",
     title: "AB Testing in Livesport",
@@ -1345,6 +1348,8 @@ export const caseStudies: CaseStudy[] = [
     subtitle: "UX, design system and full digital ecosystem for one of Europe's largest energy brands",
     thumbnail: "/images/cs-eon-cover.png",
     coverImage: "/images/cs-eon-cover.png",
+    introImage: "/images/cs-eon-intro.png",
+    solutionImage: "/images/cs-eon-solution.png",
     role: "UX / UI Designer",
     timeline: "1 Year",
     tools: "Figma · Miro · Jira · Claude",
@@ -1362,20 +1367,23 @@ export const caseStudies: CaseStudy[] = [
   },
   {
     slug: "space-arena",
-    title: "SPACE Arena",
-    subtitle: "Fan experience app and website for Czech Republic's most modern multi-purpose arena",
+    title: 'MHAP "SPACE" Arena',
+    subtitle: "Animated concept pitch for the most modern arena in the Czech Republic — AI-assisted motion design in Figma to make the vision feel real before a line of code was written",
     thumbnail: "/images/cs-space-thumb.jpg",
     coverImage: "/images/cs-space-cover.jpg",
-    role: "UX / UI Designer",
+    introImage: "/images/cs-space-intro.mp4",
+    solutionImage: "/images/cs-space-solution.png",
+    galleryAspectRatio: "16/9",
+    role: "Motion Designer",
     timeline: "1 Month",
     tools: "Figma · Claude · Adobe",
     year: 2025,
     accentColor: "#7C3AED",
     chapters: spaceArenaChapters,
     sections: [
-      { id: "intro", type: "intro", heading: "SPACE Arena", body: "A cinematic fan experience app for a Czech multi-purpose venue — concerts, hockey, and everything in between, all in one place." },
+      { id: "intro", type: "intro", heading: "SPACE Arena", body: "A digital platform concept for a future landmark Czech arena — one personalised app for two worlds: HC Dynamo Pardubice ice hockey and a world-class cultural venue." },
       { id: "context", type: "text", heading: "The Brief", body: "Ackee designed a concept for the arena's mobile app and website, covering the full fan journey from ticket purchase to post-event sharing." },
-      { id: "images-1", type: "images", images: ["/images/cs-space-1.png", "/images/cs-space-2.png"] },
+      { id: "images-1", type: "images", images: ["/images/cs-space-1.jpg", "/images/cs-space-2.png"] },
       { id: "metrics", type: "metrics", metrics: [{ label: "Feature flows", value: "12" }, { label: "Event types", value: "2" }, { label: "Concept status", value: "Approved" }] },
       { id: "images-2", type: "images", images: ["/images/cs-space-3.png", "/images/cs-space-4.png", "/images/cs-space-5.png", "/images/cs-space-6.png"] },
       { id: "outro", type: "outro", heading: "Takeaway", body: "That tension between expressive and reliable — where emotion amplifies the event but the UX never loses the visitor — is what makes entertainment product design so compelling." },
@@ -1387,6 +1395,8 @@ export const caseStudies: CaseStudy[] = [
     subtitle: "A shared wireframing language and component library for Ackee's mobile design team",
     thumbnail: "/images/cs-wireframe-thumb.png",
     coverImage: "/images/cs-wireframe-cover.png",
+    introImage: "/images/cs-wireframe-intro.png",
+    solutionImage: "/images/cs-wireframe-solution.png",
     role: "Design System Architect",
     timeline: "3 Months",
     tools: "Figma · Claude · Notion",
@@ -1502,6 +1512,16 @@ export const caseStudies: CaseStudy[] = [
     sections: [],
   },
 ];
+
+/* Public lists — hidden cases stay in the data above, they're just filtered
+   out of every listing, the homepage sections, prev/next navigation, and
+   direct URLs (the case-study route 404s on slugs missing from these). */
+export const portfolioItems: PortfolioItem[] = allPortfolioItems.filter(
+  (p) => !HIDDEN_SLUGS.includes(p.slug)
+);
+export const caseStudies: CaseStudy[] = allCaseStudies.filter(
+  (c) => !HIDDEN_SLUGS.includes(c.slug)
+);
 
 export const timelineEntries: TimelineEntry[] = [
   {

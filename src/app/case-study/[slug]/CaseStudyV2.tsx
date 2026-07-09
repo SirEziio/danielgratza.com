@@ -9,6 +9,7 @@ import GridBackground from "@/components/GridBackground";
 import { CaseStudy, CaseStudyChapter } from "@/lib/types";
 import { PortfolioItem, caseStudies } from "@/lib/data";
 import PillCTA from "@/components/PillCTA";
+import ChapterGallery, { GalleryChapter } from "@/components/ChapterGallery";
 
 /* ─────────────────────────────────────────────────────────────────
    useInView — fires once when element enters the viewport
@@ -67,7 +68,7 @@ function FadeUp({
 /* ─────────────────────────────────────────────────────────────────
    SectionGallery — slides through images, dot indicator, hover chevrons
 ───────────────────────────────────────────────────────────────── */
-function SectionGallery({ images }: { images: string[] }) {
+function SectionGallery({ images, aspectRatio = "3/2", onExpand }: { images: string[]; aspectRatio?: string; onExpand?: (idx: number) => void }) {
   const [current, setCurrent] = useState(0);
   const [hovered, setHovered] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -118,9 +119,15 @@ function SectionGallery({ images }: { images: string[] }) {
     >
       {/* Image viewport */}
       <div
-        style={{ position: "relative", overflow: "hidden", aspectRatio: "3/2" }}
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          aspectRatio: aspectRatio,
+          cursor: onExpand ? "zoom-in" : "default",
+        }}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
+        onClick={onExpand ? () => onExpand(current) : undefined}
       >
         {/* Sliding strip */}
         <div
@@ -147,6 +154,32 @@ function SectionGallery({ images }: { images: string[] }) {
             </div>
           ))}
         </div>
+
+        {/* "View all" hint — appears on hover when expandable */}
+        {onExpand && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 12,
+              right: 12,
+              background: "rgba(0,0,0,0.48)",
+              backdropFilter: "blur(6px)",
+              WebkitBackdropFilter: "blur(6px)",
+              borderRadius: 4,
+              padding: "4px 10px",
+              opacity: hovered ? 1 : 0,
+              transition: "opacity 220ms ease",
+              pointerEvents: "none",
+            }}
+          >
+            <span
+              className="font-futura"
+              style={{ color: "rgba(255,255,255,0.85)", fontSize: 10, letterSpacing: "0.1em" }}
+            >
+              VIEW ALL
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Left chevron — half outside the image */}
@@ -405,6 +438,7 @@ const TOOL_ICON: Record<string, string> = {
   "framer":          "/icons/tools/framer.svg",
   "optimizely":      "/icons/tools/optimizely.svg",
   "ga4":             "/icons/tools/ga4.svg",
+  "adobe":           "/icons/tools/adobe.svg",
   "adobe cc":        "/icons/tools/adobe-cc.svg",
   "photoshop":       "/icons/tools/photoshop.svg",
   "illustrator":     "/icons/tools/illustrator.svg",
@@ -417,6 +451,7 @@ const TOOL_ICON: Record<string, string> = {
   "miro":            "/icons/tools/miro.svg",
   "unity":           "/icons/tools/unity.svg",
   "claude":          "/icons/tools/Claude.svg",
+  "notion":          "/icons/tools/notion.svg",
 };
 
 function getToolIcon(name: string): string | null {
@@ -538,7 +573,7 @@ function MetaStrip({ study }: { study: CaseStudy }) {
 /* ─────────────────────────────────────────────────────────────────
    3. OVERVIEW / CHALLENGE
 ───────────────────────────────────────────────────────────────── */
-function OverviewSection({ chapters }: { chapters: CaseStudyChapter[] }) {
+function OverviewSection({ chapters, study }: { chapters: CaseStudyChapter[]; study: CaseStudy }) {
   // Pull text from the first overview block found across chapters
   const overviewBlock = chapters
     .flatMap((ch) => ch.blocks)
@@ -557,7 +592,7 @@ function OverviewSection({ chapters }: { chapters: CaseStudyChapter[] }) {
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
             gap: "clamp(2.5rem, 6vw, 5.0000rem)",
-            alignItems: "center",
+            alignItems: "start",
           }}
         >
           {/* Left — text */}
@@ -589,23 +624,24 @@ function OverviewSection({ chapters }: { chapters: CaseStudyChapter[] }) {
             </p>
           </FadeUp>
 
-          {/* Right — image */}
+          {/* Right — intro media, natural aspect ratio */}
           <FadeUp delay={120}>
-            <div
-              style={{
-                borderRadius: 0,
-                overflow: "hidden",
-                aspectRatio: "3 / 2",
-                position: "relative",
-              }}
-            >
-              <Image
-                src="/images/cs-arma4-1.jpg"
-                alt="Case study detail"
-                fill
-                style={{ objectFit: "cover" }}
+            {(study.introImage || study.coverImage || "").endsWith(".mp4") ? (
+              <video
+                src={study.introImage || study.coverImage}
+                autoPlay
+                loop
+                muted
+                playsInline
+                style={{ width: "100%", height: "auto", display: "block" }}
               />
-            </div>
+            ) : (
+              <img
+                src={study.introImage || study.coverImage || "/images/cs-arma4-cover.png"}
+                alt="Case study detail"
+                style={{ width: "100%", height: "auto", display: "block" }}
+              />
+            )}
           </FadeUp>
         </div>
       </div>
@@ -616,7 +652,7 @@ function OverviewSection({ chapters }: { chapters: CaseStudyChapter[] }) {
 /* ─────────────────────────────────────────────────────────────────
    4. RESEARCH
 ───────────────────────────────────────────────────────────────── */
-function ResearchSection({ chapters, study }: { chapters: CaseStudyChapter[]; study: CaseStudy }) {
+function ResearchSection({ chapters, study, galleryImages, galleryAspectRatio, onOpenGallery }: { chapters: CaseStudyChapter[]; study: CaseStudy; galleryImages: string[]; galleryAspectRatio?: string; onOpenGallery: (chIdx: number, imgIdx: number) => void }) {
   // Pull findings from any two-col-findings block
   const findingsBlock = chapters
     .flatMap((ch) => ch.blocks)
@@ -630,15 +666,6 @@ function ResearchSection({ chapters, study }: { chapters: CaseStudyChapter[]; st
           { num: "02", text: "Inventory management is a critical bottleneck under stress" },
           { num: "03", text: "Military conventions shape mental models; deviate at your peril" },
         ];
-
-  // Gallery: first image-row block across all chapters
-  const firstImageRow = chapters
-    .flatMap((ch) => ch.blocks)
-    .find((b) => b.type === "image-row");
-  const galleryImages =
-    firstImageRow?.type === "image-row"
-      ? firstImageRow.images
-      : ["/images/cs-arma4-1.jpg", "/images/cs-arma4-2.jpg", "/images/cs-arma4-3.jpg"];
 
   return (
     <section
@@ -660,53 +687,56 @@ function ResearchSection({ chapters, study }: { chapters: CaseStudyChapter[]; st
           </h2>
         </FadeUp>
 
-        {/* Finding glassy cards */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 56 }}>
+        {/* Findings — Swiss columns under accent-ticked hairlines */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: "clamp(2rem, 4vw, 3rem)",
+            marginBottom: 56,
+          }}
+        >
           {findings.map((f, i) => (
             <FadeUp key={f.num} delay={i * 80}>
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 20,
-                  padding: "20px 24px",
-                  borderRadius: 0,
-                  background: "rgba(255,255,255,0.45)",
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  border: "1px solid rgba(36,36,36,0.08)",
-                  transition: "border-color 0.2s ease, box-shadow 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(36,36,36,0.16)";
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 20px rgba(36,36,36,0.07)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(36,36,36,0.08)";
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                  position: "relative",
+                  borderTop: "1px solid var(--grid-line)",
+                  paddingTop: 22,
+                  height: "100%",
                 }}
               >
+                {/* Accent overline tick */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: -1,
+                    left: 0,
+                    width: 32,
+                    height: 2,
+                    background: study.accentColor,
+                  }}
+                />
                 <span
                   className="font-futura"
                   style={{
-                    fontSize: "clamp(1.0625rem, calc(0.5rem + 0.8vw), 1.3125rem)",
+                    display: "block",
+                    fontSize: 11,
                     fontWeight: 700,
-                    letterSpacing: "0.08em",
+                    letterSpacing: "0.16em",
+                    textTransform: "uppercase",
                     color: study.accentColor,
-                    opacity: 0.85,
-                    flexShrink: 0,
-                    width: 36,
-                    textAlign: "right",
+                    marginBottom: 14,
                   }}
                 >
-                  {f.num}
+                  Finding {String(i + 1).padStart(2, "0")}
                 </span>
                 <p
                   className="font-futura"
                   style={{
-                    fontSize: "clamp(1.0625rem, calc(0.5rem + 0.9vw), 1.5rem)",
+                    fontSize: "1rem",
                     color: "var(--ink)",
-                    lineHeight: 1.45,
+                    lineHeight: 1.6,
                     fontWeight: 400,
                     margin: 0,
                   }}
@@ -720,7 +750,7 @@ function ResearchSection({ chapters, study }: { chapters: CaseStudyChapter[]; st
 
         {/* Research — gallery */}
         <FadeUp delay={200}>
-          <SectionGallery images={galleryImages} />
+          <SectionGallery images={galleryImages} aspectRatio={galleryAspectRatio} onExpand={(idx) => onOpenGallery(0, idx)} />
         </FadeUp>
       </div>
     </section>
@@ -732,7 +762,7 @@ function ResearchSection({ chapters, study }: { chapters: CaseStudyChapter[]; st
 ───────────────────────────────────────────────────────────────── */
 const PROCESS_STEPS = ["Define", "Research", "Analyze", "Design", "Test"];
 
-function ProcessSection({ chapters }: { chapters: CaseStudyChapter[] }) {
+function ProcessSection({ chapters, galleryImages, galleryAspectRatio, onOpenGallery }: { chapters: CaseStudyChapter[]; galleryImages: string[]; galleryAspectRatio?: string; onOpenGallery: (chIdx: number, imgIdx: number) => void }) {
   // Pull two-col-text block for ideation text
   const textBlock = chapters
     .flatMap((ch) => ch.blocks)
@@ -741,22 +771,12 @@ function ProcessSection({ chapters }: { chapters: CaseStudyChapter[] }) {
   const leftText =
     textBlock?.type === "two-col-text"
       ? textBlock.leftText
-      : "We started by mapping the existing Arma 3 inventory to identify friction points and quantify the cognitive load placed on players during combat scenarios.";
+      : "We started by mapping the existing inventory to identify friction points and quantify the cognitive load.";
 
   const rightText =
     textBlock?.type === "two-col-text"
       ? textBlock.rightText
-      : "Multiple rounds of wireframing followed, testing different organizational hierarchies, drag-and-drop interactions, and contextual quick-actions before arriving at the final system.";
-
-  // Gallery: second image-row block across all chapters (process images)
-  const allImageRows = chapters
-    .flatMap((ch) => ch.blocks)
-    .filter((b) => b.type === "image-row");
-  const processImageRow = allImageRows[1] ?? allImageRows[0];
-  const galleryImages =
-    processImageRow?.type === "image-row"
-      ? processImageRow.images
-      : ["/images/cs-arma4-4.jpg", "/images/cs-arma4-5.jpg", "/images/cs-arma4-6.jpg"];
+      : "Multiple rounds of wireframing followed, testing different organizational hierarchies before arriving at the final system.";
 
   return (
     <section
@@ -905,7 +925,7 @@ function ProcessSection({ chapters }: { chapters: CaseStudyChapter[] }) {
 
         {/* Process — gallery */}
         <FadeUp delay={240}>
-          <SectionGallery images={galleryImages} />
+          <SectionGallery images={galleryImages} aspectRatio={galleryAspectRatio} onExpand={(idx) => onOpenGallery(1, idx)} />
         </FadeUp>
       </div>
     </section>
@@ -915,69 +935,29 @@ function ProcessSection({ chapters }: { chapters: CaseStudyChapter[] }) {
 /* ─────────────────────────────────────────────────────────────────
    6. SOLUTION / FINAL DESIGN
 ───────────────────────────────────────────────────────────────── */
-function SolutionSection({ study }: { study: CaseStudy }) {
-  const featureCards = [
-    {
-      icon: (
-        <svg
-          width="28"
-          height="28"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M12 2L2 7l10 5 10-5-10-5z" />
-          <path d="M2 17l10 5 10-5" />
-          <path d="M2 12l10 5 10-5" />
-        </svg>
-      ),
-      title: "Layered Inventory",
-      desc: "A tiered system separating quick-access slots from long-term storage, reducing cognitive overhead in combat.",
-    },
-    {
-      icon: (
-        <svg
-          width="28"
-          height="28"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="12" cy="12" r="3" />
-          <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
-        </svg>
-      ),
-      title: "Contextual Actions",
-      desc: "Right-click interactions surface only the relevant actions for each item type, minimising UI noise.",
-    },
-    {
-      icon: (
-        <svg
-          width="28"
-          height="28"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect x="3" y="3" width="7" height="7" rx="1" />
-          <rect x="14" y="3" width="7" height="7" rx="1" />
-          <rect x="3" y="14" width="7" height="7" rx="1" />
-          <rect x="14" y="14" width="7" height="7" rx="1" />
-        </svg>
-      ),
-      title: "Grid Snap System",
-      desc: "Tetris-style grid placement communicates weight and bulk realistically without sacrificing usability.",
-    },
-  ];
+function SolutionSection({ study, chapters }: { study: CaseStudy; chapters: CaseStudyChapter[] }) {
+  // Derive feature cards from the metrics-takeaways block in chapters
+  const metricsBlock = chapters
+    .flatMap((ch) => ch.blocks)
+    .find((b) => b.type === "metrics-takeaways");
+
+  const featureCards: { num: string; title: string; desc: string }[] =
+    metricsBlock?.type === "metrics-takeaways"
+      ? metricsBlock.metrics.slice(0, 3).map((m) => {
+          // Split on em-dash " — " or ": " to get a short title + longer desc
+          const emIdx = m.text.indexOf(" — ");
+          const colonIdx = m.text.indexOf(": ");
+          const pivot = emIdx > 0 ? emIdx : colonIdx > 0 ? colonIdx : -1;
+          if (pivot > 0) {
+            return {
+              num: m.num,
+              title: m.text.slice(0, pivot),
+              desc: m.text.slice(pivot + (emIdx > 0 ? 3 : 2)),
+            };
+          }
+          return { num: m.num, title: m.text, desc: "" };
+        })
+      : [];
 
   return (
     <section
@@ -999,92 +979,91 @@ function SolutionSection({ study }: { study: CaseStudy }) {
           </h2>
         </FadeUp>
 
-        {/* Hero solution image */}
+        {/* Hero solution image — natural aspect ratio, content width */}
         <FadeUp delay={80}>
-          <div
-            style={{
-              borderRadius: 0,
-              overflow: "hidden",
-              aspectRatio: "3/2",
-              position: "relative",
-              marginBottom: 48,
-            }}
-          >
-            <Image
-              src={study.coverImage || "/images/cs-arma4-cover.png"}
-              alt="Final design"
-              fill
-              style={{ objectFit: "cover" }}
-            />
-          </div>
+          <img
+            src={study.solutionImage || study.coverImage || "/images/cs-arma4-cover.png"}
+            alt="Final design"
+            style={{ width: "100%", height: "auto", display: "block", marginBottom: 48 }}
+          />
         </FadeUp>
 
-        {/* Feature cards — dark glassy */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: 16,
-          }}
-        >
-          {featureCards.map((card, i) => (
-            <FadeUp key={card.title} delay={i * 80}>
-              <div
-                style={{
-                  background: "rgba(255,255,255,0.5)",
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  border: "1px solid rgba(36,36,36,0.08)",
-                  borderLeft: `3px solid ${study.accentColor}`,
-                  borderRadius: 0,
-                  padding: "40px 36px 36px",
-                  height: "100%",
-                  transition: "box-shadow 0.25s ease",
-                  cursor: "default",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 24px rgba(36,36,36,0.08)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-                }}
-              >
-                {/* Icon */}
+        {/* Feature cards — data-driven from metrics-takeaways */}
+        {featureCards.length > 0 && (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+              gap: 16,
+            }}
+          >
+            {featureCards.map((card, i) => (
+              <FadeUp key={card.num} delay={i * 80}>
                 <div
                   style={{
-                    color: "var(--ink-faint)",
-                    marginBottom: 22,
+                    background: "rgba(255,255,255,0.5)",
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                    border: "1px solid rgba(36,36,36,0.08)",
+                    borderLeft: `3px solid ${study.accentColor}`,
+                    borderRadius: 0,
+                    padding: "32px 28px 28px",
+                    height: "100%",
+                    transition: "box-shadow 0.25s ease",
+                    cursor: "default",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 24px rgba(36,36,36,0.08)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
                   }}
                 >
-                  {card.icon}
+                  <span
+                    className="font-futura"
+                    style={{
+                      display: "block",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: "0.14em",
+                      color: study.accentColor,
+                      opacity: 0.85,
+                      marginBottom: 14,
+                    }}
+                  >
+                    {card.num}
+                  </span>
+                  <p
+                    className="font-futura"
+                    style={{
+                      fontSize: "clamp(1.0625rem, calc(0.5rem + 0.7vw), 1.1875rem)",
+                      color: "var(--ink)",
+                      fontWeight: 600,
+                      marginBottom: card.desc ? 12 : 0,
+                      letterSpacing: "0.01em",
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {card.title}
+                  </p>
+                  {card.desc && (
+                    <p
+                      className="font-futura"
+                      style={{
+                        fontSize: "0.9375rem",
+                        color: "var(--ink-muted)",
+                        lineHeight: 1.75,
+                        fontWeight: 400,
+                      }}
+                    >
+                      {card.desc}
+                    </p>
+                  )}
                 </div>
-                <p
-                  className="font-futura"
-                  style={{
-                    fontSize: "clamp(1.0625rem, calc(0.5rem + 0.7vw), 1.3125rem)",
-                    color: "var(--ink)",
-                    fontWeight: 600,
-                    marginBottom: 14,
-                    letterSpacing: "0.01em",
-                  }}
-                >
-                  {card.title}
-                </p>
-                <p
-                  className="font-futura"
-                  style={{
-                    fontSize: "1rem",
-                    color: "var(--ink-muted)",
-                    lineHeight: 1.8,
-                    fontWeight: 400,
-                  }}
-                >
-                  {card.desc}
-                </p>
-              </div>
-            </FadeUp>
-          ))}
-        </div>
+              </FadeUp>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
@@ -1179,25 +1158,20 @@ function ReflectionSection({ chapters, study }: { chapters: CaseStudyChapter[]; 
           </div>
         </FadeUp>
 
-        {/* Secondary image */}
+        {/* Secondary image — natural aspect ratio */}
         <FadeUp delay={200}>
-          <div
+          <img
+            src={study.solutionImage || study.coverImage || "/images/cs-arma4-cover.png"}
+            alt="Final design detail"
             style={{
+              width: "100%",
+              height: "auto",
+              display: "block",
               marginTop: 56,
-              borderRadius: 0,
-              overflow: "hidden",
-              aspectRatio: "3/2",
-              position: "relative",
+              opacity: 0.85,
               border: "1px solid rgba(255,255,255,0.06)",
             }}
-          >
-            <Image
-              src="/images/cs-arma4-5.jpg"
-              alt="Final design detail"
-              fill
-              style={{ objectFit: "cover", opacity: 0.8 }}
-            />
-          </div>
+          />
         </FadeUp>
       </div>
     </section>
@@ -1401,6 +1375,31 @@ export default function CaseStudyV2({
   const heroRef = useRef<HTMLElement | null>(null);
   const [scrolledPastHero, setScrolledPastHero] = useState(false);
 
+  // Flatten all images from all image-rows into one pool, then split equally
+  const allGalleryImages = chapters
+    .flatMap((ch) => ch.blocks)
+    .filter((b): b is { type: "image-row"; images: string[] } => b.type === "image-row")
+    .flatMap((b) => b.images);
+
+  const splitAt = Math.ceil(allGalleryImages.length / 2);
+  const gallery1Images = allGalleryImages.slice(0, splitAt);
+  const gallery2Images = allGalleryImages.slice(splitAt);
+
+  const galleryChapters: GalleryChapter[] = [
+    ...(gallery1Images.length > 0 ? [{ title: "Research", images: gallery1Images }] : []),
+    ...(gallery2Images.length > 0 ? [{ title: "Process", images: gallery2Images }] : []),
+  ];
+
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryChapterIdx, setGalleryChapterIdx] = useState(0);
+  const [galleryImageIdx, setGalleryImageIdx] = useState(0);
+
+  const handleOpenGallery = useCallback((chIdx: number, imgIdx: number) => {
+    setGalleryChapterIdx(chIdx);
+    setGalleryImageIdx(imgIdx);
+    setGalleryOpen(true);
+  }, []);
+
   // Update theme-color meta to match status bar area
   const setThemeColor = useCallback((color: string) => {
     let tag = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
@@ -1440,16 +1439,16 @@ export default function CaseStudyV2({
         <MetaStrip study={study} />
 
         {/* 3 — Overview / Challenge */}
-        <OverviewSection chapters={chapters} />
+        <OverviewSection chapters={chapters} study={study} />
 
         {/* 4 — Research */}
-        <ResearchSection chapters={chapters} study={study} />
+        <ResearchSection chapters={chapters} study={study} galleryImages={gallery1Images} galleryAspectRatio={study.galleryAspectRatio} onOpenGallery={handleOpenGallery} />
 
         {/* 5 — Process */}
-        <ProcessSection chapters={chapters} />
+        <ProcessSection chapters={chapters} galleryImages={gallery2Images} galleryAspectRatio={study.galleryAspectRatio} onOpenGallery={handleOpenGallery} />
 
         {/* 6 — Solution */}
-        <SolutionSection study={study} />
+        <SolutionSection study={study} chapters={chapters} />
 
         {/* 7 — Reflection (dark) */}
         <ReflectionSection chapters={chapters} study={study} />
@@ -1457,6 +1456,15 @@ export default function CaseStudyV2({
         {/* 8 — Next project */}
         <NextProjectSection study={study} />
       </main>
+
+      {galleryOpen && galleryChapters.length > 0 && (
+        <ChapterGallery
+          chapters={galleryChapters}
+          initialChapter={galleryChapterIdx}
+          initialImage={galleryImageIdx}
+          onClose={() => setGalleryOpen(false)}
+        />
+      )}
     </>
   );
 }

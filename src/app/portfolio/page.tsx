@@ -266,11 +266,11 @@ export default function PortfolioPage() {
         {/* Cards grid */}
         <div
           style={{
-            display: "flex",
-            flexWrap: "wrap",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, 320px)",
             gap: 32,
             justifyContent: "center",
-            maxWidth: 1064,
+            maxWidth: 1200,
             width: "100%",
             padding: "0 var(--page-pad)",
           }}

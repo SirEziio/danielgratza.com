@@ -27,6 +27,9 @@ export interface CaseStudy {
   subtitle: string;
   thumbnail: string;         // URL or path
   coverImage: string;
+  introImage?: string;       // overview section right-side image (falls back to coverImage)
+  solutionImage?: string;    // solution section hero image (falls back to coverImage)
+  galleryAspectRatio?: string; // e.g. "16/9" or "3/2" (default "3/2")
   role: string;
   timeline: string;
   tools: string;
