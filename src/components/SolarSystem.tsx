@@ -929,7 +929,9 @@ export default function SolarSystem() {
             try { (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = "0.14em"; } catch { /* older browsers */ }
             ctx.fillStyle = ink(a);
             ctx.textAlign = "center";
-            ctx.fillText("TAP A PLANET · TAP SPACE TO LAUNCH A COMET", w / 2, h - 96);
+            /* Two stacked lines, well above the scroll indicator */
+            ctx.fillText("TAP A PLANET", w / 2, h - 150);
+            ctx.fillText("TAP SPACE TO LAUNCH A COMET", w / 2, h - 132);
             ctx.textAlign = "left";
           }
         }

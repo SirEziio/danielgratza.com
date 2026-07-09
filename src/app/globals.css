@@ -213,6 +213,14 @@ main {
   50%       { transform: translateY(3px); }
 }
 
+/* Swipe-down indicator (touch devices) — dot travels down the track */
+@keyframes swipeDown {
+  0%   { transform: translateY(0); opacity: 1; }
+  65%  { transform: translateY(20px); opacity: 0; }
+  80%  { transform: translateY(0); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
 /* ─── Reveal on scroll (about page) ──────────────────────── */
 .reveal {
   opacity: 0;
