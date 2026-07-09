@@ -132,7 +132,7 @@ export default function SolarSystem() {
     const view = { tilt: TILT, roll: ROLL };
     const comet = { dx: 1, dy: 0 };
     /* Released comet — free-flying in plane space, sun gravity, open trajectory */
-    const free = { active: false, x: 0, y: 0, vx: 0, vy: 0 };
+    const free = { active: false, x: 0, y: 0, vx: 0, vy: 0, novaKicked: false };
     let cometRebirth = -1; // -1: cursor comet live; Infinity: in flight; else: fade-in start time
 
     /* Supernova state */
@@ -142,12 +142,17 @@ export default function SolarSystem() {
        Flies in the ecliptic plane: bent arrival, planet scan, escape orbit. */
     const ufo = {
       active: false, start: 0, next: 0, mode: 0, target: 0,
-      ex: 0, ey: 0, cx: 0, cy: 0, x: 0, y: 0, vx: 0, vy: 0, psx: 0,
-      wasIn: false, passes: 0,
+      ex: 0, ey: 0, cx: 0, cy: 0, x: 0, y: 0, vx: 0, vy: 0, psx: 0, psy: 0,
+      wasIn: false, passes: 0, touched: false,
+    };
+
+    /* Shipwreck — saucer fragments + the kitten floating free (plane coords) */
+    const wreck = {
+      active: false, t: 0, ox: 0, oy: 0, kx: 0, ky: 0, kvx: 0, kvy: 0,
+      parts: [] as { x: number; y: number; vx: number; vy: number; rot: number; vr: number; a0: number }[],
     };
 
     const bodyFont = getComputedStyle(document.body).fontFamily;
-    let sunHoverT = -1; // when the pointer started resting on the sun
     const novaHit: boolean[] = new Array(PLANETS.length).fill(false);
     const pushD: number[] = new Array(PLANETS.length).fill(0); // radial displacement px
     const pushV: number[] = new Array(PLANETS.length).fill(0);
@@ -160,6 +165,10 @@ export default function SolarSystem() {
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
     let mobileCard = -1;
     let touchHintDone = false; // one-time "how to play" caption on touch
+    let sunHintDone = false;   // one-time cryptic nudge toward the supernova
+    let sunHintStart = -1;     // reveal timer — earned via Grand Tour or kitten
+    const sunClickFx = { t: -1e9, n: 0 }; // escalating click feedback state
+    const visited = new Set<number>();    // planets whose cards were opened
 
     /* Cached hero-title dodge zone */
     let titleEl: Element | null = null;
@@ -308,13 +317,14 @@ export default function SolarSystem() {
         const nowC = performance.now();
         sunClicks.push(nowC);
         while (sunClicks.length && nowC - sunClicks[0] > 1400) sunClicks.shift();
+        sunClickFx.t = nowC;
+        sunClickFx.n = sunClicks.length;
         if (sunClicks.length >= 3 && !nova.active) {
           nova.active = true;
           nova.start = nowC;
           novaHit.fill(false);
           sunClicks.length = 0;
         }
-        sunHoverT = nowC; // they got the message — stop nagging while they click
         return;
       }
 
@@ -337,6 +347,7 @@ export default function SolarSystem() {
         free.vx = rx * vr + -ry * vt;
         free.vy = ry * vr + rx * vt;
         free.active = true;
+        free.novaKicked = false;
         cometRebirth = Infinity;
       }
     };
@@ -371,6 +382,7 @@ export default function SolarSystem() {
       const fast =
         free.active ||
         ufo.active ||
+        wreck.active ||
         (nova.start !== 0 && now - nova.start < 8000) ||
         now - t0 < STAGGER_MS * 7 + ARRIVE_MS + TAIL_FADE_MS ||
         now - lastMove < 250;
@@ -390,8 +402,21 @@ export default function SolarSystem() {
 
       /* Sun — slow elliptical wander AROUND the centered name, never over it */
       const ang = driftDir * driftT * 0.000022 + driftPhase;
-      const sunX = w * 0.5 + Math.cos(ang) * (w * 0.22 + minDim * 0.03 * Math.sin(driftT * 0.000013 + wobblePhase));
-      const sunY = h * 0.44 + Math.sin(ang) * h * 0.12;
+      let sunX = w * 0.5 + Math.cos(ang) * (w * 0.22 + minDim * 0.03 * Math.sin(driftT * 0.000013 + wobblePhase));
+      let sunY = h * 0.44 + Math.sin(ang) * h * 0.12;
+
+      /* Escalating click feedback — the wordless breadcrumb. One click:
+         a faint tremor. Two: the whole system shudders and the star dims.
+         Anyone who notices a pattern will try the third. */
+      const fxAge = now - sunClickFx.t;
+      const fxDur = sunClickFx.n >= 2 ? 550 : 380;
+      let sunDim = 0;
+      if (sunClickFx.n > 0 && sunClickFx.n < 3 && fxAge < fxDur) {
+        const k = (1 - fxAge / fxDur) * (sunClickFx.n >= 2 ? 1 : 0.35);
+        sunX += Math.sin(now * 0.09) * 4 * k;
+        sunY += Math.cos(now * 0.11) * 4 * k;
+        sunDim = k * (sunClickFx.n >= 2 ? 0.3 : 0.12);
+      }
       cur.sunX = sunX;
       cur.sunY = sunY;
 
@@ -571,6 +596,13 @@ export default function SolarSystem() {
         ctx.globalAlpha = clamp(b.alpha, 0, 1);
         ctx.drawImage(planetSprites[b.i] as HTMLCanvasElement, b.x - half, b.y - half, half * 2, half * 2);
         ctx.globalAlpha = 1;
+        /* Grand Tour marker — a faint ring on every planet already met */
+        if (visited.has(b.i)) {
+          ctx.strokeStyle = pc(b.i, 0.3 * clamp(b.alpha, 0, 1));
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r + 3.5, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
         if (b.p.name === "Saturn") {
           ctx.strokeStyle = pc(b.i, b.alpha * 0.7);
           ctx.beginPath();
@@ -630,7 +662,9 @@ export default function SolarSystem() {
           }
         }
       }
+      if (sunDim > 0) ctx.globalAlpha = 1 - sunDim * (0.7 + 0.3 * Math.sin(now * 0.06));
       ctx.drawImage(sunSprite, sunX - sunR - 2, sunY - sunR - 2, (sunR + 2) * 2, (sunR + 2) * 2);
+      ctx.globalAlpha = 1;
 
       bodies.forEach((b) => strokeSegs(b, false));
       bodies.filter((b) => !b.far).forEach(drawBody);
@@ -664,14 +698,10 @@ export default function SolarSystem() {
         }
       }
       hovering = !!hover; // pauses the drift next frame
+      if (hover) visited.add(hover.i); // Grand Tour progress
 
       /* The sun is clickable too (three clicks…) — show the same cursor */
       const overSun = !isTouch && Math.hypot(mouse.x - sunX, mouse.y - sunY) < sunR;
-      if (overSun) {
-        if (sunHoverT < 0) sunHoverT = now;
-      } else {
-        sunHoverT = -1;
-      }
       const wantPointer = !!hover || overSun;
       if (wantPointer !== cursorSet) {
         cursorSet = wantPointer;
@@ -843,6 +873,12 @@ export default function SolarSystem() {
         const [fx, fy] = toScreen(free.x, free.y);
         const sxp = sunX + fx;
         const syp = sunY + fy;
+        /* A passing supernova shockwave blasts the comet outward */
+        if (nova.active && !free.novaKicked && ringR >= Math.hypot(fx, fy)) {
+          free.novaKicked = true;
+          free.vx += (free.x / rp) * 16;
+          free.vy += (free.y / rp) * 16;
+        }
         if (sxp < -250 || sxp > w + 250 || syp < -250 || syp > h + 250) {
           free.active = false;
           cometRebirth = now + 1200; // pause, then slowly grow a new one
@@ -899,13 +935,51 @@ export default function SolarSystem() {
         }
       }
 
-      /* Rest on the sun long enough and it starts hissing suggestions */
-      if (overSun && sunHoverT > 0 && now - sunHoverT > 3000) {
-        const a = clamp((now - sunHoverT - 3000) / 450, 0, 1) * 0.55;
-        ctx.font = `700 10px ${bodyFont}`;
-        try { (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = "0.14em"; } catch { /* older browsers */ }
-        ctx.fillStyle = ink(a);
-        ctx.fillText("TRY CLICKSSS", mouse.x + 16, mouse.y + 28);
+      /* The secret hint — earned, never given. Two ways to unlock the rim
+         crawl: the Grand Tour (open all eight planet cards in one visit),
+         or catch the kitten — it whispers. Skipped if found unaided. */
+      if (!sunHintDone) {
+        if (nova.start !== 0) {
+          sunHintDone = true;
+        } else {
+          if (sunHintStart < 0 && visited.size >= PLANETS.length) {
+            sunHintStart = now; // the system rewards those who met everyone
+          }
+          const tS = sunHintStart < 0 ? -1 : now - sunHintStart;
+          if (tS > 8000) {
+            sunHintDone = true;
+          } else if (tS > 0) {
+            const a =
+              Math.min(tS / 900, 1) * 0.28 * clamp(1 - (tS - 7000) / 1000, 0, 1);
+            if (a > 0.005) {
+              const text = isTouch ? "THREE TAPS TO OBLIVION" : "THREE CLICKS TO OBLIVION";
+              const R2 = sunR + 11;
+              const drift = Math.PI / 2 + tS * 0.00006; // slow crawl along the rim
+              ctx.font = `700 9px ${bodyFont}`;
+              ctx.fillStyle = ink(a);
+              ctx.textAlign = "center";
+              const gap = 1.6;
+              const widths: number[] = [];
+              let total = -gap;
+              for (const ch of text) {
+                const cw2 = ctx.measureText(ch).width;
+                widths.push(cw2);
+                total += cw2 + gap;
+              }
+              let dist = 0;
+              for (let ci = 0; ci < text.length; ci++) {
+                const aC = drift + (total / 2 - dist - widths[ci] / 2) / R2;
+                ctx.save();
+                ctx.translate(sunX + Math.cos(aC) * R2, sunY + Math.sin(aC) * R2);
+                ctx.rotate(aC - Math.PI / 2);
+                ctx.fillText(text[ci], 0, 0);
+                ctx.restore();
+                dist += widths[ci] + gap;
+              }
+              ctx.textAlign = "left";
+            }
+          }
+        }
       }
 
       /* UFO flyby — the kitten respects orbital mechanics: it arrives through
@@ -1025,17 +1099,76 @@ export default function SolarSystem() {
           ufo.psx = 0;
           ufo.wasIn = false;
           ufo.passes = 0;
+          ufo.touched = false;
         }
         if (ufo.active) {
-          const el = now - ufo.start;
           const tgt = bodies[ufo.target];
           const GM2 = minDim * 9;
-          for (let s = 0; s < 2; s++) {
-            const r3 = Math.pow(Math.hypot(ufo.x, ufo.y), 3) || 1;
-            ufo.vx -= ((GM2 * ufo.x) / r3) * 0.5;
-            ufo.vy -= ((GM2 * ufo.y) / r3) * 0.5;
-            ufo.x += ufo.vx * 0.5;
-            ufo.y += ufo.vy * 0.5;
+          /* Cursor vs kitten: a LOADED comet destroys the ship; an empty
+             hand (mid-reload) catches it — held in place, reload paused,
+             until the cursor lets go. */
+          const cometFade2 = cometRebirth < 0 ? 1 : clamp((now - cometRebirth) / 2200, 0, 1);
+          const nearCursor =
+            !isTouch && ufo.psx !== 0 &&
+            Math.hypot(mouse.x - ufo.psx, mouse.y - ufo.psy) < 36 * uiScale;
+
+          /* Boom — saucer shatters, kitten floats out. Optionally the blast
+             pushes everything radially away (supernova case). */
+          const blowUpShip = (outward: boolean) => {
+            wreck.active = true;
+            wreck.t = now;
+            wreck.ox = ufo.x;
+            wreck.oy = ufo.y;
+            wreck.kx = ufo.x;
+            wreck.ky = ufo.y;
+            const rr0 = Math.hypot(ufo.x, ufo.y) || 1;
+            const rux = ufo.x / rr0, ruy = ufo.y / rr0;
+            wreck.kvx = outward ? rux * 1.1 : (Math.random() - 0.5) * 0.5;
+            wreck.kvy = outward ? ruy * 1.1 : 0.45;
+            wreck.parts = Array.from({ length: 3 }, (_, j) => ({
+              x: ufo.x, y: ufo.y,
+              vx: (Math.random() - 0.5) * 1.6 + (outward ? rux * 1.4 : 0),
+              vy: (Math.random() - 0.5) * 1.6 + (outward ? ruy * 1.4 : 0),
+              rot: Math.random() * Math.PI,
+              vr: (Math.random() - 0.5) * 0.06,
+              a0: j * 2.1,
+            }));
+            ufo.active = false;
+            ufo.mode = 0;
+            ufo.next = now + 90000 + Math.random() * 120000; // kitten needs a new ship
+          };
+
+          if (nearCursor && cometFade2 >= 1) {
+            blowUpShip(false);
+            cometRebirth = now + 1200; // the comet was spent on the deed
+          } else if (
+            nova.active && ufo.psx !== 0 &&
+            ringR >= Math.hypot(ufo.psx - sunX, ufo.psy - sunY)
+          ) {
+            /* The shockwave caught the flyby — no ship survives a supernova */
+            blowUpShip(true);
+          } else if (
+            free.active &&
+            Math.hypot(free.x - ufo.x, free.y - ufo.y) < 26 * uiScale
+          ) {
+            /* Direct comet strike — the rock wins, and keeps flying */
+            blowUpShip(false);
+          } else {
+          const held = nearCursor; // only reachable when the comet isn't loaded
+          const el = now - ufo.start;
+          if (held) {
+            ufo.start += frameDt; // mission clock freezes in your grip
+            if (Number.isFinite(cometRebirth) && cometRebirth > 0) cometRebirth += frameDt; // reload pauses
+            if (!sunHintDone && sunHintStart < 0) sunHintStart = now; // the kitten whispers the secret
+            ufo.touched = true; // …but a held scanner is an interfered-with scanner
+          } else {
+            for (let s = 0; s < 2; s++) {
+              const r3 = Math.pow(Math.hypot(ufo.x, ufo.y), 3) || 1;
+              ufo.vx -= ((GM2 * ufo.x) / r3) * 0.5;
+              ufo.vy -= ((GM2 * ufo.y) / r3) * 0.5;
+              ufo.x += ufo.vx * 0.5;
+              ufo.y += ufo.vy * 0.5;
+            }
           }
           const ply2 = ufo.y;
           const [uox, uoy] = toScreen(ufo.x, ufo.y);
@@ -1067,7 +1200,12 @@ export default function SolarSystem() {
             ufo.vx = (ufo.vx / sp) * vE;
             ufo.vy = (ufo.vy / sp) * vE;
           };
-          if (!scanning && ufo.wasIn && ufo.mode === 2 && ufo.passes >= 2) escapeBurn();
+          if (!scanning && ufo.wasIn && ufo.mode === 2 && ufo.passes >= 2) {
+            /* The scanner scanned — a mission completed untouched broadcasts
+               its findings to whoever watched the whole thing */
+            if (!ufo.touched && !sunHintDone && sunHintStart < 0 && nova.start === 0) sunHintStart = now;
+            escapeBurn();
+          }
           /* Safety: missed approach or an overlong visit — head home */
           if (ufo.mode !== 3 && ((ufo.mode <= 1 && el > 25000) || el > 60000)) escapeBurn();
           ufo.wasIn = scanning;
@@ -1105,10 +1243,93 @@ export default function SolarSystem() {
               ctx.arc(tgt.x, tgt.y, tgt.r + 3 + rp2 * tgt.r * 1.6, 0, 2 * Math.PI);
               ctx.stroke();
             }
-            const rot = clamp((usx - (ufo.psx || usx)) * 0.02, -0.14, 0.14);
+            let rot = clamp((usx - (ufo.psx || usx)) * 0.02, -0.14, 0.14);
+            if (held) rot += Math.sin(now * 0.02) * 0.1; // caught — it wriggles
             ufo.psx = usx;
+            ufo.psy = usy;
             /* Behind the sun on the far side of the plane, like everything else */
             withSunOcclusion(ply2 > 0, () => drawUfo(usx, usy, rot));
+          }
+          }
+        }
+      }
+
+      /* Shipwreck aftermath — tumbling hull shards, kitten adrift */
+      if (wreck.active) {
+        const age = now - wreck.t;
+        if (age > 5200) {
+          wreck.active = false;
+        } else {
+          /* Blast ring, briefly */
+          if (age < 400) {
+            const fp = age / 400;
+            const [bx2, by2] = toScreen(wreck.ox, wreck.oy);
+            ctx.strokeStyle = ink((1 - fp) * 0.5);
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(sunX + bx2, sunY + by2, (8 + fp * 34) * uiScale, 0, 2 * Math.PI);
+            ctx.stroke();
+            ctx.lineWidth = 1;
+          }
+          /* Hull shards */
+          const pa = clamp(1 - age / 2600, 0, 1);
+          for (const part of wreck.parts) {
+            part.x += part.vx;
+            part.y += part.vy;
+            part.rot += part.vr;
+            if (pa > 0.01) {
+              const [sx2, sy2] = toScreen(part.x, part.y);
+              ctx.strokeStyle = ink(0.8 * pa);
+              ctx.lineWidth = 3;
+              ctx.beginPath();
+              ctx.ellipse(sunX + sx2, sunY + sy2, 20 * uiScale, 6 * uiScale, part.rot, part.a0, part.a0 + 1.4);
+              ctx.stroke();
+              ctx.lineWidth = 1;
+            }
+          }
+          /* The kitten — unharmed, unhurried, slowly spinning into the void */
+          wreck.kx += wreck.kvx;
+          wreck.ky += wreck.kvy;
+          const ka = clamp(1 - Math.max(0, age - 2200) / 3000, 0, 1);
+          if (ka > 0.01) {
+            const [kx2, ky2] = toScreen(wreck.kx, wreck.ky);
+            const kr = age * 0.0005 + Math.sin(age * 0.002) * 0.3;
+            ctx.save();
+            ctx.translate(sunX + kx2, sunY + ky2);
+            ctx.rotate(kr);
+            ctx.scale(uiScale, uiScale);
+            ctx.globalAlpha = ka;
+            const fur = dark ? "#a8a29a" : "#8f8a82";
+            const marks = dark ? "#6e6a64" : "#5c5852";
+            ctx.fillStyle = fur;
+            ctx.beginPath();
+            ctx.moveTo(-6, -3); ctx.lineTo(-4.5, -9); ctx.lineTo(-1.5, -4.5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(6, -3); ctx.lineTo(4.5, -9); ctx.lineTo(1.5, -4.5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(0, 0, 6, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.strokeStyle = marks;
+            ctx.lineWidth = 0.9;
+            ctx.beginPath();
+            ctx.moveTo(-2, -5); ctx.lineTo(-1.6, -2.4);
+            ctx.moveTo(0, -5.6); ctx.lineTo(0, -2.8);
+            ctx.moveTo(2, -5); ctx.lineTo(1.6, -2.4);
+            ctx.stroke();
+            ctx.lineWidth = 1;
+            ctx.fillStyle = marks;
+            ctx.beginPath(); ctx.arc(-3.6, 1.4, 0.55, 0, 2 * Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.arc(3.6, 1.4, 0.55, 0, 2 * Math.PI); ctx.fill();
+            ctx.fillStyle = "#7d9a5a";
+            ctx.beginPath(); ctx.arc(-2.2, -0.2, 0.9, 0, 2 * Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.arc(2.2, -0.2, 0.9, 0, 2 * Math.PI); ctx.fill();
+            ctx.fillStyle = marks;
+            ctx.beginPath(); ctx.arc(0, 1.6, 0.5, 0, 2 * Math.PI); ctx.fill();
+            ctx.restore();
           }
         }
       }
