@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /* ─────────────────────────────────────────────────────────────────
    SolarSystem — the site ball becomes the Sun.
@@ -146,6 +146,11 @@ export default function SolarSystem() {
   const tipPlanet = useRef(-1);
   const infoWrapRef = useRef<HTMLDivElement>(null);
   const infoCardRef = useRef<HTMLDivElement>(null);
+  const [touchUI, setTouchUI] = useState(false);
+
+  useEffect(() => {
+    setTouchUI(window.matchMedia("(pointer: coarse)").matches);
+  }, []);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -1807,6 +1812,12 @@ export default function SolarSystem() {
           <div data-l2 />
           <div>PLANETARY POSITIONS: REAL-TIME</div>
           <div data-l4 />
+          {touchUI && (
+            <div style={{ borderTop: "1px solid var(--grid-line)", marginTop: 8, paddingTop: 8 }}>
+              <div>TAP A PLANET // FACTS &amp; MORE</div>
+              <div>TAP EMPTY SPACE // LAUNCH A COMET</div>
+            </div>
+          )}
         </div>
         <button
           aria-label="About the data"

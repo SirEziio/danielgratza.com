@@ -25,34 +25,19 @@ export default function MouseScrollIcon({ onClick }: { onClick?: () => void }) {
       }}
     >
       {isTouch ? (
-        /* Swipe-down affordance — a dot travelling down a faint track */
-        <svg
-          width="20"
-          height="44"
-          viewBox="0 0 20 44"
-          fill="none"
-          style={{ opacity: 0.55 }}
+        /* Swipe-down text — same voice as the hint captions */
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            color: "var(--ink)",
+            opacity: 0.5,
+          }}
         >
-          <line
-            x1="10"
-            y1="4"
-            x2="10"
-            y2="40"
-            stroke="var(--ink)"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            opacity="0.3"
-          />
-          <circle
-            cx="10"
-            cy="12"
-            r="3.5"
-            fill="var(--ink)"
-            style={{
-              animation: "swipeDown 1.6s ease-in-out infinite",
-            }}
-          />
-        </svg>
+          Swipe down
+        </span>
       ) : (
         /* Mouse body */
         <svg
