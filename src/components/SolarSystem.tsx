@@ -60,7 +60,7 @@ function tipHTML(i: number, touch: boolean) {
   const cta = touch
     ? `<a data-cta href="https://eyes.nasa.gov/apps/solar-system/#/${p.name.toLowerCase()}" target="_blank" rel="noopener"
         style="display:block;margin-top:12px;padding:10px 12px;text-align:center;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink);border:1px solid var(--ink-faint);border-radius:8px;text-decoration:none;">
-        Fly there in 3D ↗</a>`
+        Fly there in 3D<svg width="9" height="9" viewBox="0 0 10 10" fill="none" style="margin-left:7px;vertical-align:0;"><path d="M2 8L8 2M3.5 2H8V6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>`
     : "";
   return `${closeBtn}
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
@@ -225,6 +225,7 @@ export default function SolarSystem() {
     /* Mobile: tap → card, same-planet tap → Wikipedia, card tap → close */
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
     let mobileCard = -1;
+    let mobileProbe: "" | "nh" | "hal" = ""; // first tap inspects, second opens
     let sunHintDone = false;   // one-time cryptic nudge toward the supernova
     let sunHintStart = -1;     // reveal timer — earned via Grand Tour or kitten
     const sunClickFx = { t: -1e9, n: 0 }; // escalating click feedback state
@@ -379,15 +380,29 @@ export default function SolarSystem() {
         return;
       }
 
-      /* Deep-space markers open their mission pages */
-      if (probes.nh.on && Math.hypot(cx - probes.nh.x, cy - probes.nh.y) < 16) {
+      /* Deep-space markers: on touch, first tap inspects (trajectory +
+         info, like desktop hover), second tap opens the mission page */
+      if (probes.nh.on && Math.hypot(cx - probes.nh.x, cy - probes.nh.y) < 18) {
+        if (isTouch && mobileProbe !== "nh") {
+          mobileProbe = "nh";
+          mobileCard = -1;
+          return;
+        }
         window.open("https://eyes.nasa.gov/apps/solar-system/#/sc_new_horizons", "_blank", "noopener");
+        mobileProbe = "";
         return;
       }
-      if (probes.hal.on && Math.hypot(cx - probes.hal.x, cy - probes.hal.y) < 16) {
+      if (probes.hal.on && Math.hypot(cx - probes.hal.x, cy - probes.hal.y) < 18) {
+        if (isTouch && mobileProbe !== "hal") {
+          mobileProbe = "hal";
+          mobileCard = -1;
+          return;
+        }
         window.open("https://science.nasa.gov/solar-system/comets/1p-halley/", "_blank", "noopener");
+        mobileProbe = "";
         return;
       }
+      mobileProbe = ""; // tapped elsewhere — probe inspection ends
 
       /* Clicking the SUN: never releases a comet — three quick clicks go nova */
       if (geom && Math.hypot(cx - cur.sunX, cy - cur.sunY) < geom.sunR) {
@@ -885,7 +900,9 @@ export default function SolarSystem() {
           probes.nh.on = true;
           probes.nh.x = px3;
           probes.nh.y = py3;
-          probes.nh.hov = !isTouch && Math.hypot(mouse.x - px3, mouse.y - py3) < 16;
+          probes.nh.hov =
+            (!isTouch && Math.hypot(mouse.x - px3, mouse.y - py3) < 16) ||
+            (isTouch && mobileProbe === "nh");
           /* Trajectory — the long straight road out, dashed */
           probeGlow.nh += ((probes.nh.hov ? 1 : 0) - probeGlow.nh) * 0.12;
           if (probeGlow.nh > 0.01) {
@@ -978,7 +995,9 @@ export default function SolarSystem() {
           probes.hal.on = true;
           probes.hal.x = hx3;
           probes.hal.y = hy3;
-          probes.hal.hov = !isTouch && Math.hypot(mouse.x - hx3, mouse.y - hy3) < 16;
+          probes.hal.hov =
+            (!isTouch && Math.hypot(mouse.x - hx3, mouse.y - hy3) < 16) ||
+            (isTouch && mobileProbe === "hal");
           /* Trajectory — the whole 75-year ellipse, radially compressed
              like everything else on this map, dashed */
           probeGlow.hal += ((probes.hal.hov ? 1 : 0) - probeGlow.hal) * 0.12;
@@ -1808,16 +1827,29 @@ export default function SolarSystem() {
         style={{ position: "absolute", right: 20, bottom: 20, zIndex: 11, pointerEvents: "auto" }}
       >
         <div ref={infoCardRef} className="ephem-card">
+          {touchUI && (
+            <div
+              className="font-futura"
+              style={{
+                borderBottom: "1px solid var(--grid-line)",
+                marginBottom: 8,
+                paddingBottom: 8,
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "var(--ink)",
+                opacity: 0.6,
+              }}
+            >
+              <div>Tap a planet — facts &amp; more</div>
+              <div>Tap empty space — launch a comet</div>
+            </div>
+          )}
           <div>EPHEMERIS // JPL APPROXIMATE ELEMENTS 1800–2050</div>
           <div data-l2 />
           <div>PLANETARY POSITIONS: REAL-TIME</div>
           <div data-l4 />
-          {touchUI && (
-            <div style={{ borderTop: "1px solid var(--grid-line)", marginTop: 8, paddingTop: 8 }}>
-              <div>TAP A PLANET // FACTS &amp; MORE</div>
-              <div>TAP EMPTY SPACE // LAUNCH A COMET</div>
-            </div>
-          )}
         </div>
         <button
           aria-label="About the data"

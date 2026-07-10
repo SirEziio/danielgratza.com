@@ -237,6 +237,23 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
         }}>
           <ThemeToggle />
         </div>
+
+        {/* Cryptic breadcrumb for the patient */}
+        <p
+          className="font-futura"
+          style={{
+            marginTop: 18,
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            color: "var(--ink-faint)",
+            opacity: menuOpen ? 1 : 0,
+            transition: "opacity 0.35s ease 460ms",
+          }}
+        >
+          try to catch the kitten
+        </p>
       </div>
     </>
   );
