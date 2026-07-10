@@ -213,6 +213,76 @@ main {
   50%       { transform: translateY(3px); }
 }
 
+/* Hero bio — one-time Star Wars opening-crawl: rises from below, recedes
+   into the distance and fades. Window sits above the scroll indicator
+   (and above the canvas tap hints on phones). */
+.bio-crawl {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 176px;
+  height: 170px;
+  display: flex;
+  justify-content: center;
+  perspective: 340px;
+  overflow: hidden;
+  pointer-events: none;
+  /* Soft dissolve at the window edges — no hard crop at the horizon */
+  mask-image: linear-gradient(to top, transparent 0%, #000 14%, #000 62%, transparent 94%);
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 14%, #000 62%, transparent 94%);
+}
+.bio-crawl-text {
+  position: absolute;
+  bottom: 0;
+  max-width: min(88vw, 420px);
+  text-align: center;
+  transform-origin: 50% 100%;
+  transform: rotateX(24deg) translateY(190px);
+  opacity: 0;
+  animation: bioCrawl 26s linear 3s 1 forwards;
+}
+@keyframes bioCrawl {
+  0%   { transform: rotateX(24deg) translateY(190px); opacity: 0; }
+  9%   { opacity: 1; }
+  74%  { opacity: 1; }
+  100% { transform: rotateX(24deg) translateY(-260px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bio-crawl-text { animation: none; transform: none; opacity: 1; }
+}
+
+/* Ephemeris info card — hidden until the icon is hovered (or tapped) */
+.ephem-card {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(36, 36, 36, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 32px rgba(36, 36, 36, 0.12);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  pointer-events: none;
+}
+html.dark .ephem-card {
+  background: rgba(36, 36, 36, 0.55);
+  border-color: rgba(225, 223, 216, 0.14);
+}
+.ephem-info:hover .ephem-card,
+.ephem-info.open .ephem-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Swipe-down indicator (touch devices) — dot travels down the track */
 @keyframes swipeDown {
   0%   { transform: translateY(0); opacity: 1; }

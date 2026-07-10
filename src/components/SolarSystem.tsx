@@ -34,11 +34,35 @@ const PLANETS = [
   { name: "Saturn",  pr: 7.2, col: "#b4a276", sym: "♄", dia: "116,460 km across — 23 million giraffes, neck to hoof", fact: "Less dense than water — it would float in a big enough bathtub. Visual weight and actual weight are two different things; ask any UI designer.", k: [9.53667594, -0.0012506, 0.05386179, -0.00050991, 2.48599187, 0.00193609, 49.95424423, 1222.49362201, 92.59887831, -0.41897216, 113.66242448, -0.28867794] },
   { name: "Uranus",  pr: 5.4, col: "#7fa39c", sym: "♅", dia: "50,724 km across — 2 million blue whales nose to tail", fact: "Axis tipped 98° — the only planet that permanently rotated into landscape mode.", k: [19.18916464, -0.00196176, 0.04725744, -0.00004397, 0.77263783, -0.00242939, 313.23810451, 428.48202785, 170.9542763, 0.40805281, 74.01692503, 0.04240589] },
   { name: "Neptune", pr: 5.2, col: "#5c6d94", sym: "♆", dia: "49,244 km across — 1,167 marathons, side by side", fact: "Predicted by math from Uranus's wobble before any telescope saw it. Good research finds the problem before anyone sees it.", k: [30.06992276, 0.00026291, 0.00859048, 0.00005105, 1.77004347, 0.00035372, -55.12002969, 218.45945325, 44.96476227, -0.32241464, 131.78422574, -0.00508664] },
+  { name: "Pluto",   pr: 2.2, col: "#a08d7c", sym: "♇", dia: "2,377 km across — 1,483 Sněžkas stacked on top of each other", fact: "Demoted in 2006; still a planet in this house. New Horizons flew by in 2015 — it's the little diamond out there.", k: [39.48211675, -0.00031596, 0.2488273, 0.0000517, 17.14001206, 0.00004818, 238.92903833, 145.20780515, 224.06891629, -0.04062942, 110.30393684, -0.01183482] },
 ];
 
-function tipHTML(i: number) {
+/* Real astronomical calendar — drives the ephemeris event line and showers */
+const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+const SKY_EVENTS: [number, number, string][] = [
+  [1, 3, "QUADRANTIDS PEAK"],
+  [3, 20, "MARCH EQUINOX"],
+  [4, 22, "LYRIDS PEAK"],
+  [5, 6, "ETA AQUARIIDS PEAK"],
+  [6, 21, "JUNE SOLSTICE"],
+  [8, 12, "PERSEIDS PEAK"],
+  [9, 22, "SEPTEMBER EQUINOX"],
+  [10, 21, "ORIONIDS PEAK"],
+  [12, 14, "GEMINIDS PEAK"],
+  [12, 21, "DECEMBER SOLSTICE"],
+];
+
+function tipHTML(i: number, touch: boolean) {
   const p = PLANETS[i];
-  return `
+  const closeBtn = touch
+    ? `<button data-close aria-label="Close" style="position:absolute;top:6px;right:6px;background:none;border:none;font-size:18px;line-height:1;color:var(--ink-muted);padding:8px;cursor:pointer;">×</button>`
+    : "";
+  const cta = touch
+    ? `<a data-cta href="https://eyes.nasa.gov/apps/solar-system/#/${p.name.toLowerCase()}" target="_blank" rel="noopener"
+        style="display:block;margin-top:12px;padding:10px 12px;text-align:center;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink);border:1px solid var(--ink-faint);border-radius:8px;text-decoration:none;">
+        Fly there in 3D ↗</a>`
+    : "";
+  return `${closeBtn}
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
       <span style="font-size:20px;line-height:1;color:${p.col};flex-shrink:0;">${p.sym}</span>
       <span style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink);">${p.name}</span>
@@ -53,7 +77,8 @@ function tipHTML(i: number) {
       <span data-coord style="color:var(--ink);font-weight:600;"></span> ecliptic
     </div>
     <div style="font-size:12px;line-height:1.5;color:var(--ink-muted);">${p.dia}</div>
-    <div style="font-size:12px;line-height:1.55;color:var(--ink);border-top:1px solid var(--grid-line);padding-top:8px;margin-top:9px;">${p.fact}</div>`;
+    <div style="font-size:12px;line-height:1.55;color:var(--ink);border-top:1px solid var(--grid-line);padding-top:8px;margin-top:9px;">${p.fact}</div>
+    ${cta}`;
 }
 
 type El = { a: number; e: number; I: number; O: number; w: number; M: number };
@@ -119,6 +144,8 @@ export default function SolarSystem() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tipRef = useRef<HTMLDivElement>(null);
   const tipPlanet = useRef(-1);
+  const infoWrapRef = useRef<HTMLDivElement>(null);
+  const infoCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -153,6 +180,35 @@ export default function SolarSystem() {
     };
 
     const bodyFont = getComputedStyle(document.body).fontFamily;
+
+    /* Ephemeris state (feeds the info card, once per second) */
+    let clockSec = -1;
+    let clockStr = "";
+    let eventLine = "";
+    let showerActive = false;
+
+    /* Meteors — occasional sporadics, frequent during real shower windows */
+    const meteors: { x: number; y: number; vx: number; vy: number; born: number; life: number }[] = [];
+    let nextMeteor = 0;
+
+    /* Deep-space markers: screen positions + hover state for click-through */
+    const probes = {
+      nh: { x: 0, y: 0, on: false, hov: false },
+      hal: { x: 0, y: 0, on: false, hov: false },
+    };
+    /* Supernova knocks the probes around too — damped spring per marker */
+    const probePush = {
+      nh: { d: 0, v: 0, hit: false },
+      hal: { d: 0, v: 0, hit: false },
+    };
+    /* Trajectory reveal on hover, eased like planet orbits */
+    const probeGlow = { nh: 0, hal: 0 };
+
+    /* Asteroid belt — baked dot-field sprite */
+    let beltSprite: HTMLCanvasElement | null = null;
+    let beltDark: boolean | null = null;
+    let beltDim = 0;
+    let beltROut = 0;
     const novaHit: boolean[] = new Array(PLANETS.length).fill(false);
     const pushD: number[] = new Array(PLANETS.length).fill(0); // radial displacement px
     const pushV: number[] = new Array(PLANETS.length).fill(0);
@@ -164,11 +220,14 @@ export default function SolarSystem() {
     /* Mobile: tap → card, same-planet tap → Wikipedia, card tap → close */
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
     let mobileCard = -1;
-    let touchHintDone = false; // one-time "how to play" caption on touch
     let sunHintDone = false;   // one-time cryptic nudge toward the supernova
     let sunHintStart = -1;     // reveal timer — earned via Grand Tour or kitten
     const sunClickFx = { t: -1e9, n: 0 }; // escalating click feedback state
     const visited = new Set<number>();    // planets whose cards were opened
+
+    /* Hovered planet gets its full orbit drawn — eased in and out */
+    const orbitGlow: number[] = new Array(PLANETS.length).fill(0);
+    let hoverIdx = -1;
 
     /* Cached hero-title dodge zone */
     let titleEl: Element | null = null;
@@ -283,34 +342,47 @@ export default function SolarSystem() {
        pointer-events:none, so hit-test manually and never hijack clicks
        that land on real interactive elements. */
     const onClick = (e: MouseEvent) => {
-      if ((e.target as Element | null)?.closest?.("a, button, [role='button']")) return;
+      const targetEl = e.target as Element | null;
+      /* A tap anywhere outside the info widget closes its card */
+      if (infoWrapRef.current && targetEl && !infoWrapRef.current.contains(targetEl)) {
+        infoWrapRef.current.classList.remove("open");
+      }
+      /* Taps inside the open card (touch): the CTA link navigates natively;
+         anything else — including the × — closes the card */
+      if (isTouch && tipRef.current && targetEl && tipRef.current.contains(targetEl)) {
+        if (!targetEl.closest("[data-cta]")) mobileCard = -1;
+        return;
+      }
+      if (targetEl?.closest?.("a, button, [role='button']")) return;
       const rect = canvas.getBoundingClientRect();
       const cx = e.clientX - rect.left;
       const cy = e.clientY - rect.top;
-      if (cx >= 0 && cy >= 0 && geom && cx <= geom.w && cy <= geom.h) touchHintDone = true;
-      /* Mobile: a tap on the open card closes it */
-      if (isTouch && mobileCard >= 0 && tipRef.current) {
-        const tr = tipRef.current.getBoundingClientRect();
-        if (e.clientX >= tr.left && e.clientX <= tr.right && e.clientY >= tr.top && e.clientY <= tr.bottom) {
-          mobileCard = -1;
-          return;
-        }
-      }
-
       for (let k = 0; k < hits.length; k++) {
         const t = hits[k];
         if (Math.hypot(cx - t.x, cy - t.y) < Math.max(14, t.r + 8)) {
-          if (isTouch && mobileCard !== k) {
-            mobileCard = k; // first tap: show the card
+          if (isTouch) {
+            /* Touch: tap toggles the card — the CTA inside is the only link */
+            mobileCard = mobileCard === k ? -1 : k;
             return;
           }
-          const slug = t.name === "Mercury" ? "Mercury_(planet)" : t.name;
-          window.open(`https://en.wikipedia.org/wiki/${slug}`, "_blank", "noopener");
-          if (isTouch) mobileCard = -1;
+          window.open(`https://eyes.nasa.gov/apps/solar-system/#/${t.name.toLowerCase()}`, "_blank", "noopener");
           return;
         }
       }
-      if (isTouch) mobileCard = -1; // tap elsewhere dismisses the card
+      if (isTouch && mobileCard >= 0) {
+        mobileCard = -1; // tap elsewhere just dismisses — no accidental comet
+        return;
+      }
+
+      /* Deep-space markers open their mission pages */
+      if (probes.nh.on && Math.hypot(cx - probes.nh.x, cy - probes.nh.y) < 16) {
+        window.open("https://eyes.nasa.gov/apps/solar-system/#/sc_new_horizons", "_blank", "noopener");
+        return;
+      }
+      if (probes.hal.on && Math.hypot(cx - probes.hal.x, cy - probes.hal.y) < 16) {
+        window.open("https://science.nasa.gov/solar-system/comets/1p-halley/", "_blank", "noopener");
+        return;
+      }
 
       /* Clicking the SUN: never releases a comet — three quick clicks go nova */
       if (geom && Math.hypot(cx - cur.sunX, cy - cur.sunY) < geom.sunR) {
@@ -323,6 +395,8 @@ export default function SolarSystem() {
           nova.active = true;
           nova.start = nowC;
           novaHit.fill(false);
+          probePush.nh.hit = false;
+          probePush.hal.hit = false;
           sunClicks.length = 0;
         }
         return;
@@ -384,7 +458,7 @@ export default function SolarSystem() {
         ufo.active ||
         wreck.active ||
         (nova.start !== 0 && now - nova.start < 8000) ||
-        now - t0 < STAGGER_MS * 7 + ARRIVE_MS + TAIL_FADE_MS ||
+        now - t0 < STAGGER_MS * (PLANETS.length - 1) + ARRIVE_MS + TAIL_FADE_MS ||
         now - lastMove < 250;
       if (!fast && (frameNo & 1) === 1) {
         raf = requestAnimationFrame(tick);
@@ -486,6 +560,32 @@ export default function SolarSystem() {
           tailLen = delta + (Math.min(TAIL_RAD, delta) - delta) * easeOutCubic(shrinkP);
         }
 
+        /* Full-orbit highlight while hovered */
+        orbitGlow[i] += ((i === hoverIdx ? 1 : 0) - orbitGlow[i]) * 0.12;
+        let orbit: { far: { x: number; y: number }[][]; near: { x: number; y: number }[][]; glow: number } | null = null;
+        if (orbitGlow[i] > 0.01) {
+          const far: { x: number; y: number }[][] = [];
+          const near: { x: number; y: number }[][] = [];
+          let run: { x: number; y: number }[] = [];
+          let runFar: boolean | null = null;
+          const NO = 110;
+          for (let j = 0; j <= NO; j++) {
+            const pt = project(orbitPoint(el, (j / NO) * 2 * Math.PI), kPx, view.tilt, view.roll);
+            const isFar = pt.depth > 0;
+            if (runFar === null) runFar = isFar;
+            if (isFar !== runFar) {
+              run.push(pt);
+              (runFar ? far : near).push(run);
+              run = [pt];
+              runFar = isFar;
+            } else {
+              run.push(pt);
+            }
+          }
+          if (run.length > 1 && runFar !== null) (runFar ? far : near).push(run);
+          orbit = { far, near, glow: orbitGlow[i] };
+        }
+
         const v = orbitPoint(el, Edraw);
         const pos = project(v, kPx, view.tilt, view.roll);
         const depthNorm = clamp(pos.depth / el.a, -1, 1);
@@ -522,7 +622,7 @@ export default function SolarSystem() {
         }
 
         return {
-          p, i, segs,
+          p, i, segs, orbit,
           plx: v.x * kPx, // plane-space coords, for visiting spacecraft
           ply: v.y * kPx,
           x: sunX + pos.x + pushX,
@@ -540,15 +640,32 @@ export default function SolarSystem() {
       ctx.clearRect(0, 0, w, h);
       ctx.lineWidth = 1;
 
+      /* Trail strokes batched by quantized alpha — the alpha ramp is
+         monotonic along the tail, so buckets are contiguous and ~6 strokes
+         replace up to 70 per planet */
       const strokeSegs = (b: (typeof bodies)[number], farPhase: boolean) => {
+        let bucket = -1;
+        let open = false;
+        let lx = NaN;
+        let ly = NaN;
         for (const s of b.segs) {
           if (s.far !== farPhase || s.alpha < 0.006) continue;
-          ctx.strokeStyle = pc(b.i, s.alpha);
-          ctx.beginPath();
-          ctx.moveTo(s.x1, s.y1);
+          const q = Math.ceil(s.alpha * 16) / 16;
+          if (q !== bucket) {
+            if (open) ctx.stroke();
+            bucket = q;
+            ctx.strokeStyle = pc(b.i, q);
+            ctx.beginPath();
+            open = true;
+            ctx.moveTo(s.x1, s.y1);
+          } else if (s.x1 !== lx || s.y1 !== ly) {
+            ctx.moveTo(s.x1, s.y1); // occlusion gap — don't bridge it
+          }
           ctx.lineTo(s.x2, s.y2);
-          ctx.stroke();
+          lx = s.x2;
+          ly = s.y2;
         }
+        if (open) ctx.stroke();
       };
 
       /* Planet sprites — gradient + grain baked once per theme/layout */
@@ -611,7 +728,61 @@ export default function SolarSystem() {
         }
       };
 
+      /* Asteroid belt — baked once, one drawImage per frame.
+         Drawn beneath everything so planets/trails pass over it. */
+      if (beltDark !== dark || beltDim !== minDim || !beltSprite) {
+        beltDark = dark;
+        beltDim = minDim;
+        const [br, bg, bb] = themeCache.ink;
+        const sq0 = Math.sqrt(PLANETS[0].k[0]);
+        const sq7 = Math.sqrt(PLANETS[7].k[0]);
+        const Rof = (a: number) =>
+          minDim * 0.185 + (minDim * 0.47 - minDim * 0.185) * ((Math.sqrt(a) - sq0) / (sq7 - sq0));
+        beltROut = Rof(3.4) + 3;
+        const bs = document.createElement("canvas");
+        const bdpr = geom.dpr;
+        bs.width = bs.height = Math.ceil(beltROut * 2 * bdpr);
+        const bctx = bs.getContext("2d");
+        if (bctx) {
+          bctx.setTransform(bdpr, 0, 0, bdpr, 0, 0);
+          let seed = 12345;
+          const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+          for (let i = 0; i < 320; i++) {
+            const rr = Rof(2.1 + rnd() * 1.25);
+            const aa = rnd() * 2 * Math.PI;
+            bctx.fillStyle = `rgba(${br},${bg},${bb},${0.12 + rnd() * 0.25})`;
+            const sz = 0.5 + rnd() * 0.7;
+            bctx.fillRect(beltROut + Math.cos(aa) * rr, beltROut + Math.sin(aa) * rr, sz, sz);
+          }
+        }
+        beltSprite = bs;
+      }
+      {
+        const jdB = T * 36525 + 2451545;
+        const beltSpin = (((jdB - 2451545) / (4.6 * 365.25)) * 2 * Math.PI) % (2 * Math.PI);
+        ctx.save();
+        ctx.translate(sunX, sunY);
+        ctx.rotate(view.roll);
+        ctx.scale(1, -view.tilt);
+        ctx.rotate(beltSpin);
+        if (beltSprite) ctx.drawImage(beltSprite, -beltROut, -beltROut, beltROut * 2, beltROut * 2);
+        ctx.restore();
+      }
+
+      /* Hovered planet's full orbit — hairline in its own color */
+      const strokeOrbit = (b: (typeof bodies)[number], farPhase: boolean) => {
+        if (!b.orbit) return;
+        ctx.strokeStyle = pc(b.i, 0.22 * b.orbit.glow);
+        ctx.beginPath();
+        for (const run of farPhase ? b.orbit.far : b.orbit.near) {
+          ctx.moveTo(sunX + run[0].x, sunY + run[0].y);
+          for (let j = 1; j < run.length; j++) ctx.lineTo(sunX + run[j].x, sunY + run[j].y);
+        }
+        ctx.stroke();
+      };
+
       /* Far side → Sun → near side */
+      bodies.forEach((b) => strokeOrbit(b, true));
       bodies.forEach((b) => strokeSegs(b, true));
       bodies.filter((b) => b.far).forEach(drawBody);
 
@@ -666,8 +837,225 @@ export default function SolarSystem() {
       ctx.drawImage(sunSprite, sunX - sunR - 2, sunY - sunR - 2, (sunR + 2) * 2, (sunR + 2) * 2);
       ctx.globalAlpha = 1;
 
+      bodies.forEach((b) => strokeOrbit(b, false));
       bodies.forEach((b) => strokeSegs(b, false));
       bodies.filter((b) => !b.far).forEach(drawBody);
+
+      /* New Horizons — the real probe, on its real escape trajectory.
+         Direction is essentially fixed (toward Sagittarius); distance grows
+         ~2.95 AU/year. Linear extrapolation is accurate for decades. */
+      {
+        const jdNow = Date.now() / 86400000 + 2440587.5;
+        const rAU = 61.0 + (jdNow - 2461041.5) * (2.95 / 365.25); // 61 AU on 2026-01-01
+        const lonP = 293.2 * DEG;
+        const latP = 1.2 * DEG;
+        const vP = {
+          x: Math.cos(latP) * Math.cos(lonP) * rAU,
+          y: Math.cos(latP) * Math.sin(lonP) * rAU,
+          z: Math.sin(latP) * rAU,
+        };
+        const s0 = Math.sqrt(PLANETS[0].k[0]);
+        const s7 = Math.sqrt(PLANETS[7].k[0]);
+        const Rpx = minDim * 0.185 + (minDim * 0.47 - minDim * 0.185) * ((Math.sqrt(rAU) - s0) / (s7 - s0));
+        const posP = project(vP, Rpx / rAU, view.tilt, view.roll);
+        let px3 = sunX + posP.x;
+        let py3 = sunY + posP.y;
+        /* Shockwave push + spring home */
+        {
+          const pp = probePush.nh;
+          pp.v -= pp.d * 0.014;
+          pp.v *= 0.94;
+          pp.d += pp.v;
+          const dSun = Math.hypot(px3 - sunX, py3 - sunY) || 1;
+          if (nova.active && !pp.hit && ringR >= dSun) {
+            pp.hit = true;
+            pp.v += 22 + Math.random() * 10;
+          }
+          px3 += ((px3 - sunX) / dSun) * pp.d;
+          py3 += ((py3 - sunY) / dSun) * pp.d;
+        }
+        const pFade = clamp((now - t0 - (STAGGER_MS * PLANETS.length + 600)) / 1500, 0, 1);
+        probes.nh.on = false;
+        if (pFade > 0.01 && px3 > -40 && px3 < w + 40 && py3 > -20 && py3 < h + 20) {
+          probes.nh.on = true;
+          probes.nh.x = px3;
+          probes.nh.y = py3;
+          probes.nh.hov = !isTouch && Math.hypot(mouse.x - px3, mouse.y - py3) < 16;
+          /* Trajectory — the long straight road out, dashed */
+          probeGlow.nh += ((probes.nh.hov ? 1 : 0) - probeGlow.nh) * 0.12;
+          if (probeGlow.nh > 0.01) {
+            ctx.strokeStyle = ink(0.3 * probeGlow.nh);
+            ctx.setLineDash([5, 6]);
+            ctx.beginPath();
+            let first = true;
+            for (let rr = 30; rr <= 110; rr += 8) {
+              const kk =
+                (minDim * 0.185 + (minDim * 0.47 - minDim * 0.185) * ((Math.sqrt(rr) - s0) / (s7 - s0))) / rr;
+              const pt = project({ x: vP.x / rAU * rr, y: vP.y / rAU * rr, z: vP.z / rAU * rr }, kk, view.tilt, view.roll);
+              if (first) {
+                ctx.moveTo(sunX + pt.x, sunY + pt.y);
+                first = false;
+              } else {
+                ctx.lineTo(sunX + pt.x, sunY + pt.y);
+              }
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+          const a = 0.8 * pFade;
+          const rv = Math.hypot(posP.x, posP.y) || 1;
+          const uxp = posP.x / rv;
+          const uyp = posP.y / rv;
+          /* Tiny wake pointing back toward the sun it left behind */
+          ctx.strokeStyle = ink(a * 0.4);
+          ctx.beginPath();
+          ctx.moveTo(px3 - uxp * 5, py3 - uyp * 5);
+          ctx.lineTo(px3 - uxp * 13, py3 - uyp * 13);
+          ctx.stroke();
+          /* The probe — a small diamond */
+          ctx.save();
+          ctx.translate(px3, py3);
+          ctx.rotate(Math.PI / 4);
+          ctx.fillStyle = ink(a);
+          ctx.fillRect(-1.7, -1.7, 3.4, 3.4);
+          ctx.restore();
+          /* Name always; the numbers only when inspected */
+          ctx.font = "9px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+          ctx.textAlign = "center";
+          ctx.fillStyle = ink(probes.nh.hov ? a * 0.8 : a * 0.5);
+          ctx.fillText("NEW HORIZONS", px3, py3 + 16);
+          if (probes.nh.hov) {
+            ctx.fillStyle = ink(0.6);
+            ctx.fillText(
+              `${rAU.toFixed(2)} AU · ${((rAU * 8.317) / 60).toFixed(1)} LIGHT-HOURS FROM THE SUN`,
+              px3,
+              py3 + 28
+            );
+          }
+          ctx.textAlign = "left";
+        }
+      }
+
+      /* 1P/Halley — past its 2023 aphelion, now genuinely falling back
+         toward us for the 2061 perihelion. High-e Kepler solved live. */
+      {
+        const jdNow = Date.now() / 86400000 + 2440587.5;
+        const eH = 0.96714;
+        const Mh = ((((jdNow - 2446467.4) / 27510) * 2 * Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+        let Eh = Math.PI;
+        for (let i = 0; i < 14; i++) Eh += (Mh - (Eh - eH * Math.sin(Eh))) / (1 - eH * Math.cos(Eh));
+        const elH: El = { a: 17.834, e: eH, I: 162.262 * DEG, O: 58.42 * DEG, w: 111.332 * DEG, M: 0 };
+        const vH = orbitPoint(elH, Eh);
+        const rH = Math.hypot(vH.x, vH.y, vH.z) || 1;
+        const sq0 = Math.sqrt(PLANETS[0].k[0]);
+        const sq7 = Math.sqrt(PLANETS[7].k[0]);
+        const RH = minDim * 0.185 + (minDim * 0.47 - minDim * 0.185) * ((Math.sqrt(rH) - sq0) / (sq7 - sq0));
+        const posH = project(vH, RH / rH, view.tilt, view.roll);
+        let hx3 = sunX + posH.x;
+        let hy3 = sunY + posH.y;
+        /* Shockwave push + spring home */
+        {
+          const pp = probePush.hal;
+          pp.v -= pp.d * 0.014;
+          pp.v *= 0.94;
+          pp.d += pp.v;
+          const dSun = Math.hypot(hx3 - sunX, hy3 - sunY) || 1;
+          if (nova.active && !pp.hit && ringR >= dSun) {
+            pp.hit = true;
+            pp.v += 22 + Math.random() * 10;
+          }
+          hx3 += ((hx3 - sunX) / dSun) * pp.d;
+          hy3 += ((hy3 - sunY) / dSun) * pp.d;
+        }
+        const hFade = clamp((now - t0 - (STAGGER_MS * PLANETS.length + 1200)) / 1500, 0, 1);
+        probes.hal.on = false;
+        if (hFade > 0.01 && hx3 > -40 && hx3 < w + 40 && hy3 > -20 && hy3 < h + 20) {
+          probes.hal.on = true;
+          probes.hal.x = hx3;
+          probes.hal.y = hy3;
+          probes.hal.hov = !isTouch && Math.hypot(mouse.x - hx3, mouse.y - hy3) < 16;
+          /* Trajectory — the whole 75-year ellipse, radially compressed
+             like everything else on this map, dashed */
+          probeGlow.hal += ((probes.hal.hov ? 1 : 0) - probeGlow.hal) * 0.12;
+          if (probeGlow.hal > 0.01) {
+            ctx.strokeStyle = ink(0.3 * probeGlow.hal);
+            ctx.setLineDash([5, 6]);
+            ctx.beginPath();
+            const NO2 = 130;
+            for (let j = 0; j <= NO2; j++) {
+              const vO = orbitPoint(elH, (j / NO2) * 2 * Math.PI);
+              const rO = Math.hypot(vO.x, vO.y, vO.z) || 1;
+              const kO =
+                (minDim * 0.185 + (minDim * 0.47 - minDim * 0.185) * ((Math.sqrt(rO) - sq0) / (sq7 - sq0))) / rO;
+              const pt = project(vO, kO, view.tilt, view.roll);
+              if (j === 0) ctx.moveTo(sunX + pt.x, sunY + pt.y);
+              else ctx.lineTo(sunX + pt.x, sunY + pt.y);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+          const a = 0.7 * hFade;
+          const rv2 = Math.hypot(posH.x, posH.y) || 1;
+          /* Micro-tail away from the sun, as ever */
+          ctx.strokeStyle = ink(a * 0.45);
+          ctx.beginPath();
+          ctx.moveTo(hx3 + (posH.x / rv2) * 3, hy3 + (posH.y / rv2) * 3);
+          ctx.lineTo(hx3 + (posH.x / rv2) * 9, hy3 + (posH.y / rv2) * 9);
+          ctx.stroke();
+          ctx.fillStyle = ink(a);
+          ctx.beginPath();
+          ctx.arc(hx3, hy3, 1.6, 0, 2 * Math.PI);
+          ctx.fill();
+          /* Name always; the story only when inspected */
+          ctx.font = "9px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+          ctx.textAlign = "center";
+          ctx.fillStyle = ink(probes.hal.hov ? a * 0.8 : a * 0.5);
+          ctx.fillText("1P/HALLEY", hx3, hy3 + 14);
+          if (probes.hal.hov) {
+            ctx.fillStyle = ink(0.6);
+            ctx.fillText(`${rH.toFixed(2)} AU · FALLING SUNWARD SINCE DEC 2023`, hx3, hy3 + 26);
+            ctx.fillText("INBOUND · PERIHELION 2061", hx3, hy3 + 38);
+          }
+          ctx.textAlign = "left";
+        }
+      }
+
+      /* Meteors — sporadic normally, busy during real shower windows */
+      if (!reduceMotion) {
+        if (nextMeteor === 0) nextMeteor = now + 20000 + Math.random() * 30000;
+        if (now > nextMeteor && meteors.length < 4) {
+          const ang = 0.55 + Math.random() * 0.5; // down-and-right-ish
+          const sp = 11 + Math.random() * 7;
+          meteors.push({
+            x: Math.random() * w * 0.9,
+            y: Math.random() * h * 0.45,
+            vx: Math.cos(ang) * sp,
+            vy: Math.sin(ang) * sp,
+            born: now,
+            life: 380 + Math.random() * 220,
+          });
+          nextMeteor = now + (showerActive ? 2500 + Math.random() * 4500 : 90000 + Math.random() * 60000);
+        }
+        for (let i = meteors.length - 1; i >= 0; i--) {
+          const m = meteors[i];
+          const age = now - m.born;
+          if (age > m.life) {
+            meteors.splice(i, 1);
+            continue;
+          }
+          const step = frameDt / 16.7;
+          m.x += m.vx * step;
+          m.y += m.vy * step;
+          const aM = Math.sin(Math.PI * (age / m.life)) * 0.55;
+          ctx.strokeStyle = ink(aM);
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(m.x, m.y);
+          ctx.lineTo(m.x - m.vx * 5, m.y - m.vy * 5);
+          ctx.stroke();
+          ctx.lineWidth = 1;
+        }
+      }
 
       /* Supernova shockwave ring */
       if (nova.start && now - nova.start < 1600) {
@@ -697,12 +1085,13 @@ export default function SolarSystem() {
           if (d < Math.max(14, b.r + 8) && d < bestD) { bestD = d; hover = b; }
         }
       }
-      hovering = !!hover; // pauses the drift next frame
+      hovering = !!hover || probes.nh.hov || probes.hal.hov; // pauses the drift next frame
+      hoverIdx = hover ? hover.i : -1; // orbit highlight next frame
       if (hover) visited.add(hover.i); // Grand Tour progress
 
       /* The sun is clickable too (three clicks…) — show the same cursor */
       const overSun = !isTouch && Math.hypot(mouse.x - sunX, mouse.y - sunY) < sunR;
-      const wantPointer = !!hover || overSun;
+      const wantPointer = !!hover || overSun || probes.nh.hov || probes.hal.hov;
       if (wantPointer !== cursorSet) {
         cursorSet = wantPointer;
         document.body.style.cursor = cursorSet ? "pointer" : "";
@@ -726,8 +1115,9 @@ export default function SolarSystem() {
         if (tip) {
           if (tipPlanet.current !== hover.i) {
             tipPlanet.current = hover.i;
-            tip.innerHTML = tipHTML(hover.i);
+            tip.innerHTML = tipHTML(hover.i, isTouch);
           }
+          tip.style.pointerEvents = isTouch ? "auto" : "none";
           const auEl = tip.querySelector("[data-au]") as HTMLElement | null;
           if (auEl) auEl.textContent = `${hover.au.toFixed(2)} AU`;
           const deEl = tip.querySelector("[data-de]") as HTMLElement | null;
@@ -784,6 +1174,7 @@ export default function SolarSystem() {
         }
       } else if (tip) {
         tip.style.opacity = "0";
+        tip.style.pointerEvents = "none"; // an invisible card must not eat taps
       }
 
       /* Comets — both live IN the ecliptic plane: tails point away from the
@@ -799,9 +1190,14 @@ export default function SolarSystem() {
       const heatOf = (r: number) => clamp((minDim * 0.5 - r) / (minDim * 0.32), 0, 1);
 
       /* On the far side of the plane the comet passes BEHIND the sun —
-         clip its drawing to everything except the sun disc */
-      const withSunOcclusion = (farSide: boolean, draw: () => void) => {
-        if (!farSide) { draw(); return; }
+         clip its drawing to everything except the sun disc. The clip is
+         expensive on Safari/Firefox, so it's applied only when the drawn
+         object can actually overlap the disc. */
+      const withSunOcclusion = (farSide: boolean, x: number, y: number, reach: number, draw: () => void) => {
+        if (!farSide || Math.hypot(x - sunX, y - sunY) > sunR + reach) {
+          draw();
+          return;
+        }
         ctx.save();
         const p = new Path2D();
         p.rect(0, 0, w, h);
@@ -884,7 +1280,7 @@ export default function SolarSystem() {
           cometRebirth = now + 1200; // pause, then slowly grow a new one
         } else {
           /* Tail grows and the nucleus heats up as it swings near the sun */
-          withSunOcclusion(free.y > 0, () =>
+          withSunOcclusion(free.y > 0, sxp, syp, clamp(24000 / rp, 40, 130) * uiScale + 40, () =>
             drawComet(sxp, syp, free.x / rp, free.y / rp, clamp(24000 / rp, 40, 130) * uiScale, 2.8, 1, heatOf(rp))
           );
         }
@@ -900,7 +1296,7 @@ export default function SolarSystem() {
         comet.dx += (planeX / dl - comet.dx) * 0.08;
         comet.dy += (planeY / dl - comet.dy) * 0.08;
         const cl = Math.hypot(comet.dx, comet.dy) || 1;
-        withSunOcclusion(planeY > 0, () =>
+        withSunOcclusion(planeY > 0, mouse.x, mouse.y, 60 * uiScale + 40, () =>
           drawComet(mouse.x, mouse.y, comet.dx / cl, comet.dy / cl, 60 * uiScale, 2.4, easeOutCubic(fade), heatOf(dl))
         );
 
@@ -912,28 +1308,7 @@ export default function SolarSystem() {
           try { (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = "0.14em"; } catch { /* older browsers */ }
           ctx.fillStyle = ink(a);
           ctx.fillText("CLICK TO RELEASE", mouse.x + 16, mouse.y + 28);
-        }
-      }
-
-      /* Touch devices get no hover — spell out the interactions once,
-         after the arrival animation settles, until the first tap */
-      if (isTouch && !touchHintDone) {
-        const tH = now - t0 - 3200;
-        if (tH > 0) {
-          const a =
-            Math.min(tH / 500, 1) * 0.5 * clamp(1 - (tH - 9000) / 800, 0, 1);
-          if (a <= 0.005 && tH > 9000) {
-            touchHintDone = true;
-          } else if (a > 0.005) {
-            ctx.font = `700 10px ${bodyFont}`;
-            try { (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = "0.14em"; } catch { /* older browsers */ }
-            ctx.fillStyle = ink(a);
-            ctx.textAlign = "center";
-            /* Two stacked lines, well above the scroll indicator */
-            ctx.fillText("TAP A PLANET", w / 2, h - 150);
-            ctx.fillText("TAP SPACE TO LAUNCH A COMET", w / 2, h - 132);
-            ctx.textAlign = "left";
-          }
+          try { (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = "0px"; } catch { /* older browsers */ }
         }
       }
 
@@ -980,6 +1355,39 @@ export default function SolarSystem() {
               }
               ctx.textAlign = "left";
             }
+          }
+        }
+      }
+
+      /* Ephemeris data — feeds the info card + shower detection, 1 Hz */
+      {
+        const sec = Math.floor(Date.now() / 1000);
+        if (sec !== clockSec) {
+          clockSec = sec;
+          clockStr = new Date().toISOString().slice(0, 16).replace("T", " ");
+          /* Next real sky event — and live shower detection */
+          let best: { t: number; label: string } | null = null;
+          let active: string | null = null;
+          const yNow = new Date().getUTCFullYear();
+          for (const [m, d, label] of SKY_EVENTS) {
+            for (const yy of [yNow, yNow + 1]) {
+              const t2 = Date.UTC(yy, m - 1, d);
+              const dd = (t2 - Date.now()) / 86400000;
+              if (label.includes("PEAK") && Math.abs(dd) <= 3) active = label;
+              if (dd >= -0.5 && (!best || t2 < best.t)) best = { t: t2, label: `${label} · ${MONTHS[m - 1]} ${d}` };
+            }
+          }
+          showerActive = !!active;
+          eventLine = active
+            ? `NOW // ${active.replace(" PEAK", "")} ACTIVE`
+            : `NEXT // ${best ? best.label : "—"}`;
+          const card = infoCardRef.current;
+          if (card) {
+            const jd = Date.now() / 86400000 + 2440587.5;
+            const l2 = card.querySelector("[data-l2]");
+            if (l2) l2.textContent = `JD ${jd.toFixed(5)} // ${clockStr} UTC`;
+            const l4 = card.querySelector("[data-l4]");
+            if (l4) l4.textContent = eventLine;
           }
         }
       }
@@ -1056,16 +1464,10 @@ export default function SolarSystem() {
         ctx.restore();
       };
 
-      /* The kitten stays home on very large displays (> ~2K viewport) —
-         the flyby isn't worth the extra frame cost there */
-      const ufoAllowed = w * h <= 2560 * 1440;
-      if (!ufoAllowed && ufo.active) {
-        ufo.active = false;
-        ufo.mode = 0;
-        ufo.next = now + 60000;
-      }
-      if (!reduceMotion && ufoAllowed) {
-        if (ufo.next === 0) ufo.next = now + 15000 + Math.random() * 30000;
+      /* The kitten flies on all displays again — after capping the raster
+         size, its vector cost is negligible even at 4K */
+      if (!reduceMotion) {
+        if (ufo.next === 0) ufo.next = now + 45000 + Math.random() * 45000;
         if (!ufo.active && now > ufo.next) {
           /* One continuous near-parabolic orbit: enter along the target
              planet's bearing (so the inbound leg sweeps past it), whip
@@ -1217,7 +1619,7 @@ export default function SolarSystem() {
           if (((ufo.mode === 1 || ufo.mode === 3) && !onScreen) || el > 70000) {
             ufo.active = false;
             ufo.mode = 0;
-            ufo.next = now + 60000 + Math.random() * 120000;
+            ufo.next = now + 120000 + Math.random() * 90000;
           } else {
             /* Scan beam + expanding rings on the target — mid-flight */
             if (scanning) {
@@ -1250,7 +1652,7 @@ export default function SolarSystem() {
             ufo.psx = usx;
             ufo.psy = usy;
             /* Behind the sun on the far side of the plane, like everything else */
-            withSunOcclusion(ply2 > 0, () => drawUfo(usx, usy, rot));
+            withSunOcclusion(ply2 > 0, usx, usy, 40 * uiScale, () => drawUfo(usx, usy, rot));
           }
           }
         }
@@ -1394,6 +1796,39 @@ export default function SolarSystem() {
           zIndex: 11,
         }}
       />
+      {/* Ephemeris info — quiet icon, glassy card on hover/tap */}
+      <div
+        ref={infoWrapRef}
+        className="ephem-info"
+        style={{ position: "absolute", right: 20, bottom: 20, zIndex: 11, pointerEvents: "auto" }}
+      >
+        <div ref={infoCardRef} className="ephem-card">
+          <div>EPHEMERIS // JPL APPROXIMATE ELEMENTS 1800–2050</div>
+          <div data-l2 />
+          <div>PLANETARY POSITIONS: REAL-TIME</div>
+          <div data-l4 />
+        </div>
+        <button
+          aria-label="About the data"
+          onClick={(e) => {
+            e.stopPropagation();
+            infoWrapRef.current?.classList.toggle("open");
+          }}
+          style={{
+            width: 26,
+            height: 26,
+            borderRadius: "50%",
+            border: "1px solid var(--ink-faint)",
+            background: "none",
+            color: "var(--ink-muted)",
+            font: "italic 700 12px Georgia, serif",
+            cursor: "pointer",
+            display: "block",
+          }}
+        >
+          i
+        </button>
+      </div>
     </div>
   );
 }

@@ -321,6 +321,28 @@ export default function HomePage() {
             <GridBackground interactive={false} />
           </div>
 
+          {/* Bio — one-time Star Wars crawl, BEHIND the solar system */}
+          <div className="bio-crawl">
+            <p
+              className="font-futura bio-crawl-text"
+              style={{
+                fontSize: "clamp(0.95rem, calc(0.78rem + 0.45vw), 1.125rem)",
+                fontWeight: 400,
+                color: "color-mix(in srgb, var(--ink) 78%, transparent)",
+                letterSpacing: "0.03em",
+                lineHeight: 1.6,
+              }}
+            >
+              Competitive dreamer,
+              <br />
+              edge-of-the-world explorer,
+              <br />
+              side-quest collector
+              <br />
+              — with the urge to make things.
+            </p>
+          </div>
+
           {/* Solar system — appears last */}
           <div style={{
             opacity: heroStage >= 4 ? 1 : 0,
@@ -374,6 +396,7 @@ export default function HomePage() {
               UX Designer
             </p>
           </div>
+
 
           {/* Scroll indicator — appears with ball */}
           <div
