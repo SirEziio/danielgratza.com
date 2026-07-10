@@ -1965,9 +1965,13 @@ export default function SolarSystem() {
             carrying = true;
             ufo.start += frameDt; // mission clock freezes in your grip
             if (Number.isFinite(cometRebirth) && cometRebirth > 0) cometRebirth += frameDt; // reload pauses
-            /* Desktop: follows the cursor. Touch: follows only while the
-               finger is down (drag) — otherwise it waits, parked. */
-            if (!isTouch || drag.active) {
+            /* Desktop: follows the cursor. Touch: follows only during a REAL
+               drag (finger down AND moved) — a plain tap parks it exactly
+               where it was, no hop toward the fingertip. */
+            if (
+              !isTouch ||
+              (drag.active && Math.hypot(mouse.x - drag.x, mouse.y - drag.y) > 8)
+            ) {
               ufo.carX += (mouse.x - ufo.carX) * 0.3;
               ufo.carY += (mouse.y - ufo.carY) * 0.3;
             }
@@ -2159,7 +2163,10 @@ export default function SolarSystem() {
             /* On the cursor — carried to safety */
             carrying = true;
             if (Number.isFinite(cometRebirth) && cometRebirth > 0) cometRebirth += frameDt;
-            if (!isTouch || drag.active) {
+            if (
+              !isTouch ||
+              (drag.active && Math.hypot(mouse.x - drag.x, mouse.y - drag.y) > 8)
+            ) {
               wreck.ksx += (mouse.x - wreck.ksx) * 0.3;
               wreck.ksy += (mouse.y - wreck.ksy) * 0.3;
             }
