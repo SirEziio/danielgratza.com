@@ -14,6 +14,18 @@ interface Props {
 export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true }: Props) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [conquest, setConquest] = useState<{ caught: boolean; n: number } | null>(null);
+
+  // Kitten conquest status — read fresh every time the menu opens
+  useEffect(() => {
+    if (!menuOpen) return;
+    try {
+      const d = JSON.parse(localStorage.getItem("dg-kitten-conquest") || "null");
+      setConquest({ caught: !!d?.c, n: d?.p?.length || 0 });
+    } catch {
+      setConquest(null);
+    }
+  }, [menuOpen]);
 
   // Close on route change
   useEffect(() => { setMenuOpen(false); }, [pathname]);
@@ -252,7 +264,7 @@ export default function Navigation({ hideLogo, lightNav, scrolledPastHero = true
             transition: "opacity 0.35s ease 460ms",
           }}
         >
-          try to catch the kitten
+          {conquest?.caught ? `Planets conquered: ${conquest.n}/9` : "try to catch the kitten"}
         </p>
       </div>
     </>

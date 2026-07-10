@@ -60,7 +60,7 @@ function tipHTML(i: number, touch: boolean) {
   const cta = touch
     ? `<a data-cta href="https://eyes.nasa.gov/apps/solar-system/#/${p.name.toLowerCase()}" target="_blank" rel="noopener"
         style="display:block;margin-top:12px;padding:10px 12px;text-align:center;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink);border:1px solid var(--ink-faint);border-radius:8px;text-decoration:none;">
-        Fly there in 3D<svg width="9" height="9" viewBox="0 0 10 10" fill="none" style="margin-left:7px;vertical-align:1px;"><path d="M2 2H8V8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>`
+        Fly there in 3D<svg width="8" height="8" viewBox="0 0 10 10" fill="none" style="display:inline-block;vertical-align:middle;margin-left:7px;margin-top:-1px;"><path d="M2 2H8V8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>`
     : "";
   return `${closeBtn}
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
@@ -185,14 +185,19 @@ export default function SolarSystem() {
     const CONQUEST_KEY = "dg-kitten-conquest";
     const conquered = new Set<number>();
     let takeoverDone = false;
+    let caughtEver = false;
     try {
       const d = JSON.parse(localStorage.getItem(CONQUEST_KEY) || "null");
       if (d?.p) for (const idx of d.p) conquered.add(idx);
       takeoverDone = !!d?.done;
+      caughtEver = !!d?.c;
     } catch { /* fresh start */ }
     const saveConquest = () => {
       try {
-        localStorage.setItem(CONQUEST_KEY, JSON.stringify({ p: [...conquered], done: takeoverDone ? 1 : 0 }));
+        localStorage.setItem(
+          CONQUEST_KEY,
+          JSON.stringify({ p: [...conquered], done: takeoverDone ? 1 : 0, c: caughtEver ? 1 : 0 })
+        );
       } catch { /* storage unavailable */ }
     };
     const flagPop: number[] = new Array(PLANETS.length).fill(0);
@@ -214,7 +219,7 @@ export default function SolarSystem() {
       if (!geom || rrel <= geom.minDim * 0.16) return false; // too close to the sun
       ufo.x = rpx;
       ufo.y = rpy;
-      const GMr = geom.minDim * 9;
+      const GMr = geom.minDim * (isTouch ? 4 : 9); // phones get a calmer ship
       const sgn2 = Math.random() < 0.5 ? -1 : 1;
       const vCap2 = 0.85 * Math.sqrt(GMr / rrel);
       ufo.vx = (-rpy / rrel) * vCap2 * sgn2;
@@ -434,6 +439,10 @@ export default function SolarSystem() {
         ufo.carY = ufo.psy;
         ufo.dropArmed = false;
         ufo.touched = true;
+        if (!caughtEver) {
+          caughtEver = true; // the game has begun
+          saveConquest();
+        }
         mobileCard = -1;
         drag.active = true;
         drag.t = performance.now();
@@ -449,6 +458,10 @@ export default function SolarSystem() {
         Math.hypot(cx - wreck.ksx, cy - wreck.ksy) < 22
       ) {
         wreck.mode = 1;
+        if (!caughtEver) {
+          caughtEver = true;
+          saveConquest();
+        }
         mobileCard = -1;
         drag.active = true;
         drag.t = performance.now();
@@ -468,6 +481,9 @@ export default function SolarSystem() {
       drag.active = false;
       if (!moved && !heldLong) return; // quick tap → sticky carry
       swallowClick = true;
+      /* Touch: lifting the finger parks the cargo where it is — the next
+         tap (planet or space) decides its fate. Desktop releases here. */
+      if (isTouch) return;
       if (drag.kind === "ufo" && ufo.active && ufo.mode === 6) {
         releaseShipHere(); // planet drops already fired by contact mid-drag
       } else if (drag.kind === "wreck" && wreck.active && wreck.mode === 1) {
@@ -480,6 +496,12 @@ export default function SolarSystem() {
     };
     window.addEventListener("pointerdown", onDown);
     window.addEventListener("pointerup", onUp);
+
+    /* While a finger-drag is live, the page must not scroll */
+    const onTouchMove = (ev: TouchEvent) => {
+      if (drag.active) ev.preventDefault();
+    };
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
 
     /* Click on a hovered planet → its Wikipedia page. The canvas is
        pointer-events:none, so hit-test manually and never hijack clicks
@@ -505,14 +527,36 @@ export default function SolarSystem() {
       const cx = e.clientX - rect.left;
       const cy = e.clientY - rect.top;
 
-      /* Sticky-carried ship: a click in empty space releases it back into
-         flight; near-planet drops are handled by contact in the frame loop */
+      /* Sticky-carried ship: tap a planet to SEND the kitten there (it
+         glides over and plants); tap empty space to release it back into
+         flight. Near-planet drops still happen by contact mid-drag. */
       if (ufo.active && ufo.mode === 6) {
+        for (const t of hits) {
+          if (Math.hypot(cx - t.x, cy - t.y) < Math.max(16, t.r + 10)) {
+            ufo.carX = t.x; // glide target — the contact drop fires on arrival
+            ufo.carY = t.y;
+            return;
+          }
+        }
         releaseShipHere();
         return;
       }
-      /* Sticky-carried kitten: clicks do nothing (drop is by contact) */
-      if (wreck.active && wreck.mode === 1) return;
+      /* Sticky-carried kitten: same — tap a planet to send it to safety,
+         tap space to let it drift (and freeze) where it floats */
+      if (wreck.active && wreck.mode === 1) {
+        for (const t of hits) {
+          if (Math.hypot(cx - t.x, cy - t.y) < Math.max(16, t.r + 10)) {
+            wreck.ksx = t.x;
+            wreck.ksy = t.y;
+            return;
+          }
+        }
+        const [kx2, ky2] = planeOf(wreck.ksx - cur.sunX, wreck.ksy - cur.sunY);
+        wreck.kx = kx2;
+        wreck.ky = ky2;
+        wreck.mode = 0;
+        return;
+      }
 
       /* Signal flags — click a planted flag: it waves, sends a directional
          signal, and the fleet answers 10 seconds sooner. Once per flag. */
@@ -1689,6 +1733,11 @@ export default function SolarSystem() {
             if (l2) l2.textContent = `JD ${jd.toFixed(5)} // ${clockStr} UTC`;
             const l4 = card.querySelector("[data-l4]");
             if (l4) l4.textContent = eventLine;
+            const cq = card.querySelector("[data-conq]");
+            if (cq)
+              cq.textContent = caughtEver
+                ? `Planets conquered: ${conquered.size}/${PLANETS.length}`
+                : "Try to catch the kitten";
           }
         }
       }
@@ -1796,7 +1845,7 @@ export default function SolarSystem() {
           const rP = Math.hypot(tgt0.plx, tgt0.ply) || 1;
           const thP = Math.atan2(tgt0.ply, tgt0.plx);
           const R = Math.hypot(w, h) * 0.85;
-          const GM2 = minDim * 9;
+          const GM2 = minDim * (isTouch ? 4 : 9); // phones get a calmer ship
           const q = Math.min(minDim * 0.17, rP * 0.75); // perihelion, off the sun disc
           const nuE = -Math.acos(clamp((2 * q) / R - 1, -1, 1));
           const nuP = -Math.acos(clamp((2 * q) / rP - 1, -1, 1));
@@ -1819,7 +1868,7 @@ export default function SolarSystem() {
         }
         if (ufo.active) {
           const tgt = bodies[ufo.target];
-          const GM2 = minDim * 9;
+          const GM2 = minDim * (isTouch ? 4 : 9);
           /* Cursor vs kitten: a LOADED comet destroys the ship; an empty
              hand (mid-reload) catches it — held in place, reload paused,
              until the cursor lets go. */
@@ -1890,8 +1939,12 @@ export default function SolarSystem() {
             carrying = true;
             ufo.start += frameDt; // mission clock freezes in your grip
             if (Number.isFinite(cometRebirth) && cometRebirth > 0) cometRebirth += frameDt; // reload pauses
-            ufo.carX += (mouse.x - ufo.carX) * 0.3;
-            ufo.carY += (mouse.y - ufo.carY) * 0.3;
+            /* Desktop: follows the cursor. Touch: follows only while the
+               finger is down (drag) — otherwise it waits, parked. */
+            if (!isTouch || drag.active) {
+              ufo.carX += (mouse.x - ufo.carX) * 0.3;
+              ufo.carY += (mouse.y - ufo.carY) * 0.3;
+            }
             /* Drop check — touch a planet and the flag goes down, but only
                once the cargo has been carried clear of planets first */
             let dropped = -1;
@@ -1981,12 +2034,12 @@ export default function SolarSystem() {
             escapeBurn();
           }
           /* Safety: missed approach or an overlong visit — head home */
-          if (ufo.mode !== 3 && ((ufo.mode <= 1 && el > 25000) || el > 60000)) escapeBurn();
+          if (ufo.mode !== 3 && ((ufo.mode <= 1 && el > (isTouch ? 38000 : 25000)) || el > (isTouch ? 90000 : 60000))) escapeBurn();
           ufo.wasIn = scanning;
 
           const onScreen = usx > -120 && usx < w + 120 && usy > -120 && usy < h + 120;
           if (ufo.mode === 0 && onScreen) ufo.mode = 1; // has entered the frame
-          if (((ufo.mode === 1 || ufo.mode === 3) && !onScreen) || el > 70000) {
+          if (((ufo.mode === 1 || ufo.mode === 3) && !onScreen) || el > (isTouch ? 105000 : 70000)) {
             ufo.active = false;
             ufo.mode = 0;
             ufo.next =
@@ -2080,8 +2133,10 @@ export default function SolarSystem() {
             /* On the cursor — carried to safety */
             carrying = true;
             if (Number.isFinite(cometRebirth) && cometRebirth > 0) cometRebirth += frameDt;
-            wreck.ksx += (mouse.x - wreck.ksx) * 0.3;
-            wreck.ksy += (mouse.y - wreck.ksy) * 0.3;
+            if (!isTouch || drag.active) {
+              wreck.ksx += (mouse.x - wreck.ksx) * 0.3;
+              wreck.ksy += (mouse.y - wreck.ksy) * 0.3;
+            }
             ksx = wreck.ksx;
             ksy = wreck.ksy;
             /* Drop on a planet = saved (and the flag goes down if new) */
@@ -2235,6 +2290,7 @@ export default function SolarSystem() {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("click", onClick);
       if (cursorSet) document.body.style.cursor = "";
     };
@@ -2298,6 +2354,23 @@ export default function SolarSystem() {
             >
               ×
             </button>
+          )}
+          {!touchUI && (
+            <div
+              className="font-futura"
+              data-conq
+              style={{
+                borderBottom: "1px solid var(--grid-line)",
+                marginBottom: 8,
+                paddingBottom: 8,
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "var(--ink)",
+                opacity: 0.6,
+              }}
+            />
           )}
           {touchUI && (
             <div
