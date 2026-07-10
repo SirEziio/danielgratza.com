@@ -210,7 +210,7 @@ export default function SolarSystem() {
     /* Press-and-hold drag session: quick tap = sticky carry (click again to
        release); hold/move = classic drag, released on pointerup */
     const drag = { active: false, t: 0, x: 0, y: 0, kind: "" as "" | "ufo" | "wreck" };
-    let swallowClick = false;
+    let swallowUntil = 0; // clicks within this window belong to a grab/release
 
     /* Put a carried ship back into flight at its current cursor position */
     const releaseShipHere = () => {
@@ -449,7 +449,7 @@ export default function SolarSystem() {
         drag.x = cx;
         drag.y = cy;
         drag.kind = "ufo";
-        if (!isTouch) swallowClick = true; // touch: the click is killed at touchstart
+        swallowUntil = performance.now() + 700; // whatever click follows is ours
         return;
       }
       if (
@@ -468,7 +468,7 @@ export default function SolarSystem() {
         drag.x = cx;
         drag.y = cy;
         drag.kind = "wreck";
-        if (!isTouch) swallowClick = true;
+        swallowUntil = performance.now() + 700;
       }
     };
     const onUp = (e: PointerEvent) => {
@@ -483,7 +483,7 @@ export default function SolarSystem() {
       /* Touch: lifting the finger parks the cargo where it is — the next
          tap (planet or space) decides its fate. Desktop releases here. */
       if (isTouch) return;
-      swallowClick = true;
+      swallowUntil = performance.now() + 700;
       if (drag.kind === "ufo" && ufo.active && ufo.mode === 6) {
         releaseShipHere(); // planet drops already fired by contact mid-drag
       } else if (drag.kind === "wreck" && wreck.active && wreck.mode === 1) {
@@ -525,7 +525,6 @@ export default function SolarSystem() {
     /* Scroll stole the pointer — reset cleanly instead of glitching */
     const onCancel = () => {
       drag.active = false;
-      swallowClick = false;
     };
     window.addEventListener("pointercancel", onCancel);
 
@@ -533,10 +532,7 @@ export default function SolarSystem() {
        pointer-events:none, so hit-test manually and never hijack clicks
        that land on real interactive elements. */
     const onClick = (e: MouseEvent) => {
-      if (swallowClick) {
-        swallowClick = false; // this click belonged to a grab/drag-release
-        return;
-      }
+      if (performance.now() < swallowUntil) return; // grab/release click — ignore
       const targetEl = e.target as Element | null;
       /* A tap anywhere outside the info widget closes its card */
       if (infoWrapRef.current && targetEl && !infoWrapRef.current.contains(targetEl)) {
@@ -557,6 +553,8 @@ export default function SolarSystem() {
          glides over and plants); tap empty space to release it back into
          flight. Near-planet drops still happen by contact mid-drag. */
       if (ufo.active && ufo.mode === 6) {
+        /* Tapping the parked ship itself does nothing — only taps AWAY act */
+        if (Math.hypot(cx - ufo.carX, cy - ufo.carY) < 44) return;
         for (const t of hits) {
           if (Math.hypot(cx - t.x, cy - t.y) < Math.max(16, t.r + 10)) {
             ufo.carX = t.x; // glide target — the contact drop fires on arrival
@@ -570,6 +568,8 @@ export default function SolarSystem() {
       /* Sticky-carried kitten: same — tap a planet to send it to safety,
          tap space to let it drift (and freeze) where it floats */
       if (wreck.active && wreck.mode === 1) {
+        /* Tapping the carried kitten itself does nothing */
+        if (Math.hypot(cx - wreck.ksx, cy - wreck.ksy) < 26) return;
         for (const t of hits) {
           if (Math.hypot(cx - t.x, cy - t.y) < Math.max(16, t.r + 10)) {
             wreck.ksx = t.x;
