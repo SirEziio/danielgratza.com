@@ -449,7 +449,7 @@ export default function SolarSystem() {
         drag.x = cx;
         drag.y = cy;
         drag.kind = "ufo";
-        swallowClick = true;
+        if (!isTouch) swallowClick = true; // touch: the click is killed at touchstart
         return;
       }
       if (
@@ -468,7 +468,7 @@ export default function SolarSystem() {
         drag.x = cx;
         drag.y = cy;
         drag.kind = "wreck";
-        swallowClick = true;
+        if (!isTouch) swallowClick = true;
       }
     };
     const onUp = (e: PointerEvent) => {
@@ -480,10 +480,10 @@ export default function SolarSystem() {
       const heldLong = performance.now() - drag.t > 350;
       drag.active = false;
       if (!moved && !heldLong) return; // quick tap → sticky carry
-      swallowClick = true;
       /* Touch: lifting the finger parks the cargo where it is — the next
          tap (planet or space) decides its fate. Desktop releases here. */
       if (isTouch) return;
+      swallowClick = true;
       if (drag.kind === "ufo" && ufo.active && ufo.mode === 6) {
         releaseShipHere(); // planet drops already fired by contact mid-drag
       } else if (drag.kind === "wreck" && wreck.active && wreck.mode === 1) {
@@ -497,11 +497,37 @@ export default function SolarSystem() {
     window.addEventListener("pointerdown", onDown);
     window.addEventListener("pointerup", onUp);
 
+    /* Touch beginning ON the ship/kitten must never become a scroll —
+       otherwise the browser fires pointercancel mid-grab and the drag
+       state glitches (the old "tap and it flies away" bug) */
+    const onTouchStart = (ev: TouchEvent) => {
+      if (!isTouch || !ev.touches.length) return;
+      const rect = canvas.getBoundingClientRect();
+      const tx = ev.touches[0].clientX - rect.left;
+      const ty = ev.touches[0].clientY - rect.top;
+      const onShip =
+        ufo.active &&
+        ((ufo.mode !== 6 && ufo.kittenAboard && ufo.psx !== 0 && Math.hypot(tx - ufo.psx, ty - ufo.psy) < 44) ||
+          (ufo.mode === 6 && Math.hypot(tx - ufo.carX, ty - ufo.carY) < 44));
+      const onKitten =
+        wreck.active && wreck.kitten &&
+        Math.hypot(tx - wreck.ksx, ty - wreck.ksy) < 26;
+      if (onShip || onKitten) ev.preventDefault();
+    };
+    window.addEventListener("touchstart", onTouchStart, { passive: false });
+
     /* While a finger-drag is live, the page must not scroll */
     const onTouchMove = (ev: TouchEvent) => {
       if (drag.active) ev.preventDefault();
     };
     window.addEventListener("touchmove", onTouchMove, { passive: false });
+
+    /* Scroll stole the pointer — reset cleanly instead of glitching */
+    const onCancel = () => {
+      drag.active = false;
+      swallowClick = false;
+    };
+    window.addEventListener("pointercancel", onCancel);
 
     /* Click on a hovered planet → its Wikipedia page. The canvas is
        pointer-events:none, so hit-test manually and never hijack clicks
@@ -2290,7 +2316,9 @@ export default function SolarSystem() {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("pointercancel", onCancel);
       window.removeEventListener("click", onClick);
       if (cursorSet) document.body.style.cursor = "";
     };

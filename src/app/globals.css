@@ -256,6 +256,7 @@ main {
   }
   .bio-crawl-text {
     animation-name: bioCrawlMobile;
+    animation-delay: 0.5s; /* phones: don't keep the first pass waiting */
   }
 }
 /* Mobile: 34s transit inside the same 60s cycle, fading out earlier */
