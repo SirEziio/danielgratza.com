@@ -202,7 +202,17 @@ export default function SolarSystem() {
     };
     const flagPop: number[] = new Array(PLANETS.length).fill(0);
     const flagShake: number[] = new Array(PLANETS.length).fill(0);
-    const conquestBonus = () => conquered.size * 30000;
+    /* Visit cadence tiers: eager scouts before the first conquest, a fast
+       fleet schedule after (this replaces the old per-planet −30s bonus —
+       scans and signals still subtract on top) */
+    const nextVisitBase = () =>
+      conquered.size === 0 ? 60000 + Math.random() * 30000 : 35000 + Math.random() * 15000;
+    /* Scouting — hovering a NEW planet card before the first conquest
+       hurries the scouts along */
+    const scouted = new Set<number>();
+    /* The next arrival, pre-rolled 5s early so the edge arrow can point
+       exactly where the ship will enter */
+    const pendingSpawn = { ready: false, target: 0, x: 0, y: 0, vx: 0, vy: 0 };
     let carrying = false; // ufo or rescued kitten currently on the cursor
     let holding = false;  // ship frozen under an empty-handed hover
     let lastDropT = -1e9; // suppresses planet links right after a drop
@@ -1443,6 +1453,14 @@ export default function SolarSystem() {
       hovering = !!hover || probes.nh.hov || probes.hal.hov || carrying || holding; // pauses the drift next frame
       hoverIdx = hover ? hover.i : -1; // orbit highlight next frame
       if (hover) visited.add(hover.i); // Grand Tour progress
+      /* Scouting: every newly inspected planet hurries the fleet (−5s),
+         once per planet per visit — the wait is always gameable */
+      if (hover && !scouted.has(hover.i)) {
+        scouted.add(hover.i);
+        rewards.push({ x: hover.x, y: hover.y - hover.r - 14, born: now, text: "−5s", pi: hover.i });
+        if (ufo.active) ufo.scanMs += 5000;
+        else if (ufo.next > 0) ufo.next = Math.max(now + 3000, ufo.next - 5000);
+      }
 
       /* The sun is clickable too (three clicks…) — show the same cursor */
       const overSun = !isTouch && Math.hypot(mouse.x - sunX, mouse.y - sunY) < sunR;
@@ -1848,23 +1866,19 @@ export default function SolarSystem() {
       /* The kitten flies on all displays again — after capping the raster
          size, its vector cost is negligible even at 4K */
       if (!reduceMotion) {
-        if (ufo.next === 0) ufo.next = now + 45000 + Math.random() * 45000;
-        if (!ufo.active && now > ufo.next) {
-          /* One continuous near-parabolic orbit: enter along the target
-             planet's bearing (so the inbound leg sweeps past it), whip
-             around the sun at low perihelion, and — as parabolic orbits
-             do — exit back out the same side it came from. */
-          ufo.active = true;
-          ufo.start = now;
-          ufo.mode = 0;
-          ufo.kittenAboard = true;
-          ufo.scanMs = 0;
+        if (ufo.next === 0) ufo.next = now + 20000 + Math.random() * 25000;
+
+        /* One continuous near-parabolic orbit: enter along the target
+           planet's bearing (so the inbound leg sweeps past it), whip
+           around the sun at low perihelion, and — as parabolic orbits
+           do — exit back out the same side it came from. */
+        const rollSpawn = () => {
           /* Science first: never re-scan a conquered world */
           const cand = PLANETS.map((_, idx) => idx).filter((idx) => !conquered.has(idx));
-          ufo.target = cand.length
+          const target = cand.length
             ? cand[Math.floor(Math.random() * cand.length)]
             : Math.floor(Math.random() * PLANETS.length);
-          const tgt0 = bodies[ufo.target];
+          const tgt0 = bodies[target];
           /* Conic aiming: solve the parabola's true anomaly at the entry
              radius and at the planet's radius, then rotate the entry bearing
              so the inbound leg crosses the planet's exact polar angle. */
@@ -1877,20 +1891,82 @@ export default function SolarSystem() {
           const nuP = -Math.acos(clamp((2 * q) / rP - 1, -1, 1));
           const side = Math.random() < 0.5 ? -1 : 1;
           const phiE = thP - side * (nuP - nuE);
-          ufo.x = Math.cos(phiE) * R;
-          ufo.y = Math.sin(phiE) * R;
+          const x = Math.cos(phiE) * R;
+          const y = Math.sin(phiE) * R;
           const v = Math.sqrt((2 * GM2) / R) * 1.005; // a hair above parabolic
           const E2 = (v * v) / 2 - GM2 / R;
           const vPeri = Math.sqrt(2 * (E2 + GM2 / q));
           const vt = Math.min((q * vPeri) / R, v);
           const vr = -Math.sqrt(Math.max(v * v - vt * vt, 0));
-          const rx2 = ufo.x / R, ry2 = ufo.y / R;
-          ufo.vx = rx2 * vr - ry2 * vt * side;
-          ufo.vy = ry2 * vr + rx2 * vt * side;
+          const rx2 = x / R, ry2 = y / R;
+          return { target, x, y, vx: rx2 * vr - ry2 * vt * side, vy: ry2 * vr + rx2 * vt * side };
+        };
+
+        /* Pre-roll the arrival 5s out so the warning arrow knows the truth */
+        if (!ufo.active && ufo.next > 0 && !pendingSpawn.ready && ufo.next - now < 5000) {
+          Object.assign(pendingSpawn, rollSpawn(), { ready: true });
+        }
+
+        if (!ufo.active && now > ufo.next) {
+          const sp = pendingSpawn.ready ? { ...pendingSpawn } : rollSpawn();
+          pendingSpawn.ready = false;
+          ufo.active = true;
+          ufo.start = now;
+          ufo.mode = 0;
+          ufo.kittenAboard = true;
+          ufo.scanMs = 0;
+          ufo.target = sp.target;
+          ufo.x = sp.x;
+          ufo.y = sp.y;
+          ufo.vx = sp.vx;
+          ufo.vy = sp.vy;
           ufo.psx = 0;
           ufo.wasIn = false;
           ufo.passes = 0;
           ufo.touched = false;
+        }
+
+        /* Arrival warning — an arrow on the nearest edge, pointing along
+           the entry heading, with a live ETA. Last 5 seconds only. */
+        if (!ufo.active && pendingSpawn.ready && ufo.next > now && ufo.next - now < 5000) {
+          const [exs, eys] = toScreen(pendingSpawn.x, pendingSpawn.y);
+          const px4 = sunX + exs;
+          const py4 = sunY + eys;
+          const cxm = w / 2;
+          const cym = h / 2;
+          const dx4 = px4 - cxm;
+          const dy4 = py4 - cym;
+          const tEdge = Math.min(
+            dx4 !== 0 ? (w / 2 - 30) / Math.abs(dx4) : Infinity,
+            dy4 !== 0 ? (h / 2 - 30) / Math.abs(dy4) : Infinity,
+            1
+          );
+          const ax2 = cxm + dx4 * tEdge;
+          const ay2 = cym + dy4 * tEdge;
+          const [vxs, vys] = toScreen(pendingSpawn.vx, pendingSpawn.vy);
+          const va = Math.atan2(vys, vxs);
+          const pulse = 0.5 + 0.35 * (0.5 + 0.5 * Math.sin(now * 0.015));
+          ctx.save();
+          ctx.translate(ax2, ay2);
+          ctx.rotate(va);
+          ctx.fillStyle = ink(pulse);
+          ctx.beginPath();
+          ctx.moveTo(10, 0);
+          ctx.lineTo(-5, -6);
+          ctx.lineTo(-5, 6);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+          const inA = Math.atan2(cym - ay2, cxm - ax2); // inward, for the label
+          ctx.font = `700 10px ${bodyFont}`;
+          ctx.textAlign = "center";
+          ctx.fillStyle = ink(0.65);
+          ctx.fillText(
+            `${Math.max(1, Math.ceil((ufo.next - now) / 1000))}s`,
+            ax2 + Math.cos(inA) * 22,
+            ay2 + Math.sin(inA) * 22 + 3
+          );
+          ctx.textAlign = "left";
         }
         if (ufo.active) {
           const tgt = bodies[ufo.target];
@@ -1929,7 +2005,7 @@ export default function SolarSystem() {
             }));
             ufo.active = false;
             ufo.mode = 0;
-            ufo.next = now + Math.max(15000, 90000 + Math.random() * 120000 - conquestBonus() - ufo.scanMs); // a new ship takes time
+            ufo.next = now + Math.max(15000, nextVisitBase() + 15000 - ufo.scanMs); // a new ship takes a little extra time
           };
 
           if (ufo.mode !== 6 && nearCursor && cometFade2 >= 1) {
@@ -2076,7 +2152,7 @@ export default function SolarSystem() {
               now +
               (ufo.nextOverride > 0
                 ? ufo.nextOverride
-                : Math.max(15000, 120000 + Math.random() * 90000 - conquestBonus() - ufo.scanMs));
+                : Math.max(15000, nextVisitBase() - ufo.scanMs));
             ufo.nextOverride = 0;
           } else {
             /* Scan beam + expanding rings on the target — mid-flight */
@@ -2179,7 +2255,7 @@ export default function SolarSystem() {
                 lastDropT = performance.now();
                 wreck.active = false;
                 ufo.next = now + (wasNew
-                  ? Math.max(15000, 90000 + Math.random() * 120000 - conquestBonus() - ufo.scanMs)
+                  ? Math.max(15000, nextVisitBase() - ufo.scanMs)
                   : 4000);
                 break;
               }

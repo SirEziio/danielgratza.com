@@ -218,7 +218,7 @@ export default function ChapterGallery({
         )}
 
         {current && (
-          <img
+          <img loading="lazy" decoding="async"
             key={current.src}
             src={current.src}
             alt=""
@@ -299,7 +299,7 @@ export default function ChapterGallery({
               background: "none",
             }}
           >
-            <img
+            <img loading="lazy" decoding="async"
               src={img.src}
               alt=""
               style={{

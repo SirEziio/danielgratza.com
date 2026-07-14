@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import Image from "next/image";
 import Navigation from "@/components/Navigation";
 import GridBackground from "@/components/GridBackground";
 import SolarSystem from "@/components/SolarSystem";
@@ -98,9 +99,12 @@ function FooterPhoto({
             boxShadow: `0 24px 64px rgba(0,0,0,0.45), 0 0 0 1px ${ring}`,
             animation: glitching ? "photoGlitch 0.45s steps(4, end) forwards" : "none",
           }}>
-            <img
+            <Image
               src="/images/daniel.png"
               alt="Daniel Gratza"
+              width={400}
+              height={400}
+              sizes="200px"
               style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
             />
           </div>
@@ -577,11 +581,20 @@ export default function HomePage() {
                     ...(isMobile ? walkin(isSeen, PHOTO_DELAY) : photoSlide(isSeen, i % 2 === 0)),
                   }}
                 >
-                  <a href={`/case-study/${study.slug}`} onClick={() => sessionStorage.setItem("caseStudySource", "home")} style={{ display: "block" }}>
-                    <img
-                      src={study.coverImage}
+                  <a
+                    href={`/case-study/${study.slug}`}
+                    onClick={() => sessionStorage.setItem("caseStudySource", "home")}
+                    className="skeleton-bg"
+                    style={{ display: "block", aspectRatio: "16/10" }}
+                  >
+                    <Image
+                      src={study.coverImage || "/images/cs-arma4-cover.png"}
                       alt={study.title}
                       className="cs-cover-img"
+                      width={1600}
+                      height={1000}
+                      sizes="(max-width: 840px) 92vw, 46vw"
+                      loading="lazy"
                       style={{
                         width: "100%",
                         height: "auto",

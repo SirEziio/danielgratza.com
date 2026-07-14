@@ -54,7 +54,7 @@ function OrgCircle({ color, initials, scaled, iconSrc }: { color: string; initia
       }}
     >
       {iconSrc ? (
-        <img
+        <img loading="lazy" decoding="async"
           src={iconSrc}
           alt=""
           style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}

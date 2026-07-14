@@ -539,7 +539,7 @@ function MetaStrip({ study }: { study: CaseStudy }) {
                 return (
                   <div key={tool} style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
                     {icon && (
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={icon}
                         alt={tool}
                         width={16}
@@ -633,12 +633,17 @@ function OverviewSection({ chapters, study }: { chapters: CaseStudyChapter[]; st
                 loop
                 muted
                 playsInline
+                preload="metadata"
                 style={{ width: "100%", height: "auto", display: "block" }}
               />
             ) : (
-              <img
+              <Image
                 src={study.introImage || study.coverImage || "/images/cs-arma4-cover.png"}
                 alt="Case study detail"
+                width={1600}
+                height={1000}
+                sizes="(max-width: 840px) 92vw, 46vw"
+                priority
                 style={{ width: "100%", height: "auto", display: "block" }}
               />
             )}
@@ -981,7 +986,7 @@ function SolutionSection({ study, chapters }: { study: CaseStudy; chapters: Case
 
         {/* Hero solution image — natural aspect ratio, content width */}
         <FadeUp delay={80}>
-          <img
+          <img loading="lazy" decoding="async"
             src={study.solutionImage || study.coverImage || "/images/cs-arma4-cover.png"}
             alt="Final design"
             style={{ width: "100%", height: "auto", display: "block", marginBottom: 48 }}
@@ -1160,7 +1165,7 @@ function ReflectionSection({ chapters, study }: { chapters: CaseStudyChapter[]; 
 
         {/* Secondary image — natural aspect ratio */}
         <FadeUp delay={200}>
-          <img
+          <img loading="lazy" decoding="async"
             src={study.solutionImage || study.coverImage || "/images/cs-arma4-cover.png"}
             alt="Final design detail"
             style={{

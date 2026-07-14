@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Navigation from "@/components/Navigation";
 import GridBackground from "@/components/GridBackground";
 import { portfolioItems, PortfolioItem } from "@/lib/data";
@@ -69,9 +70,13 @@ function GlassCard({ project, index }: { project: PortfolioItem; index: number }
         }}
       >
         {project.coverImage ? (
-          <img
+          <Image
             src={project.coverImage}
             alt={project.title}
+            width={840}
+            height={378}
+            sizes="(max-width: 840px) 92vw, 420px"
+            loading="lazy"
             style={{
               position: "absolute",
               bottom: 0,
@@ -114,7 +119,7 @@ function GlassCard({ project, index }: { project: PortfolioItem; index: number }
             }}
           >
             {project.iconSrc ? (
-              <img
+              <img loading="lazy" decoding="async"
                 src={project.iconSrc}
                 alt=""
                 style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}

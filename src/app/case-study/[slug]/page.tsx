@@ -497,7 +497,7 @@ function ImageThumb({
         (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
       }}
     >
-      <img
+      <img loading="lazy" decoding="async"
         src={src}
         alt=""
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
@@ -772,7 +772,7 @@ function HeroPanel({
         {/* Logo — bare, no box */}
         <div style={{ marginBottom: 28, flexShrink: 0 }}>
           {iconSrc ? (
-            <img src={iconSrc} alt="" style={{ width: 52, height: 52, objectFit: "contain", display: "block" }} />
+            <img loading="lazy" decoding="async" src={iconSrc} alt="" style={{ width: 52, height: 52, objectFit: "contain", display: "block" }} />
           ) : (
             <span className="font-caslon" style={{ fontSize: 28, color: "var(--ink)", lineHeight: 1 }}>
               {iconLetter}
@@ -834,7 +834,7 @@ function HeroPanel({
               boxShadow: "0 20px 80px rgba(0,0,0,0.12)",
             }}
           >
-            <img
+            <img loading="lazy" decoding="async"
               src={coverImage}
               alt={title}
               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}

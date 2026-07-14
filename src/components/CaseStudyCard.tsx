@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { CaseStudy } from "@/lib/types";
 
 interface Props {
@@ -38,25 +39,22 @@ export default function CaseStudyCard({ study, variant = "light" }: Props) {
     >
       {/* Thumbnail */}
       <div
+        className="skeleton-bg"
         style={{
           width: "100%",
           paddingBottom: "62%",
           position: "relative",
-          background: isDark ? "#2A2A2A" : "#DAD6CE",
           overflow: "hidden",
         }}
       >
         {study.thumbnail && (
-          <img
+          <Image
             src={study.thumbnail}
             alt={study.title}
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
+            fill
+            sizes="(max-width: 840px) 92vw, 420px"
+            loading="lazy"
+            style={{ objectFit: "cover" }}
             onError={(e) => ((e.currentTarget as HTMLImageElement).style.display = "none")}
           />
         )}

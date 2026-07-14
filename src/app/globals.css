@@ -272,6 +272,32 @@ main {
   .bio-crawl-text { animation: none; transform: none; opacity: 1; }
 }
 
+/* ─── Image loading skeleton — shimmer behind lazy images ─────── */
+.skeleton-bg {
+  background: linear-gradient(
+    100deg,
+    rgba(36, 36, 36, 0.05) 40%,
+    rgba(36, 36, 36, 0.11) 50%,
+    rgba(36, 36, 36, 0.05) 60%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+html.dark .skeleton-bg {
+  background: linear-gradient(
+    100deg,
+    rgba(225, 223, 216, 0.05) 40%,
+    rgba(225, 223, 216, 0.11) 50%,
+    rgba(225, 223, 216, 0.05) 60%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+@keyframes skeletonShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 /* Ephemeris info card — hidden until the icon is hovered (or tapped) */
 .ephem-card {
   position: absolute;

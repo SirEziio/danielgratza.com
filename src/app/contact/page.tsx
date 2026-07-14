@@ -447,7 +447,7 @@ export default function ContactPage() {
                     style={{ position: "relative", width: "100%", paddingTop: "56.79%", overflow: "hidden", cursor: "pointer" }}
                   >
                     {/* Outline map — fades out on hover; inverted in dark mode so lines read white */}
-                    <img
+                    <img loading="lazy" decoding="async"
                       src="/images/contact/map.svg"
                       alt="Czech Republic map"
                       style={{
@@ -458,7 +458,7 @@ export default function ContactPage() {
                       }}
                     />
                     {/* Filled map on hover — dark map in light mode, inverted (white) in dark mode */}
-                    <img
+                    <img loading="lazy" decoding="async"
                       src="/images/contact/map-dark.svg"
                       alt="" aria-hidden
                       style={{
