@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Navigation from "@/components/Navigation";
 import GridBackground from "@/components/GridBackground";
+import { RadarBlips } from "@/components/SiteFooter";
 import SolarSystem from "@/components/SolarSystem";
 import MouseScrollIcon from "@/components/MouseScrollIcon";
 import { caseStudies, portfolioItems } from "@/lib/data";
@@ -617,6 +618,7 @@ export default function HomePage() {
         <div
           className="snap-section"
           data-idx={footerIdx}
+          data-site-footer
           style={{
             background: "#1a1a1a",
             display: "flex",
@@ -633,7 +635,7 @@ export default function HomePage() {
           </div>
 
           {/* Radar sweep — slow rotating conic gradient */}
-          <div style={{
+          <div data-radar-sweep style={{
             position: "absolute",
             left: "50%", top: "50%",
             width: "max(150vw, 150vh)", height: "max(150vw, 150vh)",
@@ -659,6 +661,9 @@ export default function HomePage() {
               animation: isFooterSeen ? "footerGlowPulse 4s ease-in-out 1.8s infinite" : "none",
             }} />
           </div>
+
+          {/* Radar contacts — the sweep occasionally finds something */}
+          <RadarBlips active={isFooterSeen} />
 
           {/* Decorative + markers at fixed positions */}
           {[

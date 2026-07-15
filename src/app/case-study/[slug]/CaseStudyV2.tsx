@@ -9,6 +9,7 @@ import GridBackground from "@/components/GridBackground";
 import { CaseStudy, CaseStudyChapter } from "@/lib/types";
 import { PortfolioItem, caseStudies } from "@/lib/data";
 import PillCTA from "@/components/PillCTA";
+import SiteFooter from "@/components/SiteFooter";
 import ChapterGallery, { GalleryChapter } from "@/components/ChapterGallery";
 
 /* ─────────────────────────────────────────────────────────────────
@@ -1460,6 +1461,9 @@ export default function CaseStudyV2({
 
         {/* 8 — Next project */}
         <NextProjectSection study={study} />
+
+        {/* Site-wide footer */}
+        <SiteFooter />
       </main>
 
       {galleryOpen && galleryChapters.length > 0 && (

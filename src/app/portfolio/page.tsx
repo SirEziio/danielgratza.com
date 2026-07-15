@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Navigation from "@/components/Navigation";
 import GridBackground from "@/components/GridBackground";
+import SiteFooter from "@/components/SiteFooter";
 import { portfolioItems, PortfolioItem } from "@/lib/data";
 
 function GlassCard({ project, index }: { project: PortfolioItem; index: number }) {
@@ -285,6 +286,9 @@ export default function PortfolioPage() {
           ))}
         </div>
       </div>
+
+      {/* Site-wide footer */}
+      <SiteFooter />
     </>
   );
 }

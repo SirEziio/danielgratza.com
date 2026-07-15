@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Jost, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import FloatingCTA from "@/components/FloatingCTA";
 
 // Closest free web match to Futura PT
 const jost = Jost({
@@ -48,7 +49,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${jost.variable} ${cormorant.variable}`} suppressHydrationWarning>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          <FloatingCTA />
+        </ThemeProvider>
       </body>
     </html>
   );

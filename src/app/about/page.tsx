@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Navigation from "@/components/Navigation";
 import GridBackground from "@/components/GridBackground";
+import SiteFooter from "@/components/SiteFooter";
 import { useTheme } from "@/components/ThemeProvider";
 
 /* ─────────────────────────────────────────────────────────────
@@ -543,6 +544,9 @@ export default function AboutPage() {
         </div>
       </div>
       </div>
+
+      {/* Site-wide footer */}
+      <SiteFooter />
     </>
   );
 }
